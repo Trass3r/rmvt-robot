@@ -1,103 +1,103 @@
-%PLOT	Graphical robot animation
+%PLOT Graphical robot animation
 %
 %	PLOT(ROBOT, Q)
 %	PLOT(ROBOT, Q, options)
 %
-%	Displays a graphical animation of a robot based on the
-%	kinematic model.  A stick figure polyline joins the origins of
-%	the link coordinate frames.
-%	The robot is displayed at the joint angle Q, or if a matrix it is
-%	animated as the robot moves along the trajectory.
+% Displays a graphical animation of a robot based on the
+% kinematic model.  A stick figure polyline joins the origins of
+% the link coordinate frames.
+% The robot is displayed at the joint angle Q, or if a matrix it is
+% animated as the robot moves along the trajectory.
 %
-%	The graphical robot object holds a copy of the robot object and
-%	the graphical element is tagged with the robot's name (.name method).
-%	This state also holds the last joint configuration 
-%	drawn (.q method).
+% The graphical robot object holds a copy of the robot object and
+% the graphical element is tagged with the robot's name (.name method).
+% This state also holds the last joint configuration 
+% drawn (.q method).
 %
-%	If no robot of this name is currently displayed then a robot will
-%	be drawn in the current figure.  If the robot already exists then
-%	that graphical model will be found and moved.
+% If no robot of this name is currently displayed then a robot will
+% be drawn in the current figure.  If the robot already exists then
+% that graphical model will be found and moved.
 %
-%	MULTIPLE VIEWS OF THE SAME ROBOT
-%	If one or more plots of this robot already exist then these will all
-%	be moved according to the argument Q.
+% MULTIPLE VIEWS OF THE SAME ROBOT
+% If one or more plots of this robot already exist then these will all
+% be moved according to the argument Q.
 %
-%	MULTIPLE ROBOTS
-%	Multiple robots can be displayed in the same plot, by using "hold on"
-%	before calls to plot(robot).
+% MULTIPLE ROBOTS
+% Multiple robots can be displayed in the same plot, by using "hold on"
+% before calls to plot(robot).
 %
-%	options is a list of any of the following:
-%	'workspace' [xmin, xmax ymin ymax zmin zmax]
-%	'perspective' 'ortho'	controls camera view mode
-%	'erase' 'noerase'	controls erasure of arm during animation
-%	'base' 'nobase'		controls display of base 'pedestal'
-%	'loop' 'noloop'		controls display of base 'pedestal'
-%	'wrist' 'nowrist'	controls display of wrist
-%	'name', 'noname'	display the robot's name near the first joint
-%	'shadow' 'noshadow'	controls display of shadow
-%	'xyz' 'noa'		wrist axis label
-%	'joints' 'nojoints'	controls display of joints
-%	'mag' scale		annotation scale factor
+% options is a list of any of the following:
+% 'workspace' [xmin, xmax ymin ymax zmin zmax]
+% 'perspective' 'ortho'		controls camera view mode
+% 'erase' 'noerase'		controls erasure of arm during animation
+% 'base' 'nobase'		controls display of base 'pedestal'
+% 'loop' 'noloop'		controls display of base 'pedestal'
+% 'wrist' 'nowrist'		controls display of wrist
+% 'name', 'noname'		display the robot's name 
+% 'shadow' 'noshadow'		controls display of shadow
+% 'xyz' 'noa'			wrist axis label
+% 'joints' 'nojoints'		controls display of joints
+% 'mag' scale			annotation scale factor
 %
-%	The options come from 3 sources and are processed in the order:
-%	1. Cell array of options returned by the function PLOTBOTOPT
-%	2. Cell array of options returned by the .plotopt method of the
-%	   robot object.  These are set by the .plotopt method.
-%	3. List of arguments in the command line.
+% The options come from 3 sources and are processed in the order:
+% 1. Cell array of options returned by the function PLOTBOTOPT
+% 2. Cell array of options returned by the .plotopt method of the
+%    robot object.  These are set by the .plotopt method.
+% 3. List of arguments in the command line.
 %
 % GRAPHICAL ANNOTATIONS:
 %
-%	The basic stick figure robot can be annotated with
-%		shadow on the floor
-%		XYZ wrist axes and labels
-%		joint cylinders and axes
+% The basic stick figure robot can be annotated with
+%  shadow on the floor
+%  XYZ wrist axes and labels
+%  joint cylinders and axes
 %
-%	All of these require some kind of dimension and this is determined
-%	using a simple heuristic from the workspace dimensions.  This dimension
-%	can be changed by setting the multiplicative scale factor using the
-%	'mag' option above.
+% All of these require some kind of dimension and this is determined
+% using a simple heuristic from the workspace dimensions.  This dimension
+% can be changed by setting the multiplicative scale factor using the
+% 'mag' option above.
 %
 % GETTING GRAPHICAL ROBOT STATE:
-%	q = PLOT(ROBOT)
-%	Returns the joint configuration from the state of an existing 
-%	graphical representation of the specified robot.  If multiple
-%	instances exist, that of the first one returned by findobj() is
-%	given.
-
+% q = PLOT(ROBOT)
+% Returns the joint configuration from the state of an existing 
+% graphical representation of the specified robot.  If multiple
+% instances exist, that of the first one returned by findobj() is
+% given.
 %
-%	See also PLOTBOTOPT, DRIVEBOT, FKINE, ROBOT.
+% See also: PLOTBOTOPT, DRIVEBOT, FKINE, ROBOT.
 
-%	Copright (C) Peter Corke 1993
 
 % HANDLES:
 %
 %  A robot comprises a bunch of individual graphical elements and these are 
 % kept in a structure which can be stored within the .handle element of a
 % robot object.
-%	h.robot		the robot stick figure
-%	h.shadow	the robot's shadow
-%	h.x		wrist vectors
-%	h.y
-%	h.z
-%	h.xt		wrist vector labels
-%	h.yt
-%	h.zt
+% h.robot		the robot stick figure
+% h.shadow	the robot's shadow
+% h.x		wrist vectors
+% h.y
+% h.z
+% h.xt		wrist vector labels
+% h.yt
+% h.zt
 %
 %  The plot function returns a new robot object with the handle element set.
 %
 % For the h.robot object we additionally:
-%	save this new robot object as its UserData
-%	tag it with the name field from the robot object
+% save this new robot object as its UserData
+% tag it with the name field from the robot object
 %
 %  This enables us to find all robots with a given name, in all figures,
 % and update them.
 
 % MOD.HISTORY
-%	12/94	make axis scaling adjust to robot kinematic params
-%	4/99	use objects
-%	2/01	major rewrite, axis names, drivebot, state etc.
+% 12/94	make axis scaling adjust to robot kinematic params
+% 4/99	use objects
+% 2/01	major rewrite, axis names, drivebot, state etc.
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
 
-%	Copyright (C) Peter Corke 1999
 function rnew = plot(robot, tg, varargin)
 
 	%

@@ -1,7 +1,12 @@
-%	robot objects can be multiplied r1*r2 which is mechanically equivalent
-%	to mounting robot r2 on the end of robot r1.
+%MTIMES Multiply robot objects
 %
-%	Copyright (C) Peter Corke 1999
+% Robot objects can be multiplied r1*r2 which is mechanically equivalent
+% to concatenating the two robots, or mounting robot r2 on the end of robot r1.
+
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function r2 = mtimes(r, l)
 
 	if ~isa(r, 'robot')

@@ -1,8 +1,10 @@
-function s = char(r)
-%
-% render a string representation of the robot parameters
-%       Copyright (C) Peter Corke 1999
+%CHAR String representation of robot parametesrs
 
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
+function s = char(r)
 
 	% build a configuration string
 	rp = [];

@@ -1,4 +1,4 @@
-%SUBSREF	subscript reference methods on a ROBOT object
+%SUBSREF Reference methods on a ROBOT object
 %
 %	ROBOT.n			return number of links
 %	ROBOT.link		return cell array of link objects
@@ -7,16 +7,26 @@
 %	ROBOT.tool 		return homog xform of robot tool
 %	ROBOT.qlim 		return joint limit matrix
 %	ROBOT.offset 		return joint offset vector
+%	ROBOT.mdh		return MDH convention boolean (0=DH, 1=MDH)
+%
 %	ROBOT.islimit 		return joint limit boolean vector
 %
-%	ROBOT.name 		return name
+%	ROBOT.name		return name of robot
 %	ROBOT.manuf		return who built it
 %	ROBOT.comment		return general comment
+%
+%	ROBOT.plotopt 		return options for plot(robot)
+%	ROBOT.lineopt 		return line drawing option string for links
+%	ROBOT.shadowopt 	return line drawing option string for shadow
+%	ROBOT.handle		return graphics handles in object
+%	ROBOT.q 		return joint angles for plot(robot)
 %
 %	ROBOT.dh		return legacy DH matrix
 %	ROBOT.dyn		return legacy DYN matrix
 
-%	Copyright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1999-2002, by Peter I. Corke
 
 function v = subsref(r, s)
 
@@ -29,7 +39,19 @@ function v = subsref(r, s)
 
 	el = char(s(1).subs);
 	switch el,
-	case 'link',
+	%%%%%%%%% retrieve robot parameters
+	case 'n',
+		v = r.n;
+	case 'gravity'
+		v = r.gravity;
+	case 'tool'
+		v = r.tool;
+	case 'base'
+		v = r.base;
+	case 'mdh',
+		v = r.mdh;
+
+	case {'link', 'links'},
 		if length(s) == 1,
 			v = r.link;
 		elseif s(2).type == '{}'
@@ -52,6 +74,16 @@ function v = subsref(r, s)
 		for i=1:r.n,
 			v = [v; L{i}.qlim];
 		end
+
+	%%%%%%%%% descriptive strings
+	case 'name',
+		v = r.name;
+	case 'manuf',
+		v = r.manuf;
+	case 'comment',
+		v = r.comment;
+
+	%%%%%%%%% joint limit test
 	case 'islimit',
 		L = r.link;
 		if s(2).type  ~= '()'
@@ -65,22 +97,13 @@ function v = subsref(r, s)
 		for i=1:r.n,
 			v = [v; L{i}.islimit(q(i))];
 		end
-	case 'n',
-		v = r.n;
-	case 'name',
-		v = r.name;
+	%%%%%%%%% legacy DH/DYN support
 	case 'dh',
 		v = rdh(r);
 	case 'dyn'
 		v = rdyn(r);
-	case 'gravity'
-		v = r.gravity;
-	case 'tool'
-		v = r.tool;
-	case 'base'
-		v = r.base;
-	case 'mdh',
-		v = r.mdh;
+
+	%%%%%%%%% graphics support
 	case 'q',
 		v = r.q;
 	case 'plotopt',

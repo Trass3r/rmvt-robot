@@ -1,22 +1,27 @@
-%ROBOT	robot object constructor
+%ROBOT Robot object constructor
 %
-%	ROBOT
+%	ROBOT			create a ROBOT object with no links
 %	ROBOT(robot)		create a copy of an existing ROBOT object
 %	ROBOT(robot, LINK)	replaces links for robot object
 %	ROBOT(LINK, ...)	create from a cell array of LINK objects
-%	ROBOT(DH, ...)		create from legacy DYN matrix
+%	ROBOT(DH, ...)		create from legacy DH matrix
 %	ROBOT(DYN, ...)		create from legacy DYN matrix
 %
-%	optional trailing arguments are:
-%		Name			robot type or name
-%		Manufacturer		who built it
-%		Comment			general comment
+% Optional trailing arguments are:
+% 	Name			robot type or name
+% 	Manufacturer		who built it
+% 	Comment			general comment
 %
-%  If the legacy matrix forms are used the default name is the workspace
-% variable that held the data.
+% If the legacy matrix forms are used the default name is the workspace
+% matrix that held the data.
+%
+% See also: LINK.
 
 
-%	Copyright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function r = robot(L, a1, a2, a3)
 
 	if nargin == 0
