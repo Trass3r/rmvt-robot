@@ -4,12 +4,16 @@
 % 	TR = EUL2TR(PHI, THETA, PSI)
 %
 % Returns a homogeneous tranformation for the specified Euler angles.  These 
-% correspond to rotations about the Z, X, Z axes respectively.
+% correspond to rotations about the Z, Y, Z axes respectively.
 %
 % See also: TR2EUL, RPY2TR
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 11:47:12  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.4 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function r = eul2tr(phi, theta, psi)
