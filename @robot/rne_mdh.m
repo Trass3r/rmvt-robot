@@ -1,44 +1,48 @@
-%MRNE	Compute inverse dynamics via recursive Newton-Euler formulation
+%RNE_MDH Compute inverse dynamics via recursive Newton-Euler formulation
 %
-%	TAU = MRNE(ROBOT, Q, QD, QDD)
-%	TAU = MRNE(ROBOT, [Q QD QDD])
+%	TAU = RNE(ROBOT, Q, QD, QDD)
+%	TAU = RNE(ROBOT, [Q QD QDD])
 %
-%	Returns the joint torque required to achieve the specified joint position,
-%	velocity and acceleration state.
+% Returns the joint torque required to achieve the specified joint position,
+% velocity and acceleration state.
 %
-%	Gravity vector is an attribute of the robot object but this may be 
-%	overriden by providing a gravity acceleration	vector [gx gy gz].
+% Gravity vector is an attribute of the robot object but this may be 
+% overriden by providing a gravity acceleration vector [gx gy gz].
 %
-%	TAU = MRNE(ROBOT, Q, QD, QDD, GRAV)
-%	TAU = MRNE(ROBOT, [Q QD QDD], GRAV)
+%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV)
+%	TAU = RNE(ROBOT, [Q QD QDD], GRAV)
 %
-%	An external force/moment acting on the end of the manipulator may also be
-%	specified by a 6-element vector [Fx Fy Fz Mx My Mz].
+% An external force/moment acting on the end of the manipulator may also be
+% specified by a 6-element vector [Fx Fy Fz Mx My Mz].
 %
-%	TAU = MRNE(ROBOT, Q, QD, QDD, GRAV, FEXT)
-%	TAU = MRNE(ROBOT, [Q QD QDD], GRAV, FEXT)
+%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV, FEXT)
+%	TAU = RNE(ROBOT, [Q QD QDD], GRAV, FEXT)
 %
-%	where	Q, QD and QDD are row vectors of the manipulator state; pos, vel, and accel.
+% where Q, QD and QDD are row vectors of the manipulator state; pos, vel, 
+% and accel.
 %
-%	The torque computed also contains a contribution due to armature
-%	inertia.
+% The torque computed also contains a contribution due to armature
+% inertia.
 %
-%	See also ROBOT, FROBOT, ACCEL, GRAVLOAD, INERTIA.
+% RNE can be either an M-file or a MEX-file.  See the manual for details on
+% how to configure the MEX-file.  The M-file is a wrapper which calls either
+% RNE_DH or RNE_MDH depending on the kinematic conventions used by the robot
+% object.
 %
-%	Should be a MEX file.
-%  Uses notation similar to "Introduction to Robotics", J.J. Craig.
+% See also: ROBOT, ACCEL, GRAVLOAD, INERTIA.
 %
 
-%	Copyright (C) 1995 Peter Corke
+% Copyright (C) 1995-2002, by Peter I. Corke
 
 
 % MOD.HISTORY
 %       6/95    make use of passed in FEXT 
 %       4/95    fix bug in use of passed FEXT 
-%	11/96	bug for prismatic case 
-%	3/99	uses objects
+% 11/96	bug for prismatic case 
+% 3/99	uses objects
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 %
-%	Copyright (C) Peter Corke 1999
 
 function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 
