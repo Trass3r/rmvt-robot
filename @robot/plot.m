@@ -95,10 +95,14 @@
 % 4/99	use objects
 % 2/01	major rewrite, axis names, drivebot, state etc.
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/14 02:35:36  pic
+% Cleanup internal structure.
+% Improve the newplot behavious, not complete.
+%
 % Revision 1.2  2002/04/01 12:02:27  pic
 % General tidyup, comments, clarification, copyright, see also, RCS keys.
 %
-% $Revision: 1.3 $
+% $Revision: 1.4 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function rnew = plot(robot, tg, varargin)
@@ -147,11 +151,8 @@ function rnew = plot(robot, tg, varargin)
 	fh = get(0, 'Children');
 	if isempty(fh)
 		% no figures exist at all, create one
-		disp('no figures at all, creating one')
+		%disp('no figures at all, creating one')
 		figure
-		pause
-		axis(opt.dims);
-		pause
 		h = create_new_robot(robot, opt);
 
 		% save the handles in the passed robot object, and
@@ -160,10 +161,11 @@ function rnew = plot(robot, tg, varargin)
 		set(h.robot, 'Tag', robot.name);
 		set(h.robot, 'UserData', robot);
 	else 
-		ah = findobj(gcf, 'Type', 'Axes');
-		if isempty(ah),
+		axh = findobj(gcf, 'Type', 'Axes');
+		numchildren = length( get(gcf, 'Children') );
+		if isempty(axh) | (numchildren <= 1),
 			% empty figure, just created, use it
-			disp('Use empty figure')
+			%disp('Use empty figure')
 			axis(opt.dims);
 			h = create_new_robot(robot, opt);
 
@@ -172,6 +174,8 @@ function rnew = plot(robot, tg, varargin)
 			robot.handle = h;
 			set(h.robot, 'Tag', robot.name);
 			set(h.robot, 'UserData', robot);
+		else
+			%disp('reusing existing figure');
 		end
 	end
 
@@ -316,13 +320,12 @@ function h = create_new_robot(robot, opt)
 	% setup an axis in which to animate the robot
 	%
 	% handles not provided, create graphics
-disp('in creat_new_robot')
+	%disp('in creat_new_robot')
 	if ~ishold,
 		% if current figure has hold on, then draw robot here
 		% otherwise, create a new figure
-		disp('not hold')
-		disp('Create new figure')
-		figure
+		%disp('not hold')
+		%disp('Create new figure')
 		axis(opt.dims);
 	end
 	xlabel('X')
