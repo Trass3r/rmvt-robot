@@ -5,7 +5,6 @@
 %	LINK.theta = theta
 %	LINK.D = D
 %	LINK.sigma = sigma	1 if joint is prismatic
-%	LINK.mdh = mdh		1 if modified D&H parameters
 %
 %	LINK.I = 3x3 inertia matrix about link COG
 %	LINK.I = 6x1 inertia vector [Ixx Iyy Izz Ixy Iyz Ixz] about link COG
@@ -45,8 +44,6 @@ function l = subsasgn(l, s, v)
 		else
 			l.sigma = v;
 		end
-	case 'mdh',
-		l.mdh = v;
 	case 'G',
 		l.G = v;
 	case 'I',
