@@ -7,7 +7,6 @@
 % Homogeneous transformations
 %   eul2tr      - Euler angle to transform 
 %   oa2tr       - orientation and approach vector to transform 
-%   rot2tr      - extract 3 x 3 rotational submatrix from a transform 
 %   rotx        - transform for rotation about X-axis 
 %   roty        - transform for rotation about Y-axis 
 %   rotz        - transform for rotation about Z-axis 
@@ -24,7 +23,6 @@
 %   inv         - invert a quaternion 
 %   norm        - norm of a quaternion 
 %   plot        - display a quaternion as a 3D rotation
-%   q2tr        - quaternion to transform
 %   qinterp     - interpolate quaternions
 %   unit        - unitize a quaternion 
 %
@@ -77,4 +75,8 @@
 
 % Copyright (C) 2002, by Peter I. Corke
 %   $Log: not supported by cvs2svn $
-%   $Revision: 1.1 $
+%   Revision 1.1  2002/04/01 11:47:11  pic
+%   General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+%   references, clarification of functions.
+%
+%   $Revision: 1.2 $
