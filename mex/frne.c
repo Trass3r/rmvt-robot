@@ -39,7 +39,7 @@
  * is retained, and due credit given when the results are incorporated in
  * publised work.
  *
- * $Id: frne.c,v 1.2 2002-02-11 01:48:49 pic Exp $
+ * $Id: frne.c,v 1.3 2002-02-14 11:24:32 pic Exp $
  *
  */
 
@@ -252,7 +252,7 @@ mexFunction(
 
 
 	if (firstime == 0) {
-		mexPrintf("Fast RNE: (c) Peter Corke 2000\n");
+		mexPrintf("Fast RNE: (c) Peter Corke 2002\n");
 		firstime = 1;
 	}
 

@@ -12,7 +12,7 @@
  * \todo Is code for MDH prismatic case correct?
  * \todo Handle robot object base transform
  *
- * $Id: ne.c,v 1.3 2002-02-12 21:53:55 pic Exp $
+ * $Id: ne.c,v 1.4 2002-02-14 11:24:32 pic Exp $
  *
  */
 
@@ -30,8 +30,8 @@
 #include	"vmath.h"
 
 /*
-#define	DEBUG
 */
+#define	DEBUG
 
 /*
  * Bunch of macros to make the main code easier to read.  Dereference vectors
@@ -159,7 +159,7 @@ newton_euler (
 			 * calculate omega[j]
 			 */
 			if (j == 0)
-				*(OMEGA(j)) = zero;
+				*(OMEGA(j)) = qdv;
 			else
 				rot_trans_vect_mult (OMEGA(j), ROT(j), OMEGA(j-1));
 
@@ -167,7 +167,7 @@ newton_euler (
 			 * calculate alpha[j] 
 			 */
 			if (j == 0)
-				*(OMEGADOT(j)) = zero;
+				*(OMEGADOT(j)) = qddv;
 			else
 				rot_trans_vect_mult (OMEGADOT(j), ROT(j), OMEGADOT(j-1));
 
@@ -175,19 +175,24 @@ newton_euler (
 			 * compute acc[j]
 			 */
 			if (j == 0) {
-				t1 = *robot->gravity;
+				*ACC(j) = *robot->gravity;
 			} else {
-				vect_cross(&t1, OMEGA(j-1), PSTAR(j));
-				vect_cross(&t2, OMEGA(j-1), &t1);
+				vect_cross(&t1, OMEGADOT(j-1), PSTAR(j));
+
+				vect_cross(&t3, OMEGA(j-1), PSTAR(j));
+				vect_cross(&t2, OMEGA(j-1), &t3);
 				vect_add(&t1, &t1, &t2);
 				vect_add(&t1, &t1, ACC(j-1));
-			}
-			rot_trans_vect_mult(ACC(j), ROT(j), &t1);
+				rot_trans_vect_mult(ACC(j), ROT(j), &t1);
 
-			vect_cross(&t2, OMEGA(j), &qdv);
-			scal_mult(&t2, &t2, 2.0);
-			vect_add(ACC(j), ACC(j), &t2);
-			vect_add(ACC(j), ACC(j), &qddv);
+				rot_trans_vect_mult(&t2, ROT(j), OMEGA(j-1));
+				vect_cross(&t1, &t2, &qdv);
+				scal_mult(&t1, &t1, 2.0);
+				vect_add(ACC(j), ACC(j), &t1);
+
+				vect_add(ACC(j), ACC(j), &qddv);
+			}
+
 			break;
 		}
 

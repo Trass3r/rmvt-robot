@@ -1,32 +1,22 @@
-%CHECK script to compare M-file and MEX-file versions of RNE
-
-% load the model and remove non-linear friction
+fprintf('***************************************************************\n')
+fprintf('************************ Puma 560 *****************************\n')
+fprintf('***************************************************************\n')
 clear
 puma560
 puma560akb
-rdh = nofriction(p560, 'coulomb');
-rmdh = nofriction(p560m, 'coulomb');
+rdh = p560;
+rmdh = p560m;
 
-% number of trials
-n = 10;
+check1
 
-fprintf('************************ normal case *****************************\n')
-args = {};
-fprintf('DH:  ')
-check2(rdh, n, args);
-fprintf('MDH: ')
-check2(rmdh, n, args);
+fprintf('\n***************************************************************\n')
+fprintf('********************** Stanford arm ***************************\n')
+fprintf('***************************************************************\n')
 
-fprintf('************************ no gravity *****************************\n')
-args = {[0 0 0]};
-fprintf('DH:  ')
-check2(rdh, n, args);
-fprintf('MDH: ')
-check2(rmdh, n, args);
+clear
+stanford
+stanfordm
+rdh = stan;
+rdhm = stanm;
 
-fprintf('************************ ext force *****************************\n')
-args = {[0 0 9.81], [10 10 10 10 10 10]'};
-fprintf('DH:  ')
-check2(rdh, n, args);
-fprintf('MDH: ')
-check2(rmdh, n, args);
+check1
