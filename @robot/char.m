@@ -25,7 +25,7 @@ function s = char(r)
 		s = strcat(s, sprintf('\t\tmodified D&H parameters\n'));
 	end
 
-	s = strcat(s, sprintf('\n  alpha\t\t  A\t\t  theta\t\t  D\t\tR/P\n'));
+	s = strcat(s, sprintf('\n\n  alpha\t\t A\t\t theta\t\t D\t\tR/P\n'));
 	for i = 1:r.n,
-		s = strcat(s, sprintf('%s\n', char(r.link{i})));
+		s = strcat(s, sprintf('\n%s', char(r.link{i})));
 	end
