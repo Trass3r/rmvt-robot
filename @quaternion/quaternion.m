@@ -19,14 +19,25 @@
 % A quaternion can be considered as a rotation about a vector in space where
 %	q = cos (theta/2) sin(theta/2) <vx vy vz>
 % where <vx vy vz> is a unit vector.
+%
+% Various functions such as INV, NORM, UNIT and PLOT are overloaded for
+% quaternion objects.
+%
+% Arithmetic operators are also overloaded to allow quaternion multiplication,
+% division, exponentiaton, and quaternion-vector multiplication (rotation).
+%
+% SEE ALSO: QUATERNION/SUBSREF, QUATERNION/PLOT
 
 % CHANGES:
 % 12/01	order of arguments to theta,v form, fix bug in same
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/02 12:27:26  pic
+% Remove remnant CVS clash tag.
+%
 % Revision 1.4  2002/04/01 12:06:48  pic
 % General tidyup, help comments, copyright, see also, RCS keys.
 %
-% $Revision: 1.5 $
+% $Revision: 1.6 $
 %
 % Copyright (C) 1999-2002, by Peter I. Corke
 
@@ -39,13 +50,16 @@ function q = quaternion(a1, a2)
 		q.s = [];
 		q = class(q, 'quaternion');
 	elseif isa(a1, 'quaternion')
+%	Q = QUATERNION(q)		from another quaternion
 		q = a1;
 	elseif nargin == 1
 		if all(size(a1) == [3 3])
+%	Q = QUATERNION(R)		from a 3x3 or 4x4 matrix
 			q = quaternion( tr2q(a1) );
 		elseif all(size(a1) == [4 4])
 			q = quaternion( tr2q(a1(1:3,1:3)) );
 		elseif all(size(a1) == [1 4])
+%	Q = QUATERNION([s v1 v2 v3])	from 4 elements
 			q.s = a1(1);
 			q.v = a1(2:4);
 			q = class(q, 'quaternion');
@@ -53,6 +67,7 @@ function q = quaternion(a1, a2)
 			error('unknown dimension of input');
 		end
 	elseif nargin == 2
+%	Q = QUATERNION(v, theta)	from vector plus angle
 		q = unit( quaternion( [cos(a2/2) sin(a2/2)*unit(a1(:).')]) );
 	end
 
