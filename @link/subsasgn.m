@@ -1,4 +1,4 @@
-%SUBSASGN	assignment methods on a LINK object
+%SUBSASGN assignment methods on a LINK object
 %
 %	LINK.alpha = alpha	kinematic parameters
 %	LINK.A = A
@@ -21,7 +21,8 @@
 %	LINK.qlim = 2 x 1	joint limit matrix [lower upper]
 %	LINK.offset = q0	joint coordinate offset
 
-%	Copyright (C) 1999 Peter. I. Corke
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function l = subsasgn(l, s, v)
 
 	if s(1).type  ~= '.'

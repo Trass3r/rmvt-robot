@@ -1,6 +1,15 @@
-%DISPLAY	display the value of a LINK object
+%DISPLAY Display the value of a LINK object
+%
+% This method is invoked to display a link object by the Matlab interpreter,
+% and gives a terse single line description of link kinematics.
+%
+% If invoked with a second argument (value ignored) it will display a long
+% form description which includes all defined inertial parameters.
 
-%	Copright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) Peter Corke 1999
+
 function display(l, full)
 
 	disp(' ');

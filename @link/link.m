@@ -4,22 +4,22 @@
 % kinematics of the joint, rigid-body inertial parameters, motor and
 % transmission parameters.
 %
-%	LINK
-%	LINK(link)
+%	L = LINK
+%	L = LINK(link)
 %
-%	Create a default link, or a clone of the passed link.
+% Create a default link, or a clone of the passed link.
 %
 %	A = LINK(q)
 %
-%	Compute the link transform matrix for the link, given the joint
-%	variable q.
+% Compute the link transform matrix for the link, given the joint
+% variable q.
 %
-%	LINK([alpha A theta D])
-%	LINK([alpha A theta D sigma])
-%	LINK([alpha A theta D sigma offset])
-%	LINK([alpha A theta D], CONVENTION)
-%	LINK([alpha A theta D sigma], CONVENTION)
-%	LINK([alpha A theta D sigma offset], CONVENTION)
+%	L = LINK([alpha A theta D])
+% 	L =LINK([alpha A theta D sigma])
+% 	L =LINK([alpha A theta D sigma offset])
+% 	L =LINK([alpha A theta D], CONVENTION)
+% 	L =LINK([alpha A theta D sigma], CONVENTION)
+% 	L =LINK([alpha A theta D sigma offset], CONVENTION)
 %
 % If sigma or offset are not provided they default to zero.  Offset is a
 % constant amount added to the joint angle variable before forward kinematics
@@ -27,7 +27,8 @@
 % joint angle configuration.
 %
 % The optional CONVENTION argument is 'standard' for standard D&H parameters 
-% or 'modified' for modified D&H parameters.
+% or 'modified' for modified D&H parameters.  If not specified the default
+% 'standard'.
 % Handling the different kinematic conventions is now hidden within the LINK
 % object.
 %
@@ -37,15 +38,16 @@
 % For robot models prior to Toolbox release 5 (pre Matlab objects) the
 % following object constructors are provided.
 %
-%	LINK(DYN_ROW)	create from row of legacy DYN matrix
-%	LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
+% 	L = LINK(DYN_ROW)		create from row of legacy DYN matrix
+%	L = LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
 
 % MOD HISTORY
-% 3/99	modify to use on a LINK object
-% 6/99	fix the number of fields inthe object, v5.3 doesn't let me change them
-%	mod by  Francisco Javier Blanco Rodriguez <jblanco@abedul.usal.es>
-
-%	Copyright (C) 1999 Peter. I. Corke
+% 3/99 modify to use on a LINK object
+% 6/99 fix the number of fields inthe object, v5.3 doesn't let me change them
+% mod by  Francisco Javier Blanco Rodriguez <jblanco@abedul.usal.es>
+% $Log: not supported by cvs2svn $
+% $Revision: 1.4 $
+% Copyright (C) 1999-2002, by Peter I. Corke
 
 function l = link(dh, convention)
 

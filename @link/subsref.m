@@ -1,17 +1,18 @@
-%SUBSREF	subscript reference methods on a LINK object
+%SUBSREF Reference methods on a LINK object
 %
-%	LINK(q)	return link xform matrix
+%	LINK(q)		return link transform (A) matrix
 %
-%	LINK.alpha		return DH parameters
+%	LINK.alpha	return DH parameters
 %	LINK.A
 %	LINK.theta
 %	LINK.D
-%	LINK.sigma		return prismatic flag
+%	LINK.sigma	return prismatic flag
 %	LINK.RP		return 'R' or 'P'
-%	LINK.mdh		0 if standard D&H, else 1
-%	LINK.offset		joint variable offset
-%	LINK.qlim		joint variable limits [min max]
-%	LINK.islimit(q)		check if limit is exceeded: -1, 0, +1
+%	LINK.mdh	0 if standard D&H, else 1
+%
+%	LINK.offset	return joint variable offset
+%	LINK.qlim	return joint variable limits [min max]
+%	LINK.islimit(q)	return if limit is exceeded: -1, 0, +1
 %
 %	LINK.I		return 3x3 symmetric inertia matrix
 %	LINK.m		return link mass
@@ -22,11 +23,14 @@
 %	LINK.B		return viscous friction
 %	LINK.Tc		return viscous friction
 %
-%	LINK.dh	return legacy DH row
+%	LINK.dh		return legacy DH row
 %	LINK.dyn	return legacy DYN row
 
 
-%	Copyright (C) 1999 Peter. I. Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function v = subsref(l, s)
 	if s(1).type  == '()'
 		if l.mdh == 0,
@@ -45,6 +49,7 @@ function v = subsref(l, s)
 
 		el = char(s(1).subs);
 		switch el,
+		%%%%%%% kinematic parameters
 		case 'alpha',
 			v = l.alpha;
 		case 'A',
@@ -65,6 +70,18 @@ function v = subsref(l, s)
 			end
 		case 'mdh',
 			v = l.mdh;
+
+		%%%%%%% joint limit support
+		case 'qlim',
+			v = l.qlim;
+		case 'islimit',
+			if s(2).type  ~= '()'
+				error('expecting argument for islimit method');
+			end
+			q = s(2).subs{1};
+			v = (q > l.qlim(2)) - (q < l.qlim(1));
+
+		%%%%%%% dynamic parameters
 		case 'G',
 			v = l.G;
 		case 'I',
@@ -77,16 +94,10 @@ function v = subsref(l, s)
 			v = l.B;
 		case 'Tc',
 			v = l.Tc;
-		case 'qlim',
-			v = l.qlim;
-		case 'islimit',
-			if s(2).type  ~= '()'
-				error('expecting argument for islimit method');
-			end
-			q = s(2).subs{1};
-			v = (q > l.qlim(2)) - (q < l.qlim(1));
+
 		case 'm',
 			v = l.m;
+		%%%%%%% legacy parameters
 		case 'dh',
 			v = [l.alpha l.A l.theta l.D l.sigma];
 		case 'dyn',
@@ -113,7 +124,7 @@ function v = subsref(l, s)
 %
 %	Based on the standard Denavit and Hartenberg notation.
 
-%	Copright (C) Peter Corke 1993
+%	Copyright (C) Peter Corke 1993
 function t = linktran(a, b, c, d)
 
 	if nargin == 4,
@@ -164,7 +175,7 @@ function t = linktran(a, b, c, d)
 %
 %	Based on the modified Denavit and Hartenberg notation.
 
-%	Copright (C) Peter Corke 1993
+%	Copyright (C) Peter Corke 1993
 function t = mlinktran(a, b, c, d)
 
 	if nargin == 4,

@@ -1,8 +1,13 @@
-%SHOWLINK	show all parameters of LINK object
+%SHOWLINK show all parameters of LINK object
 %
 %	SHOWLINK(link)
+%
+% Display all parameters, including all defined inertial parameters, for the
+% link object.
+%
+% See also: ROBOT/SHOWLINK, LINK.
 
-%	Copyright (C) 1999 Peter. I. Corke
+% Copyright (C) 1999-2002, by Peter I. Corke
 
 function showlink(l)
 

@@ -1,16 +1,18 @@
-%FRICTION	compute friction torque on the LINK object
+%FRICTION Compute friction torque on the LINK object
 %
 %	TAU = FRICTION(LINK, QD)
 %
-%	Return the friction torque on the link moving at speed QD.  Depending
-%	on fields in the LINK object viscous and/or Coulomb friction
-%	are computed.
+% Return the friction torque on the link moving at speed QD.  Depending
+% on fields in the LINK object viscous and/or Coulomb friction
+% are computed.
 %
 
 % MOD HISTORY
-% 3/99	modify to use on a LINK object
+% 3/99 modify to use on a LINK object
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
-%	Copyright (C) 1999 Peter. I. Corke
+% Copyright (C) 1999-2002, by Peter I. Corke
 
 function  tau = friction(l, qd)
 	tau = 0.0;
