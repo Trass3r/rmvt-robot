@@ -39,7 +39,7 @@
  * is retained, and due credit given when the results are incorporated in
  * publised work.
  *
- * $Id: frne.c,v 1.4 2002-02-14 20:16:15 pic Exp $
+ * $Id: frne.c,v 1.5 2002-02-15 01:13:34 pic Exp $
  *
  */
 
@@ -47,6 +47,10 @@
 #include <math.h>
 
 #include	"frne.h"
+
+/*
+#define	DEBUG
+*/
 
 /* Input Arguments */
 #define	ROBOT_IN	prhs[0]
@@ -314,7 +318,7 @@ mexFunction(
 	fieldmap[FLD_THETA] = mstruct_getfield_number(link0, "theta");
 	fieldmap[FLD_D] = mstruct_getfield_number(link0, "D");
 	fieldmap[FLD_SIGMA] = mstruct_getfield_number(link0, "sigma");
-	fieldmap[FLD_OFFSET] = mstruct_getfield_number(link0, "sigma");
+	fieldmap[FLD_OFFSET] = mstruct_getfield_number(link0, "offset");
 	fieldmap[FLD_M] = mstruct_getfield_number(link0, "m");
 	fieldmap[FLD_R] = mstruct_getfield_number(link0, "r");
 	fieldmap[FLD_I] = mstruct_getfield_number(link0, "I");
@@ -369,6 +373,10 @@ mexFunction(
 				rot_mat(l, l->theta, MEL(q,p,j)+l->offset, robot.dhtype);
 				break;
 			}
+#ifdef	DEBUG
+			rot_print("R", &l->R);
+			vect_print("p*", &l->r);
+#endif
 		}
 
 		newton_euler(&robot, &tau[p], &qd[p], &qdd[p], fext, nq);
@@ -442,7 +450,6 @@ case MODIFIED:
 	}
 }
 
-#define	DEBUG
 /*************************************************************************
  * Matlab structure access methods
  *************************************************************************/
