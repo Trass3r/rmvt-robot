@@ -28,7 +28,10 @@
 
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 12:04:51  pic
+% General tidyup, comments, clarification, copyright, RCS keys, etc.
+%
+% $Revision: 1.4 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function v = subsref(l, s)
@@ -75,6 +78,9 @@ function v = subsref(l, s)
 		case 'qlim',
 			v = l.qlim;
 		case 'islimit',
+			if isempty(l.qlim)
+				error('no limits assigned to link')
+			end
 			if s(2).type  ~= '()'
 				error('expecting argument for islimit method');
 			end
