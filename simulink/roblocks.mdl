@@ -18,8 +18,8 @@ Library {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:20:33 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:20>"
+  LastModifiedDate	  "Mon Apr  8 11:39:30 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:23>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   AlgebraicLoopMsg	  "warning"
@@ -98,12 +98,12 @@ Library {
   }
   System {
     Name		    "roblocks"
-    Location		    [187, 133, 984, 479]
+    Location		    [320, 113, 1117, 459]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "lightBlue"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -852,14 +852,6 @@ Library {
       RTWFileNameOpts	      "Auto"
       MaskDescription	      "Robot inverse Jacobian for world coordinates.\n"
 "\nOnly valid for square jacobians (ie/ 6DOF robots)"
-      MaskPromptString	      "Robot object"
-      MaskStyleString	      "edit"
-      MaskTunableValueString  "on"
-      MaskEnableString	      "on"
-      MaskVisibilityString    "on"
-      MaskToolTipString	      "on"
-      MaskVariables	      "robot=@1;"
-      MaskInitialization      "n=robot.n;"
       MaskDisplay	      "text(0.4, 0.7, 'J', 'verticalAlignment', 'top',"
 " 'horizontalAlignment', 'left')\ntext(0.65, 0.65, '-1', 'verticalAlignment', "
 "'bottom', 'horizontalAlignment', 'right')\nport_label('input', 1, 'J');\nport"
@@ -868,7 +860,6 @@ Library {
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskIconUnits	      "normalized"
-      MaskValueString	      "robot"
       System {
 	Name			"ijacob"
 	Location		[236, 485, 600, 634]
@@ -894,7 +885,7 @@ Library {
 	  Name			  "inverse\njacobian"
 	  Position		  [110, 25, 170, 55]
 	  MATLABFcn		  "inv(u)"
-	  OutputDimensions	  "[6 6]"
+	  OutputDimensions	  "-1"
 	  OutputSignalType	  "auto"
 	  Output1D		  off
 	}
@@ -922,7 +913,7 @@ Library {
     }
     Block {
       BlockType		      SubSystem
-      Name		      "jacob0"
+      Name		      "jacob0\n"
       Ports		      [1, 1]
       Position		      [425, 165, 490, 235]
       BackgroundColor	      "red"
@@ -939,6 +930,7 @@ Library {
       MaskVisibilityString    "on"
       MaskToolTipString	      "on"
       MaskVariables	      "robot=@1;"
+      MaskInitialization      "n=robot.n;\n"
       MaskDisplay	      "text(0.4, 0.7, 'J', 'verticalAlignment', 'top',"
 " 'horizontalAlignment', 'left')\ntext(0.4, 0.7, '0', 'verticalAlignment', 'bo"
 "ttom', 'horizontalAlignment', 'right')\ntext(0.5, 0.2, robot.name,  'horizont"
@@ -950,8 +942,8 @@ Library {
       MaskIconUnits	      "normalized"
       MaskValueString	      "robot"
       System {
-	Name			"jacob0"
-	Location		[167, 513, 531, 662]
+	Name			"jacob0\n"
+	Location		[580, 550, 944, 699]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -972,9 +964,9 @@ Library {
 	Block {
 	  BlockType		  MATLABFcn
 	  Name			  "MATLAB Fcn"
-	  Position		  [105, 25, 165, 55]
+	  Position		  [100, 25, 160, 55]
 	  MATLABFcn		  "jacob0(robot,u)"
-	  OutputDimensions	  "[6 6]"
+	  OutputDimensions	  "[6 n]"
 	  OutputSignalType	  "auto"
 	  Output1D		  off
 	}
@@ -1012,14 +1004,14 @@ Library {
       RTWFcnNameOpts	      "Auto"
       RTWFileNameOpts	      "Auto"
       MaskDescription	      "Robot Jacobian for end-effector coordinates"
-      MaskPromptString	      "Robot object|World coordinate frame"
-      MaskStyleString	      "edit,checkbox"
-      MaskTunableValueString  "on,on"
-      MaskCallbackString      "|"
-      MaskEnableString	      "on,on"
-      MaskVisibilityString    "on,on"
-      MaskToolTipString	      "on,on"
-      MaskVariables	      "robot=@1;world=@2;"
+      MaskPromptString	      "Robot object"
+      MaskStyleString	      "edit"
+      MaskTunableValueString  "on"
+      MaskEnableString	      "on"
+      MaskVisibilityString    "on"
+      MaskToolTipString	      "on"
+      MaskVariables	      "robot=@1;"
+      MaskInitialization      "n=robot.n;"
       MaskDisplay	      "text(0.5, 0.4, 'J', 'verticalAlignment', 'top',"
 " 'horizontalAlignment', 'left')\ntext(0.5, 0.4, 'n', 'verticalAlignment', 'bo"
 "ttom', 'horizontalAlignment', 'right')\ntext(0.9, 0.9, robot.name,  'horizont"
@@ -1029,8 +1021,7 @@ Library {
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskIconUnits	      "normalized"
-      MaskValueString	      "robot|off"
-      MaskVariableAliases     ","
+      MaskValueString	      "robot"
       System {
 	Name			"jacobn"
 	Location		[167, 513, 531, 662]
@@ -1052,10 +1043,13 @@ Library {
 	  Interpolate		  on
 	}
 	Block {
-	  BlockType		  Fcn
-	  Name			  "jacob0"
-	  Position		  [105, 25, 165, 55]
-	  Expr			  "jacobn(robot, u(1))"
+	  BlockType		  MATLABFcn
+	  Name			  "MATLAB Fcn"
+	  Position		  [100, 25, 160, 55]
+	  MATLABFcn		  "jacobn(robot,u)"
+	  OutputDimensions	  "[6 n]"
+	  OutputSignalType	  "auto"
+	  Output1D		  off
 	}
 	Block {
 	  BlockType		  Outport
@@ -1066,7 +1060,7 @@ Library {
 	  InitialOutput		  "[]"
 	}
 	Line {
-	  SrcBlock		  "jacob0"
+	  SrcBlock		  "MATLAB Fcn"
 	  SrcPort		  1
 	  DstBlock		  "J"
 	  DstPort		  1
@@ -1074,7 +1068,7 @@ Library {
 	Line {
 	  SrcBlock		  "q"
 	  SrcPort		  1
-	  DstBlock		  "jacob0"
+	  DstBlock		  "MATLAB Fcn"
 	  DstPort		  1
 	}
       }

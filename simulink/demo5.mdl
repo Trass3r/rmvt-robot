@@ -24,8 +24,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:19:44 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:5>"
+  LastModifiedDate	  "Mon Apr  8 11:39:33 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:6>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   StartTime		  "0.0"
@@ -147,12 +147,12 @@ Model {
   }
   System {
     Name		    "demo5"
-    Location		    [216, 475, 1055, 858]
+    Location		    [505, 513, 1344, 896]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "white"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -276,7 +276,6 @@ Model {
       BackgroundColor	      "red"
       SourceBlock	      "roblocks/ijacob"
       SourceType	      ""
-      robot		      "p560"
     }
     Block {
       BlockType		      Reference
@@ -285,7 +284,7 @@ Model {
       Position		      [210, 55, 275, 125]
       BackgroundColor	      "red"
       SourceBlock	      "roblocks/jacob0"
-      SourceType	      ""
+      SourceType	      "Unknown"
       robot		      "p560"
     }
     Block {

@@ -24,8 +24,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:18:39 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:18>"
+  LastModifiedDate	  "Mon Apr  8 11:37:59 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:19>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   StartTime		  "0.0"
@@ -152,7 +152,7 @@ Model {
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "white"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -199,7 +199,7 @@ Model {
       DisplayStringWithTags   "Puma560 computed torque control\n%<Creator>\n%<"
 "LastModificationDate>"
       MaskDisplayString	      "Puma560 computed torque control\\npic\\n11-Feb-"
-"2002 12:48:29"
+"2002 14:18:39"
       HorizontalTextAlignment "Left"
       LeftAlignmentValue      "0.02"
       SourceBlockDiagram      "demo3"

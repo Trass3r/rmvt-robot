@@ -24,8 +24,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:17:48 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:18>"
+  LastModifiedDate	  "Mon Apr  8 11:38:02 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:19>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   StartTime		  "0.0"
@@ -152,7 +152,7 @@ Model {
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "white"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -210,7 +210,7 @@ Model {
       BlockCM		      "none"
       Frame		      "on"
       DisplayStringWithTags   "2-link demo\n%<Creator>\n%<ModifiedDate>"
-      MaskDisplayString	      "2-link demo\\npic\\nMon Feb 11 14:17:27 2002"
+      MaskDisplayString	      "2-link demo\\npic\\nMon Apr  8 11:37:04 2002"
       HorizontalTextAlignment "Left"
       LeftAlignmentValue      "0.02"
       SourceBlockDiagram      "demo2"
@@ -446,7 +446,6 @@ Model {
     Line {
       SrcBlock		      "Clock"
       SrcPort		      1
-      Points		      [120, 0]
       DstBlock		      "Mux"
       DstPort		      1
     }

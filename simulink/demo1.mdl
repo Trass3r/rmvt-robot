@@ -24,8 +24,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:19:48 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:19>"
+  LastModifiedDate	  "Mon Apr  8 11:39:40 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:20>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   StartTime		  "0.0"
@@ -147,12 +147,12 @@ Model {
   }
   System {
     Name		    "demo1"
-    Location		    [596, 565, 1096, 825]
+    Location		    [440, 590, 940, 850]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "white"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -180,8 +180,8 @@ Model {
       Frame		      "on"
       DisplayStringWithTags   "Simple dynamics demo\n%<Creator>\n%<LastModific"
 "ationDate>"
-      MaskDisplayString	      "Simple dynamics demo\\npic\\n11-Feb-2002 14:17:"
-"21"
+      MaskDisplayString	      "Simple dynamics demo\\npic\\n11-Feb-2002 14:19:"
+"49"
       HorizontalTextAlignment "Left"
       LeftAlignmentValue      "0.02"
       SourceBlockDiagram      "demo1"

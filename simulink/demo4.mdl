@@ -24,8 +24,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "pic"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 11 14:19:26 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:20>"
+  LastModifiedDate	  "Mon Apr  8 11:38:26 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:21>"
   ConfigurationManager	  "none"
   SimParamPage		  "Solver"
   StartTime		  "0.0"
@@ -152,7 +152,7 @@ Model {
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
     ScreenColor		    "white"
-    PaperOrientation	    "landscape"
+    PaperOrientation	    "portrait"
     PaperPositionMode	    "auto"
     PaperType		    "usletter"
     PaperUnits		    "inches"
@@ -192,7 +192,7 @@ Model {
       DisplayStringWithTags   "Torque feedforward control\n%<Creator>\n%<LastM"
 "odificationDate>"
       MaskDisplayString	      "Torque feedforward control\\npic\\n11-Feb-2002 "
-"11:36:03"
+"14:19:26"
       HorizontalTextAlignment "Left"
       LeftAlignmentValue      "0.02"
       SourceBlockDiagram      "demo4"
