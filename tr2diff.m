@@ -11,7 +11,7 @@
 % Second form returns the 6-element differential motion required to move
 % from T1 to T2 in base coordinates.
 %
-% See also: DIFF2TR, IKINE.
+% See also: DIFF2TR.
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 
@@ -19,7 +19,11 @@
 % 1/95	take mean of both values in the skew-symmetric matrix
 % 2/95	add two argument version as part of ikine() revamp
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:18  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 
 function d = tr2diff(t1, t2)
 	if nargin == 1,

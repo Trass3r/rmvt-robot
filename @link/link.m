@@ -41,17 +41,20 @@
 % 	L = LINK(DYN_ROW)		create from row of legacy DYN matrix
 %	L = LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
 %
-% SEE ALSO: SHOWLINK, ROBOT.
+% SEE ALSO: LINK/SUBSREF, LINK/SUBSASGN, SHOWLINK, ROBOT.
 
 % MOD HISTORY
 % 3/99 modify to use on a LINK object
 % 6/99 fix the number of fields inthe object, v5.3 doesn't let me change them
 % mod by  Francisco Javier Blanco Rodriguez <jblanco@abedul.usal.es>
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/14 10:20:42  pic
+% Added see also line.
+%
 % Revision 1.4  2002/04/01 12:04:51  pic
 % General tidyup, comments, clarification, copyright, RCS keys, etc.
 %
-% $Revision: 1.5 $
+% $Revision: 1.6 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function l = link(dh, convention)

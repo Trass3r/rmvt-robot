@@ -5,10 +5,14 @@
 % Returns a 6x6 Jacobian matrix to map differentials (joint velocity) between 
 % frames related by the homogeneous transform T.
 %
-% See also: TR2DIFF, DIFF2TR, DIFF
+% See also: TR2DIFF, DIFF2TR.
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:18  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function J = tr2jac(t)
