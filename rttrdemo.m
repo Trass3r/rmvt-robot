@@ -1,3 +1,6 @@
+% Copyright (C) 1993-2002, by Peter I. Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 echo on
 %
 % In the field of robotics there are many possible ways of representing 
@@ -24,7 +27,7 @@ echo on
 % to the world frame origin (0, 0, 0), that new origin would be given by
 
         t * [0 0 0 1]'
-pause	% any key to continue
+pause % any key to continue
 %
 % the orientation of the new coordinate frame may be expressed in terms of
 % Euler angles
@@ -32,7 +35,7 @@ pause	% any key to continue
 %
 % or roll/pitch/yaw angles
     tr2rpy(t)
-pause	% any key to continue
+pause % any key to continue
 %
 % It is important to note that tranform multiplication is in general not 
 % commutative as shown by the following example
@@ -40,5 +43,5 @@ pause	% any key to continue
     rotz(-pi/8) * rotx(pi/2)
 %
 %
-pause	% any key to continue
+pause % any key to continue
 echo off

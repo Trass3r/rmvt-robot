@@ -1,18 +1,20 @@
-%TRINTERP	Interpolate homogeneous transformations
+%TRINTERP Interpolate homogeneous transformations
 %
-%	T = TRINTERP(T0, T1, R)
+%	TR = TRINTERP(T0, T1, R)
 %
-%	Returns a homogeneous transform interpolation between T0 and T1 as
-%	R varies from 0 to 1.  Rotation is interpolated using quaternion
-%	spherical linear interpolation.
+% Returns a homogeneous transform interpolation between T0 and T1 as
+% R varies from 0 to 1.  Rotation is interpolated using quaternion
+% spherical linear interpolation.
 %
-%	See also CTRAJ, DRIVEPAR, QINTERP
+% See also: CTRAJ, QINTERP
 
-%	Copyright (C) 1993 Peter Corke
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 % MOD.HISTORY
-%	12/94	must have T0 as well as DP
-%	3/96	fixed bug: sin/cos(dp(4)) should be of dp(6)
+% 12/94	must have T0 as well as DP
+% 3/96	fixed bug: sin/cos(dp(4)) should be of dp(6)
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
 function t = trinterp(T0, T1, r)
 

@@ -1,5 +1,8 @@
+% Copyright (C) 1993-2002, by Peter I. Corke
 echo off
-%	6/99	fix syntax errors
+% 6/99	fix syntax errors
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 echo on
 %
 % Inverse dynamics computes the joint torques required to achieve the specified
@@ -17,20 +20,20 @@ echo on
 % of 5rad/s and accelerations of 1rad/s/s, the joint torques required are
 %
     tau = rne(p560, qz, 5*ones(1,6), ones(1,6))
-pause	% any key to continue
+pause % any key to continue
 
 % As with other functions the inverse dynamics can be computed for each point 
 % on a trajectory.  Create a joint coordinate trajectory and compute velocity 
 % and acceleration as well
-    t = [0:.056:2];			% create time vector
-    [q,qd,qdd] = jtraj(qz, qr, t);	% compute joint coordinate trajectory
-    tau = rne(p560, q, qd, qdd);	% compute inverse dynamics
+    t = [0:.056:2]; 		% create time vector
+    [q,qd,qdd] = jtraj(qz, qr, t); % compute joint coordinate trajectory
+    tau = rne(p560, q, qd, qdd); % compute inverse dynamics
 %
 %  Now the joint torques can be plotted as a function of time
     plot(t, tau(:,1:3))
     xlabel('Time (s)');
     ylabel('Joint torque (Nm)')
-pause	% any key to continue
+pause % any key to continue
 
 %
 % Much of the torque on joints 2 and 3 of a Puma 560 (mounted conventionally) is
@@ -39,7 +42,7 @@ pause	% any key to continue
     plot(t, taug(:,1:3))
     xlabel('Time (s)');
     ylabel('Gravity torque (Nm)')
-pause	% any key to continue
+pause % any key to continue
 
 % Now lets plot that as a fraction of the total torque required over the 
 % trajectory
@@ -51,7 +54,7 @@ pause	% any key to continue
     plot(t,[tau(:,3) taug(:,3)])
     xlabel('Time (s)');
     ylabel('Torque on joint 3 (Nm)')
-pause	% any key to continue
+pause % any key to continue
 %
 % The inertia seen by the waist (joint 1) motor changes markedly with robot 
 % configuration.  The function inertia() computes the manipulator inertia matrix
@@ -69,4 +72,4 @@ pause	% any key to continue
 % stability and high-performance in the face of plant variation.  In fact 
 % for this example the inertia varies by a factor of
     max(M11)/min(M11)
-pause	% any key to continue
+pause % any key to continue

@@ -1,21 +1,28 @@
-%PUMA560AKB	Load kinematic and dynamic data for a Puma 560 manipulator
+%PUMA560AKB Load kinematic and dynamic data for a Puma 560 manipulator
 %
-%	Defines the matrix 'p560' which describes the kinematic and dynamic
-%	characterstics of a Unimation Puma 560 manipulator using the data and
-%	conventions of
+%	PUMA560AKB
 %
-%		Armstrong, Khatib and Burdick 1986.
-%		"The Explicit Dynamic Model and Inertial Parameters of the Puma 560 Arm"
+% Defines the object 'p560m' in current workspace which describes the 
+% kinematic and dynamic characterstics of a Unimation Puma 560 manipulator 
+% modified DH conventions and using the data and conventions of:
 %
-%	expressed in modified D&H conventions.  
+%	Armstrong, Khatib and Burdick 1986.
+%	"The Explicit Dynamic Model and Inertial Parameters of the Puma 560 Arm"
+%
+% Also define the vector qz which corresponds to the zero joint
+% angle configuration, qr which is the vertical 'READY' configuration,
+% and qstretch in which the arm is stretched out in the X direction.
+%
+% See also: ROBOT, PUMA560, STANFORD, TWOLINK.
 
-%	Copright (C) Peter Corke 1990
+% Copyright (C) 1993-2002, by Peter I. Corke
 % CHANGES:
-%	12/01	convert to object format
-
+% 12/01	convert to object format
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 
 clear L
-%            alpha   A	    theta    D	sigma
+%            alpha   A     theta    D	sigma
 L{1} = link([0       0       0       0       0], 'mod');
 L{2} = link([-pi/2   0       0       0.2435  0], 'mod');
 L{3} = link([0       0.4318  0       -0.0934 0], 'mod');
@@ -31,20 +38,20 @@ L{5}.m = 0.34;
 L{6}.m = .09;
 
 %         rx      ry      rz
-L{1}.r = [0	  0	  0	];
+L{1}.r = [0   0	  0	];
 L{2}.r = [0.068   0.006   -0.016];
-L{3}.r = [0	  -0.070  0.014 ];
-L{4}.r = [0	  0	  -0.019];
-L{5}.r = [0	  0	  0	];
-L{6}.r = [0	  0	  .032	];
+L{3}.r = [0   -0.070  0.014 ];
+L{4}.r = [0   0	  -0.019];
+L{5}.r = [0   0	  0	];
+L{6}.r = [0   0	  .032	];
 
 %        Ixx     Iyy      Izz    Ixy     Iyz     Ixz
-L{1}.I = [0	  0	  0.35    0	  0	  0];
-L{2}.I = [.13	  .524    .539    0	  0	  0];
-L{3}.I = [.066    .0125   .066    0	  0	  0];
-L{4}.I = [1.8e-3  1.8e-3  1.3e-3  0	  0	  0];
-L{5}.I = [.3e-3   .3e-3   .4e-3   0	  0	  0];
-L{6}.I = [.15e-3  .15e-3  .04e-3  0	  0	  0];
+L{1}.I = [0   0	  0.35    0	  0	  0];
+L{2}.I = [.13   .524    .539    0	  0	  0];
+L{3}.I = [.066    .0125   .066    0   0	  0];
+L{4}.I = [1.8e-3  1.8e-3  1.3e-3  0   0	  0];
+L{5}.I = [.3e-3   .3e-3   .4e-3   0   0	  0];
+L{6}.I = [.15e-3  .15e-3  .04e-3  0   0	  0];
 
 L{1}.Jm =  291e-6;
 L{2}.Jm =  409e-6;
@@ -69,11 +76,9 @@ L{6}.G =  76.686;
 %
 % some useful poses
 %
-qz = [0 0 0 0 0 0];	% zero angles, L shaped pose
-qr = [0 -pi/2 pi/2 0 0 0];	% ready pose, arm up
-qstretch = [0 0 pi/2 0 0 0];	% horizontal along x-axis
+qz = [0 0 0 0 0 0]; % zero angles, L shaped pose
+qr = [0 -pi/2 pi/2 0 0 0]; % ready pose, arm up
+qstretch = [0 0 pi/2 0 0 0]; % horizontal along x-axis
 
 p560m = robot(L, 'Puma560-AKB', 'Unimation', 'AK&B');
 clear L
-%p560.name = 'Puma 560';
-%p560.manuf = 'Unimation';

@@ -1,24 +1,27 @@
-%TRANSL	Translational transform
+%TRANSL Create translational transform
 %
-%	T= TRANSL(X, Y, Z)
-%	T= TRANSL( [X Y Z] )
+%	TR = TRANSL(X, Y, Z)
+%	TR = TRANSL( [X Y Z] )
+%
+% Returns a homogeneous transformation representing a translation of X, Y
+% and Z.
 %
 %	[X Y Z]' = TRANSL(T)
 %
+% Returns the translational part of a homogenous transform as a 3-element 
+% column vector.
+%
 %	[X Y Z] = TRANSL(TG)
 %
-%	Returns a homogeneous transformation representing a 
-%	translation of X, Y and Z.
+% Returns a  matrix of the X, Y and Z elements extracted from a Cartesian 
+% trajectory matrix TG.
 %
-%	The third form returns the translational part of a
-%	homogenous transform as a 3-element column vector.
-%
-%	The fourth form returns a  matrix of the X, Y and Z elements
-%	extracted from a Cartesian trajectory matrix TG.
-%
-%	See also ROTX, ROTY, ROTZ, ROTVEC.
+% See also: CTRAJ.
 
-% 	Copyright (C) Peter Corke 1990
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function r = transl(x, y, z)
 	if nargin == 1,
 		if ishomog(x),

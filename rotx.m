@@ -1,11 +1,16 @@
-%ROTX	Rotation about X axis
+%ROTX Rotation about X axis
 %
-%	ROTX(theta) returns a homogeneous transformation representing a 
-%	rotation of theta about the X axis.
+%	TR = ROTX(theta)
 %
-%	See also ROTY, ROTZ, ROTVEC.
+% Returns a homogeneous transformation representing a rotation of theta 
+% about the X axis.
+%
+% See also: ROTY, ROTZ, ROTVEC.
 
-% 	Copyright (C) Peter Corke 1990
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function r = rotx(t)
 	ct = cos(t);
 	st = sin(t);

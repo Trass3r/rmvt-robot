@@ -1,11 +1,16 @@
-%ROTY	Rotation about Y axis
+%ROTY Rotation about Y axis
 %
-%	ROTY(theta) returns a homogeneous transformation representing a 
-%	rotation of theta about the Y axis.
+%	TR = ROTY(theta)
 %
-%	See also ROTX, ROTZ, ROTVEC.
+% Returns a homogeneous transformation representing a rotation of theta 
+% about the Y axis.
+%
+% See also: ROTX, ROTZ, ROTVEC.
 
-% 	Copyright (C) Peter Corke 1990
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function r = roty(t)
 	ct = cos(t);
 	st = sin(t);

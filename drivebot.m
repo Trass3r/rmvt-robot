@@ -1,22 +1,25 @@
-%DRIVEBOT	Drive a graphical robot
+%DRIVEBOT Drive a graphical robot
 %
 %	DRIVEBOT(ROBOT)
 %	DRIVEBOT(ROBOT, Q)
 %
-%	Drive a graphical robot by means of a slider panel.
+% Drive a graphical robot by means of a slider panel.
 %
-%	If no graphical robot exists one is created in a new window.  Otherwise
-%	all graphical robots are 'driven'.
+% If no graphical robot exists one is created in a new window.  Otherwise
+% all graphical robots are 'driven'.
 %
-%	If Q is specified it is used as the initial joint angle, otherwise
-%	it is taken from one of the existing graphical robots.
+% If Q is specified it is used as the initial joint angle, otherwise
+% it is taken from one of the existing graphical robots.
 %
 % SEE ALSO: PLOT
 
 % MOD HISTORY:
-% 10/01		fix bug for n<6
+% 	10/01 	fix bug for n<6
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 
-% Copyright (C) 2001 by Peter Corke
+% Copyright (C) 2001-2002, by Peter I. Corke
+
 function drivebot(a,b)
 	bgcol = [135 206 250]/255;
 

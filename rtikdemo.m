@@ -1,3 +1,7 @@
+% Copyright (C) 1993-2002, by Peter I. Corke
+
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 echo on
 %
 % Inverse kinematics is the problem of finding the robot joint coordinates,
@@ -29,7 +33,7 @@ echo on
 % the solutions are not necessarily unique, and there are singularities 
 % at which the manipulator loses degrees of freedom and joint coordinates 
 % become linearly dependent.
-pause	% any key to continue
+pause % any key to continue
 %
 % To examine the effect at a singularity lets repeat the last example but for a
 % different pose.  At the `ready' position two of the Puma's wrist axes are 
@@ -40,18 +44,18 @@ pause	% any key to continue
 %
 % which is not the same as the original joint angle
     qr
-pause	% any key to continue
+pause % any key to continue
 %
 % However both result in the same end-effector position
     fkine(p560, qi) - fkine(p560, qr)
-pause	% any key to continue
+pause % any key to continue
     
 % Inverse kinematics may also be computed for a trajectory.
 % If we take a Cartesian straight line path
-    t = [0:.056:2];			% create a time vector
-    T1 = transl(0.6, -0.5, 0.0)	% define the start point
-    T2 = transl(0.4, 0.5, 0.2)	% and destination
-    T = ctraj(T1, T2, t/2);		% compute a Cartesian path
+    t = [0:.056:2]; 		% create a time vector
+    T1 = transl(0.6, -0.5, 0.0) % define the start point
+    T2 = transl(0.4, 0.5, 0.2) % and destination
+    T = ctraj(T1, T2, t/2); 	% compute a Cartesian path
 
 %
 % now solve the inverse kinematics.  When solving for a trajectory, the 
@@ -59,7 +63,7 @@ pause	% any key to continue
 % previous inverse solution.
 %
     tic
-    q = ikine(p560, T);	
+    q = ikine(p560, T); 
     toc
 %
 % Clearly this approach is slow, and not suitable for a real robot controller 
@@ -80,8 +84,8 @@ pause	% any key to continue
     xlabel('Time (s)');
     ylabel('Joint 3 (rad)')
 
-pause	% hit any key to continue
+pause % hit any key to continue
     
 % This joint space trajectory can now be animated
     plot(p560, q)
-pause	% any key to continue
+pause % any key to continue

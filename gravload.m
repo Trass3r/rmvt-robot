@@ -1,26 +1,31 @@
-%GRAVLOAD	Compute the gravity loading on manipulator joints
+%GRAVLOAD Compute the gravity loading on manipulator joints
 %
-%	GRAVLOAD(DYN, Q) is the joint gravity loading for a manipulator whose
-%	dynamics and kinematics are described by DYN, and Q is the joint state.
+%	TAUG = GRAVLOAD(ROBOT, Q)
+%	TAUG = GRAVLOAD(ROBOT, Q, GRAV)
 %
-%	If Q is a row vector, GRAVLOAD(DYN, Q) is a row vector of joint torques.
-%	If Q is a matrix, each row is interpretted as a joint state vector, and
-%	GRAVLOAD(DYN,Q) is a matrix each row being the corresponding joint 
-%	torques.
+% Compute the joint gravity loading for the manipulator ROBOT in the
+% configuration Q.
 %
-%	GRAVLOAD(DYN,Q,GRAV) allows an arbitrary gravity vector to override
-%	the default of [0; 0; 9.81]
+% If Q is a row vector, the result is a row vector of joint torques.
+% If Q is a matrix, each row is interpretted as a joint state vector, and
+% the result is a matrix each row being the corresponding joint torques.
 %
-%	See also DYN, RNE, ITORQUE, CORIOLIS.
+% Gravity vector can be given explicitly using the GRAV argument, otherwise
+% it defaults to the value of the ROBOT object.
+%
+% See also: ROBOT, RNE, ITORQUE, CORIOLIS.
 
-%	Copright (C) Peter Corke 1993
-function tg = gravload(dyn, q, grav)
-	if numcols(q) ~= numrows(dyn),
-		error('')
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
+function tg = gravload(robot, q, grav)
+	if numcols(q) ~= robot.n
+		error('Insufficient columns in q')
 	end
 	if nargin == 2,
-		tg = rne(dyn, q, zeros(size(q)), zeros(size(q)));
+		tg = rne(robot, q, zeros(size(q)), zeros(size(q)));
 	elseif nargin == 3,
-		tg = rne(dyn, q, zeros(size(q)), zeros(size(q)), grav);
+		tg = rne(robot, q, zeros(size(q)), zeros(size(q)), grav);
 	end
 	

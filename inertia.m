@@ -1,17 +1,22 @@
-%INERTIA	Compute the manipulator inertia matrix
+%INERTIA Compute the manipulator inertia matrix
 %
-%	INERTIA(DYN, Q) for an n-axis manipulator returns the nxn symmetric 
-%	inertia matrix which relates joint torque to joint acceleration.
-%	DYN describes the manipulator dynamics and kinematics, and Q is
-%	an n element vector of joint state.
+%	INERTIA(ROBOT, Q)
 %
-%	See also DYN, RNE, ITORQUE, CORIOLIS, GRAVLOAD.
+% Returns the n x n symmetric inertia matrix which relates joint torque 
+% to joint acceleration.
+% ROBOT describes the manipulator dynamics and kinematics, and Q is
+% an n element vector of joint state.
+%
+% See also: RNE, CINERTIA, ITORQUE, CORIOLIS, GRAVLOAD.
 
 
-%	Copright (C) Peter Corke 1993
 % MOD HISTORY
 % 4/99 add objects
-%	6/99	init M to zeros rather than [], problem with cat() v 5.3
+% 6/99	init M to zeros rather than [], problem with cat() v 5.3
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+
+% Copyright (C) Peter Corke 1993
 
 function M = inertia(robot, q)
 	n = robot.n;

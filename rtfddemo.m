@@ -1,4 +1,7 @@
-% check the Matlab version, since ode45 syntax has changed
+% Copyright (C) 1993-2002, by Peter I. Corke
+
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 echo on
 %
 % Forward dynamics is the computation of joint accelerations given position and
@@ -8,7 +11,7 @@ echo on
 % Consider a Puma 560 at rest in the zero angle pose, with zero applied joint 
 % torques. The joint acceleration would be given by
     accel(p560, qz, zeros(1,6), zeros(1,6))
-pause	% any key to continue
+pause % any key to continue
 %
 % To be useful for simulation this function must be integrated.  fdyn() uses the
 % MATLAB function ode45() to integrate the joint acceleration.  It also allows 
@@ -39,10 +42,10 @@ pause	% any key to continue
 % note that rotational velocity of the upper and lower arm are exerting 
 % centripetal and Coriolis torques on the waist joint, causing it to rotate.
 
-pause	% hit any key to continue
+pause % hit any key to continue
 %
 % This can be shown in animation also
     clf
     plot(p560, q)
-pause	% hit any key to continue
+pause % hit any key to continue
 echo off

@@ -1,20 +1,25 @@
-%DRIVEPAR	Compute Cartesian path drive parameters
+%DRIVEPAR Compute Cartesian path drive parameters
 %
-%	DP = DRIVEPAR(T0, T1) returns a vector of drive parameters required
-%	to plan a Cartesian path between T0 and T1.
+%	DP = DRIVEPAR(T0, T1)
 %
-%	Inputs:	T0	homogeneous transform of initial position
-%		T1	homogeneous transform of final position
+% Returns a vector of drive parameters required to plan a Cartesian path 
+% from T0 to T1.
 %
+% This function has been obsoleted by quaternion-based interpolation in
+% TRINTERP.
+%
+% Ref:
 %	Robot manipulators: mathematics, programming and control
 %	R.P. Paul, MIT Press, 1981.
 %
-%	See also CTRAJ, TRINTERP.
+% See also: CTRAJ, TRINTERP.
 
-%	Copyright (C) 1993 Peter Corke
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 % MOD.HISTORY
 %	3/96	fixed bug: sin/cos(dp(4)) should be of dp(6)
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
 function dp = drivepar(t1, t2)
 	% Using the notation of Paul, dp is

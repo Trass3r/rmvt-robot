@@ -1,10 +1,10 @@
-%DYN	Matrix representation of manipulator kinematics and dynamics
+%DYN Matrix representation of manipulator kinematics and dynamics
 %
-%	Many robot toolbox functions take a DYN matrix which describes the
-%	kinematics and dynamics of a manipulator in a general way.
+% The original robot toolbox functions used a DYN matrix to describes the
+% kinematics and dynamics of a manipulator in a general way.
 %
-%	For an n-axis manipulator, DYN is an nx20 matrix, whose rows comprise
-%	
+% For an n-axis manipulator, DYN is an nx20 matrix, whose rows comprise
+% 
 %	1	alpha	link twist angle
 %	2	A	link length
 %	3	theta	link rotation angle
@@ -26,13 +26,17 @@
 %	19	Tc+	coulomb friction (positive rotation), motor refered
 %	20	Tc-	coulomb friction (negative rotation), motor refered
 %
-%	The first 5 columns of a DYN matrix contain the kinematic parameters
-%	and maybe used anywhere that a DH kinematic matrix is required -- the
-%	dynamic data is ignored.
+% The first 5 columns of a DYN matrix contain the kinematic parameters
+% and maybe used anywhere that a DH kinematic matrix is required -- the
+% dynamic data is ignored.
 %
-%	See also DH.
+% The functionality of the DH matrix has been replaced by the ROBOT object.
+%
+% See also: ROBOT, DH.
 
-%	Copright (C) Peter Corke 1993
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 % MOD.HISTORY
-%	1/95	reverse labels on A & D
+% 	1/95	reverse labels on A & D
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $

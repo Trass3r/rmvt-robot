@@ -1,18 +1,20 @@
-%CINERTIA	Compute the Cartesian (operational space) manipulator inertia matrix
+%CINERTIA Compute the Cartesian (operational space) manipulator inertia matrix
 %
-%	CINERTIA(ROBOT, Q) for the n-axis manipulator ROBOT returns the nxn 
-%	inertia matrix which relates Cartesian force/torque to Cartesian
-%	acceleration.
-%	ROBOT is a robot object and describes the manipulator dynamics and 
-%	kinematics, and Q is an n element vector of joint state.
+%	M = CINERTIA(ROBOT, Q)
 %
-%	See also INERTIA, ROBOT, RNE.
+% Return the n x n inertia matrix which relates Cartesian force/torque to 
+% Cartesian acceleration.
+% ROBOT is an n-axis robot object and describes the manipulator dynamics and 
+% kinematics, and Q is an n element vector of joint state.
+%
+% See also: INERTIA, ROBOT, RNE.
 
-%	Copyright (C) 1993 Peter Corke
 % MOD HISTORY
-% 4/99 add object support
+% 	4/99 add object support
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
-%	Copyright (C) 1999 Peter Corke
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 function Mx = cinertia(robot, q)
 	J = jacob0(robot, q);

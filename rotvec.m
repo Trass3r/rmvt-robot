@@ -1,14 +1,19 @@
-%ROTVEC	Rotation about arbitrary axis
+%ROTVEC Rotation about arbitrary axis
 %
-%	ROTVEC(V, THETA) returns a homogeneous transformation representing a 
-%	rotation of THETA about the vector V.
+% 	TR = ROTVEC(V, THETA)
 %
-%	See also ROTX, ROTY, ROTZ.
+% Returns a homogeneous transformation representing a rotation of THETA 
+% about the vector V.
+%
+% See also: ROTX, ROTY, ROTZ.
 
-% 	Copyright (C) Peter Corke 1990
+% Copyright (C) 1993-2002, by Peter I. Corke
 %
 % CHANGES:
-%	7/01	unitize the vector
+% 7/01	unitize the vector
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+
 function r = rotvec(v, t)
 
 	v = unit(v);

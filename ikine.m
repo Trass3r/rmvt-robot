@@ -1,57 +1,58 @@
-%IKINE	Inverse manipulator kinematics
+%IKINE Inverse manipulator kinematics
 %
 %	Q = IKINE(ROBOT, T)
 %	Q = IKINE(ROBOT, T, Q)
 %	Q = IKINE(ROBOT, T, Q, M)
 %
-%	Returns the joint coordinates corresponding to the
-%	end-effector transform T.  Note that the inverse kinematic solution is
-%	generally not unique, and depends on the initial guess Q (which 
-%	defaults to 0).
+% Returns the joint coordinates corresponding to the end-effector transform T.
+% Note that the inverse kinematic solution is generally not unique, and 
+% depends on the initial guess Q (which defaults to 0).
 %
-%	Q = IKINE(ROBOT, TG)
-%	Q = IKINE(ROBOT, TG, Q)
-%	Q = IKINE(ROBOT, TG, Q, M)
+%	QT = IKINE(ROBOT, TG)
+%	QT = IKINE(ROBOT, TG, Q)
+%	QT = IKINE(ROBOT, TG, Q, M)
 %
-%	Returns the joint coordinates corresponding to
-%	each of the transforms in the 4x4xN trajectory TG.
-%	Returns one row of Q for each input transform.  The initial estimate 
-%	of Q for each time step is taken as the solution from the previous 
-%	time step.
+% Returns the joint coordinates corresponding to each of the transforms in 
+% the 4x4xN trajectory TG.
+% Returns one row of QT for each input transform.  The initial estimate 
+% of QT for each time step is taken as the solution from the previous 
+% time step.
 %
-%	If the manipulator has fewer than 6 DOF then this method of solution
-%	will fail, since the solution space has more dimensions than can
-%	be spanned by the manipulator joint coordinates.  In such a case
-%	it is necessary to provide a mask matrix, M, which specifies the 
-%	Cartesian DOF (in the wrist coordinate frame) that will be ignored
-%	in reaching a solution.  The mask matrix has six elements that
-%	correspond to translation in X, Y and Z, and rotation about X, Y and
-%	Z respectively.  The value should be 0 (for ignore) or 1.  The number
-%	of non-zero elements should equal the number of manipulator DOF.
+% If the manipulator has fewer than 6 DOF then this method of solution
+% will fail, since the solution space has more dimensions than can
+% be spanned by the manipulator joint coordinates.  In such a case
+% it is necessary to provide a mask matrix, M, which specifies the 
+% Cartesian DOF (in the wrist coordinate frame) that will be ignored
+% in reaching a solution.  The mask matrix has six elements that
+% correspond to translation in X, Y and Z, and rotation about X, Y and
+% Z respectively.  The value should be 0 (for ignore) or 1.  The number
+% of non-zero elements should equal the number of manipulator DOF.
 %
-%	Solution is computed iteratively using the pseudo-inverse of the
-%	manipulator Jacobian.
+% Solution is computed iteratively using the pseudo-inverse of the
+% manipulator Jacobian.
 %
-%	Such a solution is completely general, though much less efficient 
-%	than specific inverse kinematic solutions derived symbolically.
-%	
-%	This approach allows a solution to obtained at a singularity, but 
-%	the joint angles within the null space are arbitrarily assigned.
+% Such a solution is completely general, though much less efficient 
+% than specific inverse kinematic solutions derived symbolically.
+% 
+% This approach allows a solution to obtained at a singularity, but 
+% the joint angles within the null space are arbitrarily assigned.
 %
-%	For instance with a typical 5 DOF manipulator one would ignore
-%	rotation about the wrist axis, that is, M = [1 1 1 1 1 0].
+% For instance with a typical 5 DOF manipulator one would ignore
+% rotation about the wrist axis, that is, M = [1 1 1 1 1 0].
 %
 %
-%	See also FKINE, TR2DIFF, JACOB0.
-	
-%	Copyright (C) 1999 Peter Corke
+% See also: FKINE, TR2DIFF, JACOB0, IKINE560.
+ 
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 % MOD.HISTORY
-%	2/95	use new 2-argument version of tr2diff(), cleanup
-%	3/99	uses objects
-%	6/99	initialize qt before loop
-%	2/01	remove inv(base) xform, since it is included in fkine
-%	10/01	bug in mask for <6 axes
+% 2/95	use new 2-argument version of tr2diff(), cleanup
+% 3/99	uses objects
+% 6/99	initialize qt before loop
+% 2/01	remove inv(base) xform, since it is included in fkine
+% 10/01	bug in mask for <6 axes
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 
 function qt = ikine(robot, tr, q, m)
 	%

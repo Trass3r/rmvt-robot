@@ -1,11 +1,16 @@
-%TR2EUL	Convert a homogeneous transform matrix to EULER angle form
+%TR2EUL Convert a homogeneous transform matrix to Euler angle form
 %
-%	[A B C] = TR2EUL(TR) returns a vector of Euler angles corresponding
-%	to the rotational part of the homogeneous transform TR.
+%	[PHI THETA PSI] = TR2EUL(TR)
 %
-%	See also  EUL2TR, TR2RPY
+% Returns a vector of Euler angles corresponding to the rotational part of 
+% the homogeneous transform TR.
+%
+% See also:  EUL2TR, TR2RPY
 
-%	Copright (C) Peter Corke 1993
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function euler = tr2eul(m)
 	
 	euler = zeros(1,3);

@@ -1,29 +1,32 @@
-%JTRAJ	Compute a joint space trajectory between two points
+%JTRAJ Compute a joint space trajectory between two points
 %
 %	[Q QD QDD] = JTRAJ(Q0, Q1, N)
 %	[Q QD QDD] = JTRAJ(Q0, Q1, N, QD0, QD1)
 %	[Q QD QDD] = JTRAJ(Q0, Q1, T)
 %	[Q QD QDD] = JTRAJ(Q0, Q1, T, QD0, QD1)
 %
-%	Returns a joint space trajectory Q from state Q0 to Q1.  The number
-%	of points is N or the length of the given time vector T.  A 7th
-%	order polynomial is used with default zero boundary conditions for
-%	velocity and acceleration.  Non-zero boundary velocities can be
-%	optionally specified as QD0 and QD1.
+% Returns a joint space trajectory Q from state Q0 to Q1.  The number
+% of points is N or the length of the given time vector T.  A 7th
+% order polynomial is used with default zero boundary conditions for
+% velocity and acceleration.  Non-zero boundary velocities can be
+% optionally specified as QD0 and QD1.
 %
-%	The function can optionally return a velocity and acceleration
-%	trajectories as QD and QDD.
+% The function can optionally return a velocity and acceleration
+% trajectories as QD and QDD.
 %
-%	Each trajectory is an mxn matrix, with one row per time step, and
-%	one column per joint parameter.
+% Each trajectory is an mxn matrix, with one row per time step, and
+% one column per joint parameter.
 %
+% See also: CTRAJ.
 
-%	Copright (C) Peter Corke 1993
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 %  MOD.HISTORY
-%	1/95 add support for initial velocities as advertised
-%	8/95 fix bug with initial conditions
-%	8/96 fix another bug with initial conditions
+% 1/95 add support for initial velocities as advertised
+% 8/95 fix bug with initial conditions
+% 8/96 fix another bug with initial conditions
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
 function [qt,qdt,qddt] = jtraj(q0, q1, tv, qd0, qd1)
 	if length(tv) > 1,

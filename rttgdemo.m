@@ -1,3 +1,6 @@
+% Copyright (C) 1993-2002, by Peter I. Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 %*****************************trajectory****************************************
 echo on
 % The path will move the robot from its zero angle pose to the upright (or 
@@ -6,12 +9,12 @@ echo on
 % First create a time vector, completing the motion in 2 seconds with a
 % sample interval of 56ms.
     t = [0:.056:2];
-pause	% hit any key to continue
+pause % hit any key to continue
 %
 % A polynomial trajectory between the 2 poses is computed using jtraj()
 %
     q = jtraj(qz, qr, t);
-pause	% hit any key to continue
+pause % hit any key to continue
 
 %
 % For this particular trajectory most of the motion is done by joints 2 and 3,
@@ -27,7 +30,7 @@ pause	% hit any key to continue
     ylabel('Joint 3 (rad)')
 
 
-    pause	% hit any key to continue
+    pause % hit any key to continue
 %
 % We can also look at the velocity and acceleration profiles.  We could 
 % differentiate the angle trajectory using diff(), but more accurate results 
@@ -57,5 +60,5 @@ pause(2)
     plot(t,qdd(:,3))
     xlabel('Time (s)');
     ylabel('Joint 3 accel (rad/s2)')
-pause	% any key to continue
+pause % any key to continue
 echo off

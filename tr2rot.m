@@ -1,13 +1,16 @@
-%TR2ROT	return rotational submatrix of a homogeneous transformation
+%TR2ROT Return rotational submatrix of a homogeneous transformation
 %
 %	R = TR2ROT(T)
 %
-% where T is a 4x4 homogeneous transformation and R is a 3x3 orthonormal
-% rotation matrix.
+% Return R the 3x3 orthonormal rotation matrix from the homogeneous 
+% transformation T.
 %
-% SEE ALSO: rot2tr
+% SEE ALSO: ROT2TR
 
-% Copyright (c) 1999 Peter Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function R = tr2rot(T)
 
 	if ~ishomog(T)

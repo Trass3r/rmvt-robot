@@ -1,26 +1,30 @@
-%JACOBN	Compute manipulator Jacobian in end-effector frame
+%JACOBN Compute manipulator Jacobian in end-effector frame
 %
-%	JACOBN(ROBOT, Q) returns a Jacobian matrix for the current pose Q.
+%	JN = JACOBN(ROBOT, Q)
 %
-% 	The manipulator Jacobian matrix maps differential changes in joint space
-%	to differential Cartesian motion of the end-effector.
-%			dX = J dQ
+% Returns a Jacobian matrix for the robot ROBOT in pose Q.
 %
-%	This function uses the technique of
-%		Paul, Shimano, Mayer
-%		Differential Kinematic Control Equations for Simple Manipulators
-%		IEEE SMC 11(6) 1981
-%		pp. 456-460
+% The manipulator Jacobian matrix maps differential changes in joint space
+% to differential Cartesian motion of the end-effector (end-effector coords).
+% 		dX = J dQ
 %
-%	For an n-axis manipulator the Jacobian is a 6 x n matrix.
+% This function uses the technique of
+% 	Paul, Shimano, Mayer
+% 	Differential Kinematic Control Equations for Simple Manipulators
+% 	IEEE SMC 11(6) 1981
+% 	pp. 456-460
 %
-%	See also DIFF2TR, TR2DIFF, DIFF
+% For an n-axis manipulator the Jacobian is a 6 x n matrix.
+%
+% See also: JACOB0, DIFF2TR, TR2DIFF
 
 % MOD.HISTORY
-%	3/99	uses objects
-%	10/01	handle Craig's conventions
-%
-%	Copyright (C) Peter Corke 1999
+% 3/99	uses objects
+% 10/01	handle Craig's conventions
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function J = jacobn(robot, q)
 
 	n = robot.n;

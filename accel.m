@@ -1,23 +1,24 @@
-%ACCEL	Compute manipulator forward dynamics
+%ACCEL Compute manipulator forward dynamics
 %
 %	QDD = ACCEL(ROBOT, Q, QD, TORQUE)
 %	QDD = ACCEL(ROBOT, [Q QD TORQUE])
 %
-%	returns a vector of joint accelerations
-%	that result from applying the actuator TORQUE to the manipulator ROBOT
-%	in state Q and QD.
+% Returns a vector of joint accelerations that result from applying the 
+% actuator TORQUE to the manipulator ROBOT in state Q and QD.
 %
-%	Uses the method 1 of Walker and Orin to compute the forward dynamics.
-%	This form is useful for simulation of manipulator dynamics, in
-%	conjunction with a numerical integration function.
+% Uses the method 1 of Walker and Orin to compute the forward dynamics.
+% This form is useful for simulation of manipulator dynamics, in
+% conjunction with a numerical integration function.
 %
-%	See also RNE, ROBOT, ODE45.
+% See also: RNE, ROBOT, ODE45.
 
 % MOD HISTORY
 % 4/99 add object support
 % 1/02 copy rne code from inertia.m to here for speed
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
 
-%	Copyright (C) 1999 Peter Corke
+% Copyright (C) 1999-2002, by Peter I. Corke
 
 function qdd = accel(robot, Q, qd, torque)
 	n = robot.n;

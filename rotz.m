@@ -1,11 +1,16 @@
-%ROTZ	Rotation about Z axis
+%ROTZ Rotation about Z axis
 %
-%	ROTZ(theta) returns a homogeneous transformation representing a 
-%	rotation of theta about the X axis.
+%	TR = ROTZ(theta)
 %
-%	See also ROTX, ROTY, ROTVEC.
+% Returns a homogeneous transformation representing a rotation of theta 
+% about the Z axis.
+%
+% See also: ROTX, ROTY, ROTVEC.
 
-% 	Copyright (C) Peter Corke 1990
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function r = rotz(t)
 	ct = cos(t);
 	st = sin(t);

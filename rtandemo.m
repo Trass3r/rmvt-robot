@@ -1,11 +1,12 @@
+
 %**************************animation********************************************
 echo on
 clf
 %
 % The trajectory demonstration has shown how a joint coordinate trajectory
 % may be generated
-    t = [0:.056:2]';		% generate a time vector
-    q = jtraj(qz, qr, t);	% generate joint coordinate trajectory
+    t = [0:.056:2]'; 	% generate a time vector
+    q = jtraj(qz, qr, t); % generate joint coordinate trajectory
 %
 % the overloaded function plot() animates a stick figure robot moving 
 % along a trajectory.
@@ -20,7 +21,7 @@ clf
 % A shadow appears on the ground which helps to give some better idea of the
 % 3D object.
 
-pause	% any key to continue
+pause % any key to continue
 %
 % We can also place additional robots into a figure.
 %
@@ -31,7 +32,7 @@ pause	% any key to continue
     p560_2.base = transl(-0.5, 0.5, 0);
     hold on
     plot(p560_2, q);
-pause	% any key to continue
+pause % any key to continue
 
 % We can also have multiple views of the same robot
     clf
@@ -40,7 +41,7 @@ pause	% any key to continue
     plot(p560, qr);
     view(40,50)
     plot(p560, q)
-pause	% any key to continue
+pause % any key to continue
 %
 % Sometimes it's useful to be able to manually drive the robot around to
 % get an understanding of how it works.

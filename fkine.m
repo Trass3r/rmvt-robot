@@ -1,7 +1,9 @@
 %FKINE  Forward robot kinematics for serial link manipulator
 %
-%	FKINE(ROBOT, Q)  computes the forward kinematics for each joint space
-%	point defined by Q.  ROBOT is a robot object.
+%	TR = FKINE(ROBOT, Q)
+%
+% Computes the forward kinematics for each joint space point defined by Q.
+% ROBOT is a robot object.
 %
 % For an n-axis manipulator Q is an n element vector or an m x n matrix. The
 % elements are interpretted as joint angle or link length according to
@@ -17,11 +19,14 @@
 % FKINE(ROBOT, Q) returns 3D matrix where the last subscript is the index
 % along thepath.
 %
-%	See also LINKTRAN, MFKINE.
+% See also: LINK.
 
-%	Copright (C) Peter Corke 1999
+% MOD HISTORY
+% 	6/99	init tt to zeros rather than [], problem with cat() v 5.3
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
-%	6/99	init tt to zeros rather than [], problem with cat() v 5.3
+% Copyright (C) 1993-2002, by Peter I. Corke
 
 function t = fkine(robot, q)
 	%

@@ -1,19 +1,23 @@
-%JACOB0	Compute manipulator Jacobian in world coordinates
+%JACOB0 Compute manipulator Jacobian in world coordinates
 %
-%	JACOB0(DH, Q) returns a Jacobian matrix for the current pose Q.
+%	J0 = JACOB0(ROBOT, Q)
 %
-% 	The manipulator Jacobian matrix maps differential changes in joint space
-%	to differential Cartesian motion (world coord frame) of the end-effector.
-%			dX = J dQ
+% Returns a Jacobian matrix for the robot ROBOT in pose Q.
 %
-%	For an n-axis manipulator the Jacobian is a 6 x n matrix.
+% The manipulator Jacobian matrix maps differential changes in joint space
+% to differential Cartesian motion (world coord frame) of the end-effector.
+% 		dX = J dQ
 %
-%	See also JACOBN, DIFF2TR, TR2DIFF, DIFF
+% For an n-axis manipulator the Jacobian is a 6 x n matrix.
+%
+% See also: JACOBN, DIFF2TR, TR2DIFF.
 
-%	Copyright (C) 1999 Peter Corke
 
+% Copyright (C) 1999-2002, by Peter I. Corke
 % MOD.HISTORY
-%	3/99	uses objects
+% 3/99	uses objects
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
 
 function J0 = jacob0(robot, q)
 	%
