@@ -12,7 +12,7 @@
  * \todo Is code for MDH prismatic case correct?
  * \todo Handle robot object base transform
  *
- * $Ident$
+ * $Id: ne.c,v 1.2 2002-02-11 01:48:49 pic Exp $
  *
  */
 

@@ -9,7 +9,7 @@
  * is retained, and due credit given when the results are incorporated in
  * publised work.
  *
- * $Ident$
+ * $Id: frne.h,v 1.2 2002-02-11 01:48:49 pic Exp $
  *
  */
 

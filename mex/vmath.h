@@ -15,7 +15,7 @@
  * is retained, and due credit given when the results are incorporated in
  * publised work.
  *
- * $Ident$
+ * $Id: vmath.h,v 1.2 2002-02-11 01:48:51 pic Exp $
  *
  */
 #ifndef	_vmath_h_

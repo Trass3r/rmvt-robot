@@ -11,7 +11,7 @@
  *
  * \note All vectors and matrices are passed by reference.
  *
- * $Ident$
+ * $Id: vmath.c,v 1.2 2002-02-11 01:48:50 pic Exp $
  *
  */
 #include	"mex.h"
