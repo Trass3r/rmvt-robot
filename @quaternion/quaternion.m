@@ -4,6 +4,21 @@
 % 	QUATERNION(v, theta)		from vector plus angle
 % 	QUATERNION(R)			from a 3x3 or 4x4 matrix
 % 	QUATERNION(q)			from another quaternion
+%
+% A quaternion is a compact method of representing a 3D rotation that has
+% computational advantages including speed and numerical robustness.
+%
+% A quaternion has 2 parts, a scalar s, and a vector v and is typically written
+%
+%	q = s <vx vy vz>
+%
+% A unit quaternion is one for which s^2+vx^2+vy^2+vz^2 = 1.
+%
+% A quaternion can be considered as a rotation about a vector in space where
+%	q = cos (theta/2) sin(theta/2) <vx vy vz>
+% where <vx vy vz> is a unit vector.
+
+
 
 %	Copright (C) Peter Corke 1999
 %
