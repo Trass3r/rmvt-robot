@@ -39,7 +39,7 @@
  * is retained, and due credit given when the results are incorporated in
  * publised work.
  *
- * $Id: frne.c,v 1.3 2002-02-14 11:24:32 pic Exp $
+ * $Id: frne.c,v 1.4 2002-02-14 20:16:15 pic Exp $
  *
  */
 
@@ -393,8 +393,13 @@ mexFunction(
  *
  */
 
-/*
- * Return the link rotation matrix and translation vector
+/**
+ * Return the link rotation matrix and translation vector.
+ *
+ * @param l Link object for which R and p* are required.
+ * @param th Joint angle, overrides value in link object
+ * @param d Link extension, overrides value in link object
+ * @param type Kinematic convention.
  */
 static void
 rot_mat (
@@ -422,8 +427,8 @@ case STANDARD:
 	l->R.n.z = 0.0;		l->R.o.z = sa;		l->R.a.z = ca;
 
 	l->r.x = l->A;
-	l->r.y = l->D * sa;
-	l->r.z = l->D * ca;
+	l->r.y = d * sa;
+	l->r.z = d * ca;
 	break;
 case MODIFIED:
 	l->R.n.x = ct;		l->R.o.x = -st;		l->R.a.x = 0.0;
@@ -431,8 +436,8 @@ case MODIFIED:
 	l->R.n.z = st*sa;	l->R.o.z = ct*sa;	l->R.a.z = ca;
 
 	l->r.x = l->A;
-	l->r.y = -l->D * sa;
-	l->r.z = l->D * ca;
+	l->r.y = -d * sa;
+	l->r.z = d * ca;
 	break;
 	}
 }
@@ -509,8 +514,10 @@ mstruct_getrealvect(mxArray *m, int i, char *field)
 #include	<stdarg.h>
 
 /**
- * Error message handler.  Takes mexPrintf() style format string and variable
+ * Error message handler.  Takes printf() style format string and variable
  * arguments and sends resultant string to Matlab via \t mexErrMsgTxt().
+ *
+ * @param s Error message string, \t  printf() style.
  */
 void
 error(char *s, ...)
