@@ -1,4 +1,3 @@
-<<<<<<< quaternion.m
 %QUATERNION Constructor for quaternion objects
 % 
 %	Q = QUATERNION([s v1 v2 v3])	from 4 elements
@@ -24,7 +23,10 @@
 % CHANGES:
 % 12/01	order of arguments to theta,v form, fix bug in same
 % $Log: not supported by cvs2svn $
-% $Revision: 1.4 $
+% Revision 1.4  2002/04/01 12:06:48  pic
+% General tidyup, help comments, copyright, see also, RCS keys.
+%
+% $Revision: 1.5 $
 %
 % Copyright (C) 1999-2002, by Peter I. Corke
 
