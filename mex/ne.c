@@ -12,7 +12,7 @@
  * \todo Is code for MDH prismatic case correct?
  * \todo Handle robot object base transform
  *
- * $Id: ne.c,v 1.4 2002-02-14 11:24:32 pic Exp $
+ * $Id: ne.c,v 1.5 2002-02-15 01:14:16 pic Exp $
  *
  */
 
@@ -30,8 +30,8 @@
 #include	"vmath.h"
 
 /*
-*/
 #define	DEBUG
+*/
 
 /*
  * Bunch of macros to make the main code easier to read.  Dereference vectors
@@ -406,8 +406,14 @@ newton_euler (
 			vect_add(&t3, &t3, n(j+1));
 			rot_vect_mult(&t2, ROT(j+1), &t3);
 			vect_add(&t1, &t1, &t2);
-		} else 
+		} else {
+			/* cross(R'*pstar,f) */
+			vect_cross(&t2, PSTAR(j), &f_tip);
+
+			/* nn += R*(nn + cross(R'*pstar,f)) */
+			vect_add(&t1, &t1, &t2);
 			vect_add(&t1, &t1, &n_tip);
+		}
 
 		mat_vect_mult(&t2, INERTIA(j), OMEGADOT(j));
 		mat_vect_mult(&t3, INERTIA(j), OMEGA(j));
