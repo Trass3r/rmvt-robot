@@ -3,12 +3,19 @@
 % 	TR = OA2TR(O, A)
 %
 % Returns a homogeneous tranformation for the specified orientation and 
-% approach vectors.
+% approach vectors.  The rotation submatrix is formed from 3 vectors such that
+% R = [N O A] and N = O x A.  
+% The submatrix is guaranteed to be orthonormal so long as O and A are 
+% not parallel.
 %
 % See also: RPY2TR, EUL2TR
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:15  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function r = oa2tr(o, a)
