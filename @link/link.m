@@ -37,8 +37,8 @@
 % For robot models prior to Toolbox release 5 (pre Matlab objects) the
 % following object constructors are provided.
 %
-%	LINK(DH_ROW)	create from row of legacy DH matrix
 %	LINK(DYN_ROW)	create from row of legacy DYN matrix
+%	LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
 
 % MOD HISTORY
 % 3/99	modify to use on a LINK object
@@ -160,5 +160,16 @@ function l = link(dh, convention)
 			l.Tc = [0 0];
 		end
 		l.qlim = [];
+		if nargin > 1
+			if strncmp(convention, 'mod', 3) == 1,
+				l.mdh = 1;
+			elseif strncmp(convention, 'sta', 3) == 1,
+				l.mdh = 0;
+			else
+				error('convention must be modified or standard');
+			end
+		else
+				l.mdh = 0;	% default to standard D&H
+		end
 		l = class(l, 'link');
 	end

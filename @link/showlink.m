@@ -1,10 +1,10 @@
-%SHOW	show all parameters of LINK object
+%SHOWLINK	show all parameters of LINK object
 %
-%	SHOW(link)
+%	SHOWLINK(link)
 
 %	Copyright (C) 1999 Peter. I. Corke
 
-function show(l)
+function showlink(l)
 
 	llab = 6;
 	for n =fieldnames(l)'
