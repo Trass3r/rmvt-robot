@@ -1,7 +1,12 @@
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 11:47:17  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.4 $
+figure(2)
 echo on
 %
 % Forward dynamics is the computation of joint accelerations given position and

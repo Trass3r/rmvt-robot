@@ -1,7 +1,12 @@
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:17  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
+figure(2)
 echo on
 %
 % Inverse kinematics is the problem of finding the robot joint coordinates,
@@ -54,8 +59,8 @@ pause % any key to continue
 % If we take a Cartesian straight line path
     t = [0:.056:2]; 		% create a time vector
     T1 = transl(0.6, -0.5, 0.0) % define the start point
-    T2 = transl(0.4, 0.5, 0.2) % and destination
-    T = ctraj(T1, T2, t/2); 	% compute a Cartesian path
+    T2 = transl(0.4, 0.5, 0.2)	% and destination
+    T = ctraj(T1, T2, length(t)); 	% compute a Cartesian path
 
 %
 % now solve the inverse kinematics.  When solving for a trajectory, the 
@@ -89,3 +94,4 @@ pause % hit any key to continue
 % This joint space trajectory can now be animated
     plot(p560, q)
 pause % any key to continue
+echo off

@@ -2,7 +2,12 @@
 echo off
 % 6/99	fix syntax errors
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:17  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
+figure(2)
 echo on
 %
 % Inverse dynamics computes the joint torques required to achieve the specified
@@ -73,3 +78,4 @@ pause % any key to continue
 % for this example the inertia varies by a factor of
     max(M11)/min(M11)
 pause % any key to continue
+echo off

@@ -1,7 +1,12 @@
 % Copyright (C) 1993-2002, by Peter I. Corke
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:18  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 %*****************************trajectory****************************************
+figure(2)
 echo on
 % The path will move the robot from its zero angle pose to the upright (or 
 % READY) pose.

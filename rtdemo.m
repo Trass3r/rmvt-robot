@@ -1,24 +1,30 @@
 %RTDEMO 	Robot toolbox demonstrations
 %
-%  Displays popup menu of toolbox demonstration scripts that illustrate:
-% homogeneous transformations
-% trajectories
-% forward kinematics
-% inverse kinematics
-% robot animation
-% inverse dynamics
-% forward dynamics
+% Displays popup menu of toolbox demonstration scripts that illustrate:
+%   * homogeneous transformations
+%   * trajectories
+%   * forward kinematics
+%   * inverse kinematics
+%   * robot animation
+%   * inverse dynamics
+%   * forward dynamics
 %
 % The scripts require the user to periodically hit <Enter> in order to move
 % through the explanation.  Set PAUSE OFF if you want the scripts to run
 % completely automatically.
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:17  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 echo off
 clear all
+delete( get(0, 'Children') );
+
 puma560
 while 1,
  selection = menu('Robot Toolbox demonstrations', ...
@@ -49,8 +55,8 @@ while 1,
  	rtidemo
  case 8,
  	rtfddemo
- 	% chaotic 2 link
  case 9,
+	delete( get(0, 'Children') );
  	break;
  end
 end
