@@ -52,7 +52,11 @@
 % 2/01	remove inv(base) xform, since it is included in fkine
 % 10/01	bug in mask for <6 axes
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 11:47:13  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.4 $
 
 function qt = ikine(robot, tr, q, m)
 	%
@@ -74,7 +78,7 @@ function qt = ikine(robot, tr, q, m)
 			error('Mask matrix should have 6 elements');
 		end
 		if length(find(m)) ~= robot.n 
-			error('Mask matrix must same number of 1s as robot DOF')
+			error('Mask matrix must have same number of 1s as robot DOF')
 		end
 	else
 		if n < 6,
