@@ -1,10 +1,18 @@
-%PLOT	plot a quaternion object as a rotated coordinate frame
+%PLOT Plot a quaternion object 
+%
+%	PLOT(Q)
+%
+% Display the quaternion as a rotated coordinate frame.
 
-%	Copright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function plot(Q)
 	axis([-1 1 -1 1 -1 1])
 
-
+	% create unit vectors
 	o = [0 0 0]';
 	x1 = Q*[1 0 0]';
 	y1 = Q*[0 1 0]';

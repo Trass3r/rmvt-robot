@@ -1,9 +1,12 @@
-%QUATERNION	constructor for quaternion objects
-%	
-% 	QUATERNION([s v1 v2 v3])	from 4 elements
-% 	QUATERNION(v, theta)		from vector plus angle
-% 	QUATERNION(R)			from a 3x3 or 4x4 matrix
-% 	QUATERNION(q)			from another quaternion
+<<<<<<< quaternion.m
+%QUATERNION Constructor for quaternion objects
+% 
+%	Q = QUATERNION([s v1 v2 v3])	from 4 elements
+%	Q = QUATERNION(v, theta)	from vector plus angle
+%	Q = QUATERNION(R)		from a 3x3 or 4x4 matrix
+%	Q = QUATERNION(q)		from another quaternion
+%
+% All versions, except the first, are guaranteed to return a unit quaternion.
 %
 % A quaternion is a compact method of representing a 3D rotation that has
 % computational advantages including speed and numerical robustness.
@@ -18,12 +21,14 @@
 %	q = cos (theta/2) sin(theta/2) <vx vy vz>
 % where <vx vy vz> is a unit vector.
 
-
-
-%	Copright (C) Peter Corke 1999
-%
 % CHANGES:
-%	12/01	order of arguments to theta,v form, fix bug in same
+% 12/01	order of arguments to theta,v form, fix bug in same
+% $Log: not supported by cvs2svn $
+% $Revision: 1.4 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
+
 function q = quaternion(a1, a2)
 
 
@@ -56,7 +61,7 @@ function q = quaternion(a1, a2)
 %	Return a unit quaternion corresponding to the rotational part of the
 %	homogeneous transform T.
 %
-%	See also Q2TR
+%	See also: Q2TR
 
 %	Copyright (C) 1993 Peter Corke
 function q = tr2q(t)

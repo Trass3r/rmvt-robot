@@ -1,6 +1,15 @@
-%MTIMES	multiply two quaternion objects
+%MTIMES Multiply two quaternion objects
+%
+% Invoked by the * operator, handle two cases:
+%
+% q1*q2	standard quaternion multiplication
+% q1*v	rotate vector v by quaternion
 
-%	Copright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.3 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function qp = mtimes(q1, q2)
 
 	if isa(q2, 'quaternion')
@@ -10,7 +19,7 @@ function qp = mtimes(q1, q2)
 	%
 	%	Return a product of unit-quaternions.
 	%
-	%	See also TR2Q
+	%	See also: TR2Q
 
 	%	Copyright (C) 1993 Peter Corke
 
@@ -29,7 +38,7 @@ function qp = mtimes(q1, q2)
 	%
 	%	Rotate the vector V by the unit-quaternion Q.
 	%
-	%	See also QQMUL, QINV
+	%	See also: QQMUL, QINV
 
 	%	Copyright (C) 1993 Peter Corke
 

@@ -1,6 +1,13 @@
-%MPOWER	raise quaternion object to integer power
+%MPOWER Raise quaternion to integer power
+%
+% Compound the quaternion with itself.  Invoked by means of the caret
+% operator.
 
-%	Copright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function qp = mpower(q, p)
 
 	% check that exponent is an integer

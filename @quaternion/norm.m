@@ -1,12 +1,15 @@
-%NORM	Compute the norm of a quaternion
+%NORM Compute the norm of a quaternion
 %
-%	N = norm(Q)
+%	QN = norm(Q)
 %
-%	Return a unit-quaternion corresponding to the quaternion Q.
+% Return a unit-quaternion corresponding to the quaternion Q.
 %
-%	See also TR2Q
 
-%	Copyright (C) 1993 Peter Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1993-2002, by Peter I. Corke
+
 function n = norm(q)
 
 	n = norm(double(q));

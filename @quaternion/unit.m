@@ -1,7 +1,13 @@
-%UNIT	Unitize a vector
+%UNIT Unitize a quaternion
 %
-%	UNIT(V) returns a unit vector aligned with V.
+%	QU = UNIT(Q)
+%
+% Returns a unit quaternion.
 
-%	Copright (C) Peter Corke 1990
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function qu = unit(q)
 	qu = q / norm(q);

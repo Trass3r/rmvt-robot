@@ -1,4 +1,4 @@
-%SUBSREF	subscript reference methods on a QUATERNION object
+%SUBSREF Reference methods on a QUATERNION object
 %
 %	QUATERNION.d		return a 4-vector of quaternion elements
 %	QUATERNION.s		return the scalar component
@@ -6,7 +6,11 @@
 %	QUATERNION.t		return a 4x4 homogeneous transform
 %	QUATERNION.r		return a 3x3 orthonormal rotation matrix
 
-%	Copyright (C) 2001 Peter. I. Corke
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function v = subsref(q, s)
 	if s(1).type  == '.'
 
@@ -38,7 +42,7 @@ function v = subsref(q, s)
 %	Return the rotational homogeneous transform corresponding to the unit
 %	quaternion Q.
 %
-%	See also TR2Q
+%	See also: TR2Q
 
 %	Copyright (C) 1993 Peter Corke
 function t = q2tr(q)

@@ -1,19 +1,23 @@
-%QINTERP	Interpolate rotations expressed by quaternion objects
+%QINTERP Interpolate rotations expressed by quaternion objects
 %
 %	QI = qinterp(Q1, Q2, R)
 %
-%	Return a unit-quaternion that interpolates between Q1 and Q2 as R moves
-%	from 0 to 1.  This is a spherical linear interpolation (slerp) that can
-%	be interpretted as interpolation along a great circle arc on a sphere.
+% Return a unit-quaternion that interpolates between Q1 and Q2 as R moves
+% from 0 to 1.  This is a spherical linear interpolation (slerp) that can
+% be interpretted as interpolation along a great circle arc on a sphere.
 %
-%	If r is a vector, QI, is a cell array of quaternions.
+% If r is a vector, QI, is a cell array of quaternions, each element
+% corresponding to sequential elements of R.
 %
-%	See also TR2Q
+% See also: CTRAJ
 
 % MOD HISTORY
-% 2/99	convert to use of objects
+% 2/99 convert to use of objects
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
 
-%	Copright (C) Peter Corke 1999
 function q = qinterp(Q1, Q2, r)
 
 

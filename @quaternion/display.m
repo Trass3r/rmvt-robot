@@ -1,6 +1,10 @@
-%DISPLAY	display the value of a quaternion object
+%DISPLAY Display the value of a quaternion object
 
-%	Copright (C) Peter Corke 1999
+% $Log: not supported by cvs2svn $
+% $Revision: 1.2 $
+%
+% Copyright (C) 1999-2002, by Peter I. Corke
+
 function display(q)
 
 	disp(' ');
