@@ -30,8 +30,8 @@
 % 'workspace' [xmin, xmax ymin ymax zmin zmax]
 % 'perspective' 'ortho'		controls camera view mode
 % 'erase' 'noerase'		controls erasure of arm during animation
+% 'loop' 'noloop'		controls endless loop mode
 % 'base' 'nobase'		controls display of base 'pedestal'
-% 'loop' 'noloop'		controls display of base 'pedestal'
 % 'wrist' 'nowrist'		controls display of wrist
 % 'name', 'noname'		display the robot's name 
 % 'shadow' 'noshadow'		controls display of shadow
@@ -71,21 +71,21 @@
 %
 %  A robot comprises a bunch of individual graphical elements and these are 
 % kept in a structure which can be stored within the .handle element of a
-% robot object.
-% h.robot		the robot stick figure
-% h.shadow	the robot's shadow
-% h.x		wrist vectors
-% h.y
-% h.z
-% h.xt		wrist vector labels
-% h.yt
-% h.zt
+% robot object:
+%	h.robot		the robot stick figure
+%	h.shadow	the robot's shadow
+%	h.x		wrist vectors
+%	h.y
+%	h.z
+%	h.xt		wrist vector labels
+%	h.yt
+%	h.zt
 %
 %  The plot function returns a new robot object with the handle element set.
 %
-% For the h.robot object we additionally:
-% save this new robot object as its UserData
-% tag it with the name field from the robot object
+% For the h.robot object we additionally: 
+%	- save this new robot object as its UserData
+%	- tag it with the name field from the robot object
 %
 %  This enables us to find all robots with a given name, in all figures,
 % and update them.
@@ -95,7 +95,10 @@
 % 4/99	use objects
 % 2/01	major rewrite, axis names, drivebot, state etc.
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 12:02:27  pic
+% General tidyup, comments, clarification, copyright, see also, RCS keys.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function rnew = plot(robot, tg, varargin)
@@ -113,6 +116,9 @@ function rnew = plot(robot, tg, varargin)
 		return
 	end
 
+	%
+	% robot2 = ROBOT(robot, q, varargin)
+	%
 	np = numrows(tg);
 	n = robot.n;
 
@@ -120,217 +126,59 @@ function rnew = plot(robot, tg, varargin)
 		error('Insufficient columns in q')
 	end
 
-	if ~isfield(robot, 'handles'),
-		%
-		% if there are no handles in this object we assume it has
-		% been invoked from the command line not drivebot() so we
-		% process the options
-		%
-
-		%%%%%%%%%%%%%% process options
-		erasemode = 'xor';
-		joints = 1;
-		wrist = 1;
-		repeat = 1;
-		shadow = 1;
-		wrist = 1;
-		dims = [];
-		base = 0;
-		wristlabel = 'xyz';
-		projection = 'orthographic';
-		magscale = 1;
-		name = 1;
-
-		% read options string in the order
-		%	1. robot.plotopt
-		%	2. the M-file plotbotopt if it exists
-		%	3. command line arguments
-		if exist('plotbotopt', 'file') == 2,
-			options = plotbotopt;
-			options = [options robot.plotopt varargin];
-		else
-			options = [robot.plotopt varargin];
-		end
-		i = 1;
-		while i <= length(options),
-			switch lower(options{i}),
-			case 'workspace'
-				dims = options{i+1};
-				i = i+1;
-			case 'mag'
-				magscale = options{i+1};
-				i = i+1;
-			case 'perspective'
-				projection = 'perspective';
-			case 'ortho'
-				projection = 'orthographic';
-			case 'erase'
-				erasemode = 'xor';
-			case 'noerase'
-				erasemode = 'none';
-			case 'base'
-				base = 1;
-			case 'nobase'
-				base = 0;
-			case 'loop'
-				repeat = Inf;
-			case 'noloop'
-				repeat = 1;
-			case 'name',
-				name = 1;
-			case 'noname',
-				name = 0;
-			case 'wrist'
-				wrist = 1;
-			case 'nowrist'
-				wrist = 0;
-			case 'shadow'
-				shadow = 1;
-			case 'noshadow'
-				shadow = 0;
-			case 'xyz'
-				wristlabel = 'XYZ';
-			case 'noa'
-				wristlabel = 'NOA';
-			case 'joints'
-				joints = 1;
-			case 'nojoints'
-				joints = 0;
-			otherwise
-				error(['unknown option: ' options{i}]);
-			end
-			i = i+1;
+	if isfield(robot, 'handles'),
+		% handles provided, animate just that robot
+		for r=1:repeat,
+		    for p=1:np,
+			animate( robot, tg(p,:));
+		    end
 		end
 
-		if isempty(dims),
-			%
-			% simple heuristic to figure the maximum reach of the robot
-			%
-			L = robot.link;
-			reach = 0;
-			for i=1:n,
-				reach = reach + abs(L{i}.A) + abs(L{i}.D);
-			end
-			dims = [-reach reach -reach reach -reach reach];
-			mag = reach/10;
-		else
-			reach = min(abs(dims));
-		end
-		mag = magscale * reach/10;
+		return;
 	end
 
-	%
-	% setup an axis in which to animate the robot
-	%
-	if isempty(robot.handle) & isempty(findobj(gcf, 'Tag', robot.name)),
-		if ~ishold,
-			clf
-			axis(dims);
-		end
-		figure(gcf);		% bring to the top
-		xlabel('X')
-		ylabel('Y')
-		zlabel('Z')
-		set(gca, 'drawmode', 'fast');
-		grid on
+	% Do the right thing with figure windows.
 
-		zlim = get(gca, 'ZLim');
-		h.zmin = zlim(1);
+	% get handle of any existing robot of same name
+	rh = findobj('Tag', robot.name);
+	% process options
+	opt = plot_options(robot, varargin);
 
-		if base,
-			b = transl(robot.base);
-			line('xdata', [b(1);b(1)], ...
-				'ydata', [b(2);b(2)], ...
-				'zdata', [h.zmin;b(3)], ...
-				'LineWidth', 4, ...
-				'color', 'red');
-		end
-		if name,
-			b = transl(robot.base);
-			text(b(1), b(2)-mag, [' ' robot.name])
-		end
-		% create a line which we will
-		% subsequently modify.  Set erase mode to xor for fast
-		% update
-		%
-		h.robot = line(robot.lineopt{:}, ...
-			'Erasemode', erasemode);
-		if shadow == 1,
-			h.shadow = line(robot.shadowopt{:}, ...
-				'Erasemode', erasemode);
-		end
+	fh = get(0, 'Children');
+	if isempty(fh)
+		% no figures exist at all, create one
+		disp('no figures at all, creating one')
+		figure
+		pause
+		axis(opt.dims);
+		pause
+		h = create_new_robot(robot, opt);
 
-		if wrist == 1,	
-			h.x = line('xdata', [0;0], ...
-				'ydata', [0;0], ...
-				'zdata', [0;0], ...
-				'color', 'red', ...
-				'erasemode', 'xor');
-			h.y = line('xdata', [0;0], ...
-				'ydata', [0;0], ...
-				'zdata', [0;0], ...
-				'color', 'green', ...
-				'erasemode', 'xor');
-			h.z = line('xdata', [0;0], ...
-				'ydata', [0;0], ...
-				'zdata', [0;0], ...
-				'color', 'blue', ...
-				'erasemode', 'xor');
-			h.xt = text(0, 0, wristlabel(1), 'erasemode', 'xor');
-			h.yt = text(0, 0, wristlabel(2), 'erasemode', 'xor');
-			h.zt = text(0, 0, wristlabel(3), 'erasemode', 'xor');
-
-		end
-
-		%
-		% display cylinders (revolute) or boxes (pristmatic) at
-		% each joint, as well as axis centerline.
-		%
-		if joints == 1,
-			L = robot.link;
-			for i=1:robot.n,
-
-				% cylinder or box to represent the joint
-				if L{i}.sigma == 0,
-					N = 8;
-				else
-					N = 4;
-				end
-				[xc,yc,zc] = cylinder(mag/4, N);
-				zc(zc==0) = -mag/2;
-				zc(zc==1) = mag/2;
-
-				% add the surface object and color it
-				h.joint(i) = surface(xc,yc,zc);
-				%set(h.joint(i), 'erasemode', 'xor');
-				set(h.joint(i), 'FaceColor', 'blue');
-
-				% build a matrix of coordinates so we
-				% can transform the cylinder in animate()
-				% and hang it off the cylinder
-				xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
-				set(h.joint(i), 'UserData', xyz);
-
-				% add a dashed line along the axis
-				h.jointaxis(i) = line('xdata', [0;0], ...
-					'ydata', [0;0], ...
-					'zdata', [0;0], ...
-					'color', 'blue', ...
-					'linestyle', '--', ...
-					'erasemode', 'xor');
-			end
-		end
-		h.mag = mag;
+		% save the handles in the passed robot object, and
+		% attach it to the robot as user data.
 		robot.handle = h;
 		set(h.robot, 'Tag', robot.name);
 		set(h.robot, 'UserData', robot);
+	else 
+		ah = findobj(gcf, 'Type', 'Axes');
+		if isempty(ah),
+			% empty figure, just created, use it
+			disp('Use empty figure')
+			axis(opt.dims);
+			h = create_new_robot(robot, opt);
+
+			% save the handles in the passed robot object, and
+			% attach it to the robot as user data.
+			robot.handle = h;
+			set(h.robot, 'Tag', robot.name);
+			set(h.robot, 'UserData', robot);
+		end
 	end
 
-
-	% save the handles in the passed robot object
+	% now animate all robots tagged with this name
 
 	rh = findobj('Tag', robot.name);
-	for r=1:repeat,
+	for r=1:opt.repeat,
 	    for p=1:np,
 		for r=rh',
 			animate( get(r, 'UserData'), tg(p,:));
@@ -348,6 +196,235 @@ function rnew = plot(robot, tg, varargin)
 	if nargout > 0,
 		rnew = robot;
 	end
+
+%PLOT_OPTIONS
+%
+%	o = PLOT_OPTIONS(robot, options)
+%
+% Returns an options structure
+
+function o = plot_options(robot, optin)
+	%%%%%%%%%%%%%% process options
+	o.erasemode = 'xor';
+	o.joints = 1;
+	o.wrist = 1;
+	o.repeat = 1;
+	o.shadow = 1;
+	o.wrist = 1;
+	o.dims = [];
+	o.base = 0;
+	o.wristlabel = 'xyz';
+	o.projection = 'orthographic';
+	o.magscale = 1;
+	o.name = 1;
+
+	% read options string in the order
+	%	1. robot.plotopt
+	%	2. the M-file plotbotopt if it exists
+	%	3. command line arguments
+	if exist('plotbotopt', 'file') == 2,
+		options = plotbotopt;
+		options = [options robot.plotopt optin];
+	else
+		options = [robot.plotopt optin];
+	end
+	i = 1;
+	while i <= length(options),
+		switch lower(options{i}),
+		case 'workspace'
+			o.dims = options{i+1};
+			i = i+1;
+		case 'mag'
+			o.magscale = options{i+1};
+			i = i+1;
+		case 'perspective'
+			o.projection = 'perspective';
+		case 'ortho'
+			o.projection = 'orthographic';
+		case 'erase'
+			o.erasemode = 'xor';
+		case 'noerase'
+			o.erasemode = 'none';
+		case 'base'
+			o.base = 1;
+		case 'nobase'
+			o.base = 0;
+		case 'loop'
+			o.repeat = Inf;
+		case 'noloop'
+			o.repeat = 1;
+		case 'name',
+			o.name = 1;
+		case 'noname',
+			o.name = 0;
+		case 'wrist'
+			o.wrist = 1;
+		case 'nowrist'
+			o.wrist = 0;
+		case 'shadow'
+			o.shadow = 1;
+		case 'noshadow'
+			o.shadow = 0;
+		case 'xyz'
+			o.wristlabel = 'XYZ';
+		case 'noa'
+			o.wristlabel = 'NOA';
+		case 'joints'
+			o.joints = 1;
+		case 'nojoints'
+			o.joints = 0;
+		otherwise
+			error(['unknown option: ' options{i}]);
+		end
+		i = i+1;
+	end
+
+	if isempty(o.dims),
+		%
+		% simple heuristic to figure the maximum reach of the robot
+		%
+		L = robot.link;
+		reach = 0;
+		for i=1:robot.n,
+			reach = reach + abs(L{i}.A) + abs(L{i}.D);
+		end
+		o.dims = [-reach reach -reach reach -reach reach];
+		o.mag = reach/10;
+	else
+		reach = min(abs(dims));
+	end
+	o.mag = o.magscale * reach/10;
+
+%CREATE_NEW_ROBOT
+% 
+%	h = CREATE_NEW_ROBOT(robot, opt)
+%
+% Using data from robot object and options create a graphical robot in
+% the current figure.
+%
+% Returns a structure of handles to graphical objects.
+%
+% If current figure is empty, draw robot in it
+% If current figure has hold on, add robot to it
+% Otherwise, create new figure and draw robot in it.
+%	
+
+function h = create_new_robot(robot, opt)
+	h.mag = opt.mag;
+
+	%
+	% setup an axis in which to animate the robot
+	%
+	% handles not provided, create graphics
+disp('in creat_new_robot')
+	if ~ishold,
+		% if current figure has hold on, then draw robot here
+		% otherwise, create a new figure
+		disp('not hold')
+		disp('Create new figure')
+		figure
+		axis(opt.dims);
+	end
+	xlabel('X')
+	ylabel('Y')
+	zlabel('Z')
+	set(gca, 'drawmode', 'fast');
+	grid on
+
+
+	zlim = get(gca, 'ZLim');
+	h.zmin = zlim(1);
+
+	if opt.base,
+		b = transl(robot.base);
+		line('xdata', [b(1);b(1)], ...
+			'ydata', [b(2);b(2)], ...
+			'zdata', [h.zmin;b(3)], ...
+			'LineWidth', 4, ...
+			'color', 'red');
+	end
+	if opt.name,
+		b = transl(robot.base);
+		text(b(1), b(2)-opt.mag, [' ' robot.name])
+	end
+	% create a line which we will
+	% subsequently modify.  Set erase mode to xor for fast
+	% update
+	%
+	h.robot = line(robot.lineopt{:}, ...
+		'Erasemode', opt.erasemode);
+	if opt.shadow == 1,
+		h.shadow = line(robot.shadowopt{:}, ...
+			'Erasemode', opt.erasemode);
+	end
+
+	if opt.wrist == 1,	
+		h.x = line('xdata', [0;0], ...
+			'ydata', [0;0], ...
+			'zdata', [0;0], ...
+			'color', 'red', ...
+			'erasemode', 'xor');
+		h.y = line('xdata', [0;0], ...
+			'ydata', [0;0], ...
+			'zdata', [0;0], ...
+			'color', 'green', ...
+			'erasemode', 'xor');
+		h.z = line('xdata', [0;0], ...
+			'ydata', [0;0], ...
+			'zdata', [0;0], ...
+			'color', 'blue', ...
+			'erasemode', 'xor');
+		h.xt = text(0, 0, opt.wristlabel(1), 'erasemode', 'xor');
+		h.yt = text(0, 0, opt.wristlabel(2), 'erasemode', 'xor');
+		h.zt = text(0, 0, opt.wristlabel(3), 'erasemode', 'xor');
+
+	end
+
+	%
+	% display cylinders (revolute) or boxes (pristmatic) at
+	% each joint, as well as axis centerline.
+	%
+	if opt.joints == 1,
+		L = robot.link;
+		for i=1:robot.n,
+
+			% cylinder or box to represent the joint
+			if L{i}.sigma == 0,
+				N = 8;
+			else
+				N = 4;
+			end
+			[xc,yc,zc] = cylinder(opt.mag/4, N);
+			zc(zc==0) = -opt.mag/2;
+			zc(zc==1) = opt.mag/2;
+
+			% add the surface object and color it
+			h.joint(i) = surface(xc,yc,zc);
+			%set(h.joint(i), 'erasemode', 'xor');
+			set(h.joint(i), 'FaceColor', 'blue');
+
+			% build a matrix of coordinates so we
+			% can transform the cylinder in animate()
+			% and hang it off the cylinder
+			xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
+			set(h.joint(i), 'UserData', xyz);
+
+			% add a dashed line along the axis
+			h.jointaxis(i) = line('xdata', [0;0], ...
+				'ydata', [0;0], ...
+				'zdata', [0;0], ...
+				'color', 'blue', ...
+				'linestyle', '--', ...
+				'erasemode', 'xor');
+		end
+	end
+
+%ANIMATE   move an existing graphical robot
+%
+%	animate(robot, q)
+%
+% Move the graphical robot to the pose specified by the joint coordinates q.
+% Graphics are defined by the handle structure robot.handle.
 
 function animate(robot, q)
 
