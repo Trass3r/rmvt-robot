@@ -11,12 +11,16 @@
 % If Q is specified it is used as the initial joint angle, otherwise
 % it is taken from one of the existing graphical robots.
 %
-% SEE ALSO: PLOT
+% SEE ALSO: ROBOT/PLOT, ROBOT
 
 % MOD HISTORY:
 % 	10/01 	fix bug for n<6
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 11:47:12  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.4 $
 
 % Copyright (C) 2001-2002, by Peter I. Corke
 

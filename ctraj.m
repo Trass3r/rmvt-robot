@@ -13,6 +13,8 @@
 % Each trajectory is a 4x4xn matrix, with the last subscript being the
 % point index.
 %
+% SEE ALSO: TRINTERP, QINTERP, TRANSL.
+%
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 
@@ -21,7 +23,11 @@
 % 	4/99	add object support
 % 	6/99	init tt to zeros rather than [], problem with cat() v 5.3
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:11  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 
 
 function tt = ctraj(t0, t1, n)
