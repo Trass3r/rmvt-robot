@@ -18,9 +18,10 @@ function [sys,x0,str,ts] = splotbot(t,x,u,flag, robot)
 		% come here on update
 		if ~isempty(u),
 			plot(robot, u');
+			drawnow
 		end
 		ret = [];
-	case {1, 2, 4, 9}
+	case {1, 4, 9}
 		ret = [];
 	end
 %
@@ -63,6 +64,6 @@ str = [];
 %
 % initialize the array of sample times
 %
-ts  = [0.2 0];
+ts  = [0 0];
  
 % end mdlInitializeSizes

@@ -1,12 +1,33 @@
 Model {
   Name			  "demo4"
-  Version		  3.00
-  SimParamPage		  "Solver"
+  Version		  4.00
   SampleTimeColors	  off
-  InvariantConstants	  off
-  WideVectorLines	  on
-  ShowLineWidths	  on
+  LibraryLinkDisplay	  "all"
+  WideLines		  on
+  ShowLineDimensions	  on
   ShowPortDataTypes	  off
+  RecordCoverage	  off
+  CovPath		  "/"
+  CovSaveName		  "covdata"
+  CovNameIncrementing	  off
+  CovHtmlReporting	  on
+  BlockNameDataTip	  off
+  BlockParametersDataTip  on
+  BlockDescriptionStringDataTip	off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks off
+  BrowserLookUnderMasks	  off
+  Created		  "Tue Jan  8 12:29:23 2002"
+  Creator		  "pic"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "pic"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Mon Feb 11 14:19:26 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:20>"
+  ConfigurationManager	  "none"
+  SimParamPage		  "Solver"
   StartTime		  "0.0"
   StopTime		  "10.0"
   SolverMode		  "Auto"
@@ -15,6 +36,8 @@ Model {
   AbsTol		  "auto"
   Refine		  "1"
   MaxStep		  "auto"
+  MinStep		  "auto"
+  MaxNumMinSteps	  "-1"
   InitialStep		  "auto"
   FixedStep		  "auto"
   MaxOrder		  5
@@ -32,9 +55,9 @@ Model {
   InitialState		  "xInitial"
   SaveFinalState	  off
   FinalStateName	  "xFinal"
-  SaveFormat		  "Matrix"
-  LimitMaxRows		  off
-  MaxRows		  "1000"
+  SaveFormat		  "Array"
+  LimitDataPoints	  off
+  MaxDataPoints		  "1000"
   Decimation		  "1"
   AlgebraicLoopMsg	  "warning"
   MinStepSizeMsg	  "warning"
@@ -42,32 +65,34 @@ Model {
   UnconnectedOutputMsg	  "warning"
   UnconnectedLineMsg	  "warning"
   InheritedTsInSrcMsg	  "warning"
+  SingleTaskRateTransMsg  "none"
+  MultiTaskRateTransMsg	  "error"
   IntegerOverflowMsg	  "warning"
+  CheckForMatrixSingularity "none"
   UnnecessaryDatatypeConvMsg "none"
   Int32ToFloatConvMsg	  "warning"
   SignalLabelMismatchMsg  "none"
-  ConsistencyChecking	  "off"
+  LinearizationMsg	  "none"
+  VectorMatrixConversionMsg "none"
+  SfunCompatibilityCheckMsg "none"
+  BlockPriorityViolationMsg "warning"
+  ArrayBoundsChecking	  "none"
+  ConsistencyChecking	  "none"
   ZeroCross		  on
+  Profile		  off
   SimulationMode	  "normal"
-  BlockDataTips		  on
-  BlockParametersDataTip  on
-  BlockAttributesDataTip  off
-  BlockPortWidthsDataTip  off
-  BlockDescriptionStringDataTip	off
-  BlockMaskParametersDataTip off
-  ToolBar		  on
-  StatusBar		  on
-  BrowserShowLibraryLinks off
-  BrowserLookUnderMasks	  off
-  OptimizeBlockIOStorage  on
-  BufferReuse		  on
-  BooleanDataType	  off
   RTWSystemTargetFile	  "grt.tlc"
   RTWInlineParameters	  off
   RTWRetainRTWFile	  off
   RTWTemplateMakefile	  "grt_default_tmf"
   RTWMakeCommand	  "make_rtw"
   RTWGenerateCodeOnly	  off
+  TLCProfiler		  off
+  TLCDebug		  off
+  TLCCoverage		  off
+  AccelSystemTargetFile	  "accel.tlc"
+  AccelTemplateMakefile	  "accel_default_tmf"
+  AccelMakeCommand	  "make_rtw"
   ExtModeMexFile	  "ext_comm"
   ExtModeBatchMode	  off
   ExtModeTrigType	  "manual"
@@ -85,15 +110,12 @@ Model {
   ExtModeAddSuffixToVar	  off
   ExtModeWriteAllDataToWs off
   ExtModeArmWhenConnect	  off
-  Created		  "Tue Jan  8 12:29:23 2002"
-  Creator		  "pic"
-  UpdateHistory		  "UpdateHistoryNever"
-  ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "pic"
-  ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Jan 27 23:52:45 2002"
-  ModelVersionFormat	  "1.%<AutoIncrement:19>"
-  ConfigurationManager	  "none"
+  ExtModeLogAll		  on
+  OptimizeBlockIOStorage  on
+  BufferReuse		  on
+  ParameterPooling	  on
+  BlockReductionOpt	  off
+  BooleanDataType	  off
   BlockDefaults {
     Orientation		    "right"
     ForegroundColor	    "black"
@@ -143,6 +165,7 @@ Model {
       Position		      [195, 145, 225, 175]
       ForegroundColor	      "gray"
       Gain		      "1"
+      Multiplication	      "Element-wise(K.*u)"
       SaturateOnIntegerOverflow	on
     }
     Block {
@@ -151,12 +174,13 @@ Model {
       Position		      [195, 95, 225, 125]
       ForegroundColor	      "gray"
       Gain		      "100"
+      Multiplication	      "Element-wise(K.*u)"
       SaturateOnIntegerOverflow	on
     }
     Block {
       BlockType		      Reference
       Name		      "Model Info"
-      Ports		      [0, 0, 0, 0, 0]
+      Ports		      []
       Position		      [20, 284, 182, 329]
       ShowName		      off
       FontName		      "Arial"
@@ -167,8 +191,8 @@ Model {
       Frame		      "on"
       DisplayStringWithTags   "Torque feedforward control\n%<Creator>\n%<LastM"
 "odificationDate>"
-      MaskDisplayString	      "Torque feedforward control\\npic\\n26-Jan-2002 "
-"12:03:00"
+      MaskDisplayString	      "Torque feedforward control\\npic\\n11-Feb-2002 "
+"11:36:03"
       HorizontalTextAlignment "Left"
       LeftAlignmentValue      "0.02"
       SourceBlockDiagram      "demo4"
@@ -177,7 +201,7 @@ Model {
     Block {
       BlockType		      Reference
       Name		      "Robot"
-      Ports		      [1, 3, 0, 0, 0]
+      Ports		      [1, 3]
       Position		      [425, 74, 540, 146]
       ForegroundColor	      "orange"
       BackgroundColor	      "red"
@@ -190,7 +214,7 @@ Model {
     Block {
       BlockType		      Sum
       Name		      "Sum"
-      Ports		      [2, 1, 0, 0, 0]
+      Ports		      [2, 1]
       Position		      [120, 100, 140, 120]
       ForegroundColor	      "gray"
       ShowName		      off
@@ -201,7 +225,7 @@ Model {
     Block {
       BlockType		      Sum
       Name		      "Sum1"
-      Ports		      [2, 1, 0, 0, 0]
+      Ports		      [2, 1]
       Position		      [145, 150, 165, 170]
       ForegroundColor	      "gray"
       ShowName		      off
@@ -212,7 +236,7 @@ Model {
     Block {
       BlockType		      Sum
       Name		      "Sum2"
-      Ports		      [2, 1, 0, 0, 0]
+      Ports		      [2, 1]
       Position		      [260, 100, 280, 120]
       ForegroundColor	      "gray"
       ShowName		      off
@@ -223,18 +247,26 @@ Model {
 	PortNumber		1
 	Name			"feedback\ntorque"
 	TestPoint		off
+	LinearAnalysisOutput	off
+	LinearAnalysisInput	off
 	RTWStorageClass		"Auto"
       }
     }
     Block {
       BlockType		      Sum
       Name		      "Sum3"
-      Ports		      [2, 1, 0, 0, 0]
+      Ports		      [2, 1]
       Position		      [370, 100, 390, 120]
       ShowName		      off
       IconShape		      "round"
       Inputs		      "|++"
       SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Terminator
+      Name		      "Terminator"
+      Position		      [565, 125, 585, 145]
+      ShowName		      off
     }
     Block {
       BlockType		      ZeroOrderHold
@@ -246,7 +278,7 @@ Model {
     Block {
       BlockType		      Reference
       Name		      "jtraj"
-      Ports		      [0, 3, 0, 0, 0]
+      Ports		      [0, 3]
       Position		      [20, 91, 70, 189]
       ForegroundColor	      "blue"
       BackgroundColor	      "red"
@@ -259,7 +291,7 @@ Model {
     Block {
       BlockType		      Reference
       Name		      "plot"
-      Ports		      [1, 0, 0, 0, 0]
+      Ports		      [1]
       Position		      [600, 57, 680, 113]
       BackgroundColor	      "red"
       SourceBlock	      "roblocks/plot"
@@ -269,7 +301,7 @@ Model {
     Block {
       BlockType		      Reference
       Name		      "rne"
-      Ports		      [3, 1, 0, 0, 0]
+      Ports		      [3, 1]
       Position		      [195, 197, 290, 263]
       ForegroundColor	      "magenta"
       BackgroundColor	      "red"
@@ -355,13 +387,14 @@ Model {
     Line {
       SrcBlock		      "jtraj"
       SrcPort		      2
-      Points		      [0, 20; 20, 0]
+      Points		      [15, 0]
       Branch {
+	Points			[0, 20]
 	DstBlock		"Sum1"
 	DstPort			2
       }
       Branch {
-	Points			[0, 70]
+	Points			[0, 90]
 	DstBlock		"rne"
 	DstPort			2
       }
@@ -382,14 +415,19 @@ Model {
     Line {
       SrcBlock		      "jtraj"
       SrcPort		      3
-      Points		      [20, 0; 0, 80]
+      Points		      [45, 0; 0, 80]
       DstBlock		      "rne"
       DstPort		      3
+    }
+    Line {
+      SrcBlock		      "Robot"
+      SrcPort		      3
+      DstBlock		      "Terminator"
+      DstPort		      1
     }
     Annotation {
       Position		      [178, 18]
       Text		      "Puma 560  torque feedforward control"
-      FontName		      "helvetica"
       FontSize		      18
       FontWeight	      "bold"
     }
