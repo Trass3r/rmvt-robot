@@ -3,9 +3,14 @@
 %	PLOT(Q)
 %
 % Display the quaternion as a rotated coordinate frame.
+%
+% SEE ALSO: QUATERNION
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 12:06:47  pic
+% General tidyup, help comments, copyright, see also, RCS keys.
+%
+% $Revision: 1.3 $
 %
 % Copyright (C) 1999-2002, by Peter I. Corke
 

@@ -9,12 +9,15 @@
 % If r is a vector, QI, is a cell array of quaternions, each element
 % corresponding to sequential elements of R.
 %
-% See also: CTRAJ
+% See also: CTRAJ, QUATERNION.
 
 % MOD HISTORY
 % 2/99 convert to use of objects
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 12:06:48  pic
+% General tidyup, help comments, copyright, see also, RCS keys.
+%
+% $Revision: 1.3 $
 %
 % Copyright (C) 1999-2002, by Peter I. Corke
 
