@@ -43,7 +43,10 @@
 % 11/96	bug for prismatic case 
 % 3/99	uses objects
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/02 11:24:40  pic
+% Updated comment blocks, fix function names.
+%
+% $Revision: 1.4 $
 
 function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 
@@ -206,15 +209,13 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 			if link.RP == 'R',
 				% revolute
 				tau(p,j) = nn'*(R'*z0) + ...
-					link.G^2 * ( link.Jm*qdd(j) + ...
-						friction(link, qd(j)) ...
-					);
+					link.G^2 * link.Jm*qdd(j) + ...
+					link.G * friction(link, qd(j));
 			else
 				% prismatic
 				tau(p,j) = f'*(R'*z0) + ...
-					link.G^2 * ( link.Jm*qdd(j) + ...
-						friction(link, qd(j)) ...
-					);
+					link.G^2 * link.Jm*qdd(j) + ...
+					link.G * friction(link, qd(j));
 			end
 		end
 	end

@@ -12,7 +12,7 @@
  * \todo Is code for MDH prismatic case correct?
  * \todo Handle robot object base transform
  *
- * $Id: ne.c,v 1.5 2002-02-15 01:14:16 pic Exp $
+ * $Id: ne.c,v 1.6 2002-09-11 04:53:18 pic Exp $
  *
  */
 
@@ -453,8 +453,8 @@ newton_euler (
 		/*
 		 * add actuator dynamics and friction
 		 */
-		t +=  l->G * l->G * (
-			l->Jm * qdd[j*stride] +
+		t +=   l->G * (
+			l->G * l->Jm * qdd[j*stride] +
 			l->B * qd[j*stride] +
 			(qd[j*stride] > 0 ? l->Tc[0] : 0.0) +
 			(qd[j*stride] < 0 ? l->Tc[1] : 0.0)
