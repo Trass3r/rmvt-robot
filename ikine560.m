@@ -32,7 +32,7 @@
 %  4/99 use new robot object
 %  4/02 tidyup, remove multiple solutions
 
-function q = ikine560(robot, T,configuration)
+function theta = ikine560(robot, T,configuration)
 
 	if robot.n ~= 6,
 		error('Solution only applicable for 6DOF manipulator');
@@ -42,7 +42,7 @@ function q = ikine560(robot, T,configuration)
 		error('Solution only applicable for standard DH conventions');
 	end
 	L = robot.links;
-	a1 = L{1}.A
+	a1 = L{1}.A;
 	a2 = L{2}.A;
 	a3 = L{3}.A;
 
@@ -80,7 +80,11 @@ function q = ikine560(robot, T,configuration)
 	% The configuration parameter determines what n1,n2,n4 values are used
 	% and how many solutions are determined which have values of -1 or +1.
 
-	configuration = lower(configuration);
+	if nargin < 3,
+		configuration = '';
+	else
+		configuration = lower(configuration);
+	end
 
 	% default configuration
 
