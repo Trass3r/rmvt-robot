@@ -1,53 +1,49 @@
 Installation:
 ------------
 
-simply copy all the .m files into a directory 'robot' 
-
-add the directory robot to your MATLABPATH
-
-start MATLAB
-
->> startup_rvc
-
-Help:
-----
-
-1: manual
+simply copy all the .m files into a directory 'robot' which is in your
+MATLABPATH.
 
 robot.pdf is the documentation in standard Mathworks style.  It is
 formatted for double sided printing which makes for a more compact
 manual and saves trees.
 
-2: desktop help GUI
-from the Matlab desktop, choose help, and select the Robotics Toolbox
-option.  HTML format documentation for all functions is available.
+Run the demo `rtdemo' to see how to use this.
 
-3: command line
-use the help command from the command prompt, eg. help ikine
+Citing the Toolbox:
+------------------
 
-4: the web
+If you use the Toolbox and want to cite it in a paper please use:
 
-http://www.petercorke.com/RTB/r9/html
+@ARTICLE{Corke96b,
+	AUTHOR             = {P.I. Corke},
+	JOURNAL            = {IEEE Robotics and Automation Magazine},
+	MONTH              = mar,
+	NUMBER             = {1},
+	PAGES              = {24-32},
+	TITLE              = {A Robotics Toolbox for {MATLAB}},
+	VOLUME             = {3},
+	YEAR               = {1996}
+}
+
+Things to do:
+------------
+
+There are many things that could be done to improve the functionality of this
+toolbox.  I'd be happy to correspond with anybody regarding bug fixes or
+enhancements.  Some things to be added one day include:
+
+* more manipulator models
+* other rotational representations
+* more tutorial material, particularly on quaternions and hom. transforms
+* more examples
+* Simulink wrappers (part way there...)
 
 
-Demos:
------
+Home page:
+---------
+	http://www.cat.csiro.au/cmst/staff/pic/robot
 
+Please email bug reports, comments or code contribtions to me.
 
-2: desktop menu bar
-from the menu bar choose demos, and select the Robotics Toolbox
-
-3: command prompt
-    >> rtbdemos
-
-
-Online resources:
-----------------
-
-Home page:         http://www.petercorke.com
-Discussion group:  http://groups.google.com/group/robotics-tool-box?hl=en
-Manual pages:      http://www.petercorke.com/RTB/r9/html
-
-Please email bug reports, comments or code contribtions to me at rvc@petercorke.com
-
-                                                            Peter Corke	
+	Peter Corke	pic@cat.csiro.au

@@ -1,90 +1,37 @@
-%TRANSL Create or unpack an SE3 translational transform
+%TRANSL	Translational transform
 %
-% Create a translational transformation matrix::
+%	T= TRANSL(X, Y, Z)
+%	T= TRANSL( [X Y Z] )
 %
-% T = TRANSL(X, Y, Z) is an SE(3) homogeneous transform (4x4) representing
-% a pure translation of X, Y and Z.
+%	[X Y Z]' = TRANSL(T)
 %
-% T = TRANSL(P) is an SE(3) homogeneous transform (4x4) representing a
-% translation of P=[X,Y,Z]. If P (Mx3) it represents a sequence and T
-% (4x4xM) is a sequence of homogeneous transforms such that T(:,:,i)
-% corresponds to the i'th row of P.
+%	[X Y Z] = TRANSL(TG)
 %
-% Unpack the translational part of a transformation matrix::
+%	Returns a homogeneous transformation representing a 
+%	translation of X, Y and Z.
 %
-% P = TRANSL(T) is the translational part of a homogeneous transform T as a
-% 3-element column vector.  If T (4x4xM) is a homogeneous transform
-% sequence the rows of P (Mx3) are the translational component of the
-% corresponding transform in the sequence.
+%	The third form returns the translational part of a
+%	homogenous transform as a 3-element column vector.
 %
-% [X,Y,Z] = TRANSL(T) is the translational part of a homogeneous transform
-% T as three components.  If T (4x4xM) is a homogeneous transform sequence
-% then X,Y,Z (1xM) are the translational components of the corresponding
-% transform in the sequence.
+%	The fourth form returns a  matrix of the X, Y and Z elements
+%	extracted from a Cartesian trajectory matrix TG.
 %
-% Notes::
-% - Somewhat unusually this function performs a function and its inverse.  An
-%   historical anomaly.
-%
-% See also CTRAJ.
+%	See also ROTX, ROTY, ROTZ, ROTVEC.
 
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
-function [t1,t2,t3] = transl(x, y, z)
-    if nargin == 1
-        if ishomog(x)
-            if ndims(x) == 3
-                % transl(T)  -> P, trajectory case
-                if nargout == 1
-                    t1 = squeeze(x(1:3,4,:))';
-                elseif nargout == 3
-                    t1 = squeeze(x(1,4,:))';
-                    t2 = squeeze(x(2,4,:))';
-                    t3 = squeeze(x(3,4,:))';
-                end
-            else
-                % transl(T)  -> P
-                if nargout == 1 || nargout == 0
-                    t1 = x(1:3,4);
-                elseif nargout == 3
-                    t1 = x(1,4);
-                    t2 = x(2,4);
-                    t3 = x(3,4);
-                end
-                    
-            end
-        elseif length(x) == 3
-            % transl(P) -> T
-            t = x(:);
-            t1 =    [eye(3)          t(:);
-                0   0   0   1];
-        else
-            % transl(P) -> T, trajectory case
-            n = numrows(x);
-            t1 = repmat(eye(4,4), [1 1 n]);
-            t1(1:3,4,:) = x';
-        end    
-    elseif nargin == 3
-        % transl(x,y,z) -> T
-        t = [x; y; z];
-        t1 =    rt2tr( eye(3), t);
-    end
+% 	Copyright (C) Peter Corke 1990
+function r = transl(x, y, z)
+	if nargin == 1,
+		if ishomog(x),
+			r = x(1:3,4);
+		elseif ndims(x) == 3,
+			r = squeeze(x(1:3,4,:))';
+		else
+			t = x(:);
+			r =    [eye(3)			t;
+				0	0	0	1];
+		end
+	elseif nargin == 3,
+		t = [x; y; z];
+		r =    [eye(3)			t;
+			0	0	0	1];
+	end
