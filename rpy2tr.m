@@ -4,12 +4,16 @@
 %	TR = RPY2TR(R,P,Y)
 %
 % Returns a homogeneous tranformation for the specified roll/pitch/yaw angles.
-% These correspond to rotations about the Z, X, Y axes respectively.
+% These correspond to rotations about the Z, Y, X axes respectively.
 %
 % See also: TR2RPY, EUL2TR
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:16  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function r = rpy2tr(roll, pitch, yaw)
