@@ -3,7 +3,7 @@
 %	EUL2TR([R P Y])
 %	EUL2TR(R,P,Y) returns a homogeneous tranformation for the specified
 %	Euler angles.  These correspond to rotations about the
-%	Z, X, Z axes respectively.
+%	Z, Y, Z axes respectively.
 %
 %	See also TR2EUL, RPY2TR
 
