@@ -47,6 +47,12 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 	grav = robot.gravity;	% default gravity from the object
 	fext = zeros(6, 1);
 
+	% Set debug to:
+	%	0 no messages
+	%	1 display results of forward and backward recursions
+	%	2 display print R and p*
+	debug = 0;
+
 	n = robot.n;
 	if numcols(a1) == 3*n,
 		Q = a1(:,1:n);
@@ -90,7 +96,7 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 		w = zeros(3,1);
 		wd = zeros(3,1);
 		v = zeros(3,1);
-		vd = grav;
+		vd = grav(:);
 
 	%
 	% init some variables, compute the link rotation matrices
@@ -106,6 +112,10 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 			end
 			alpha = link.alpha;
 			pstarm(:,j) = [link.A; D*sin(alpha); D*cos(alpha)];
+			if debug>1,
+				Rm{j}
+				Pstarm(:,j)'
+			end
 		end
 
 	%
@@ -147,12 +157,20 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 			Fm = [Fm F];
 			Nm = [Nm N];
 
+			if debug,
+				fprintf('w: '); fprintf('%.3f ', w)
+				fprintf('\nwd: '); fprintf('%.3f ', wd)
+				fprintf('\nvd: '); fprintf('%.3f ', vd)
+				fprintf('\nvdbar: '); fprintf('%.3f ', vhat)
+				fprintf('\n');
+			end
 		end
 
 	%
 	%  the backward recursion
 	%
 
+		fext = fext(:);
 		f = fext(1:3);		% force/moments on end of arm
 		nn = fext(4:6);
 
@@ -174,6 +192,12 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 				cross(pstar+r,Fm(:,j)) + ...
 				Nm(:,j);
 			f = R*f + Fm(:,j);
+			if debug,
+				fprintf('f: '); fprintf('%.3f ', f)
+				fprintf('\nn: '); fprintf('%.3f ', nn)
+				fprintf('\n');
+			end
+
 			R = Rm{j};
 			if link.RP == 'R',
 				% revolute

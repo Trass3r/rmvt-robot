@@ -45,7 +45,12 @@ function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 	z0 = [0;0;1];
 	grav = robot.gravity;	% default gravity from the object
 	fext = zeros(6, 1);
-	debug = 1;
+
+	% Set debug to:
+	%	0 no messages
+	%	1 display results of forward and backward recursions
+	%	2 display print R and p*
+	debug = 0;
 
 	n = robot.n;
 	if numcols(a1) == 3*n,
@@ -90,7 +95,7 @@ function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 		w = zeros(3,1);
 		wd = zeros(3,1);
 		v = zeros(3,1);
-		vd = grav;
+		vd = grav(:);
 
 	%
 	% init some variables, compute the link rotation matrices
@@ -106,6 +111,10 @@ function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 			end
 			alpha = link.alpha;
 			Pm(:,j) = [link.A; -D*sin(alpha); D*cos(alpha)];	% (i-1) P i
+			if debug>1,
+				Rm{j}
+				Pm(:,j)'
+			end
 		end
 
 	%
@@ -162,6 +171,7 @@ function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 	%  the backward recursion
 	%
 
+		fext = fext(:);
 		f = fext(1:3);		% force/moments on end of arm
 		nn = fext(4:6);
 
