@@ -2,6 +2,7 @@
 %
 %	ROBOT
 %	ROBOT(robot)		create a copy of an existing ROBOT object
+%	ROBOT(robot, LINK)	replaces links for robot object
 %	ROBOT(LINK, ...)	create from a cell array of LINK objects
 %	ROBOT(DH, ...)		create from legacy DYN matrix
 %	ROBOT(DYN, ...)		create from legacy DYN matrix
@@ -16,7 +17,7 @@
 
 
 %	Copyright (C) Peter Corke 1999
-function r = robot(L, name, manuf, comment)
+function r = robot(L, a1, a2, a3)
 
 	if nargin == 0
 		r.name = 'noname';
@@ -36,19 +37,23 @@ function r = robot(L, name, manuf, comment)
 		r = class(r, 'robot');
 	elseif isa(L, 'robot')
 		r = L;
+		if nargin == 2,
+			r.link = a1;
+		end
 	else
+		% assume arguments are: name, manuf, comment
 		if nargin > 1,
-			r.name = name;
+			r.name = a1;
 		else
 			r.name = 'noname';
 		end
 		if nargin > 2,
-			r.manuf = manuf;
+			r.manuf = a2;
 		else
 			r.manuf = '';
 		end
 		if nargin > 3,
-			r.comment = comment;
+			r.comment = a3;
 		else
 			r.comment = '';
 		end

@@ -51,6 +51,7 @@
 %	3/99	uses objects
 %	6/99	initialize qt before loop
 %	2/01	remove inv(base) xform, since it is included in fkine
+%	10/01	bug in mask for <6 axes
 
 function qt = ikine(robot, tr, q, m)
 	%
@@ -71,7 +72,7 @@ function qt = ikine(robot, tr, q, m)
 		if length(m) ~= 6,
 			error('Mask matrix should have 6 elements');
 		end
-		if find(m) ~= robot.n 
+		if length(find(m)) ~= robot.n 
 			error('Mask matrix must same number of 1s as robot DOF')
 		end
 	else

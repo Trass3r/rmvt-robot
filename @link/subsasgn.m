@@ -51,7 +51,9 @@ function l = subsasgn(l, s, v)
 	case 'I',
 		if all(size(v) == [3 3])
 			l.I = v;
-		else
+		elseif length(v) == 3,
+			l.I = diag(v);
+		elseif length(v) == 6,
 			l.I = [	v(1) v(4) v(6)
 				v(4) v(2) v(5)
 				v(6) v(5) v(3)];

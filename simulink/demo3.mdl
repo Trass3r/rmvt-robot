@@ -1,0 +1,886 @@
+Model {
+  Name			  "demo3"
+  Version		  3.00
+  SimParamPage		  "Solver"
+  SampleTimeColors	  off
+  InvariantConstants	  off
+  WideVectorLines	  on
+  ShowLineWidths	  on
+  ShowPortDataTypes	  off
+  StartTime		  "0.0"
+  StopTime		  "10.0"
+  SolverMode		  "Auto"
+  Solver		  "ode45"
+  RelTol		  "1e-3"
+  AbsTol		  "auto"
+  Refine		  "1"
+  MaxStep		  "auto"
+  InitialStep		  "auto"
+  FixedStep		  "auto"
+  MaxOrder		  5
+  OutputOption		  "RefineOutputTimes"
+  OutputTimes		  "[]"
+  LoadExternalInput	  off
+  ExternalInput		  "[t, u]"
+  SaveTime		  on
+  TimeSaveName		  "tout"
+  SaveState		  off
+  StateSaveName		  "xout"
+  SaveOutput		  on
+  OutputSaveName	  "yout"
+  LoadInitialState	  off
+  InitialState		  "xInitial"
+  SaveFinalState	  off
+  FinalStateName	  "xFinal"
+  SaveFormat		  "Matrix"
+  LimitMaxRows		  off
+  MaxRows		  "1000"
+  Decimation		  "1"
+  AlgebraicLoopMsg	  "warning"
+  MinStepSizeMsg	  "warning"
+  UnconnectedInputMsg	  "warning"
+  UnconnectedOutputMsg	  "warning"
+  UnconnectedLineMsg	  "warning"
+  InheritedTsInSrcMsg	  "warning"
+  IntegerOverflowMsg	  "warning"
+  UnnecessaryDatatypeConvMsg "none"
+  Int32ToFloatConvMsg	  "warning"
+  SignalLabelMismatchMsg  "none"
+  ConsistencyChecking	  "off"
+  ZeroCross		  on
+  SimulationMode	  "normal"
+  BlockDataTips		  on
+  BlockParametersDataTip  on
+  BlockAttributesDataTip  off
+  BlockPortWidthsDataTip  off
+  BlockDescriptionStringDataTip	off
+  BlockMaskParametersDataTip off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks off
+  BrowserLookUnderMasks	  off
+  OptimizeBlockIOStorage  on
+  BufferReuse		  on
+  BooleanDataType	  off
+  RTWSystemTargetFile	  "grt.tlc"
+  RTWInlineParameters	  off
+  RTWRetainRTWFile	  off
+  RTWTemplateMakefile	  "grt_default_tmf"
+  RTWMakeCommand	  "make_rtw"
+  RTWGenerateCodeOnly	  off
+  ExtModeMexFile	  "ext_comm"
+  ExtModeBatchMode	  off
+  ExtModeTrigType	  "manual"
+  ExtModeTrigMode	  "oneshot"
+  ExtModeTrigPort	  "1"
+  ExtModeTrigElement	  "any"
+  ExtModeTrigDuration	  1000
+  ExtModeTrigHoldOff	  0
+  ExtModeTrigDelay	  0
+  ExtModeTrigDirection	  "rising"
+  ExtModeTrigLevel	  0
+  ExtModeArchiveMode	  "off"
+  ExtModeAutoIncOneShot	  off
+  ExtModeIncDirWhenArm	  off
+  ExtModeAddSuffixToVar	  off
+  ExtModeWriteAllDataToWs off
+  ExtModeArmWhenConnect	  off
+  Created		  "Tue Jan  8 12:29:23 2002"
+  Creator		  "pic"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "pic"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Sun Jan 27 23:48:09 2002"
+  ModelVersionFormat	  "1.%<AutoIncrement:16>"
+  ConfigurationManager	  "none"
+  BlockDefaults {
+    Orientation		    "right"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    NamePlacement	    "normal"
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    ShowName		    on
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    "center"
+    VerticalAlignment	    "middle"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  System {
+    Name		    "demo3"
+    Location		    [228, 72, 970, 414]
+    Open		    on
+    ModelBrowserVisibility  off
+    ModelBrowserWidth	    200
+    ScreenColor		    "white"
+    PaperOrientation	    "landscape"
+    PaperPositionMode	    "auto"
+    PaperType		    "usletter"
+    PaperUnits		    "inches"
+    ZoomFactor		    "100"
+    AutoZoom		    on
+    ReportName		    "simulink-default.rpt"
+    Block {
+      BlockType		      Clock
+      Name		      "Clock"
+      Position		      [310, 241, 380, 269]
+      DisplayTime	      on
+      Decimation	      "10"
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "Kd"
+      Position		      [525, 60, 555, 90]
+      ForegroundColor	      "gray"
+      Gain		      "1"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "Kp"
+      Position		      [495, 15, 525, 45]
+      ForegroundColor	      "gray"
+      Gain		      "100"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Model Info"
+      Ports		      [0, 0, 0, 0, 0]
+      Position		      [25, 248, 228, 302]
+      ShowName		      off
+      FontName		      "Arial"
+      SourceBlock	      "simulink3/Signals\n& Systems/Model Info"
+      SourceType	      "CMBlock"
+      InitialBlockCM	      "none"
+      BlockCM		      "none"
+      Frame		      "on"
+      DisplayStringWithTags   "Puma560 computed torque control\n%<Creator>\n%<"
+"LastModificationDate>"
+      MaskDisplayString	      "Puma560 computed torque control\\npic\\n11-Jan-"
+"2002 14:21:05"
+      HorizontalTextAlignment "Left"
+      LeftAlignmentValue      "0.02"
+      SourceBlockDiagram      "demo3"
+      TagMaxNumber	      "20"
+    }
+    Block {
+      BlockType		      Mux
+      Name		      "Mux"
+      Ports		      [4, 1, 0, 0, 0]
+      Position		      [505, 240, 510, 330]
+      ShowName		      off
+      Inputs		      "4"
+      DisplayOption	      "bar"
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Robot"
+      Ports		      [1, 3, 0, 0, 0]
+      Position		      [305, 114, 420, 186]
+      ForegroundColor	      "orange"
+      BackgroundColor	      "red"
+      DropShadow	      on
+      ShowPortLabels	      on
+      MaskDescription	      "Dynamic model of robot"
+      MaskHelp		      "gravity comes from the robot object\n"
+      MaskPromptString	      "Robot object|Initial state"
+      MaskStyleString	      "edit,edit"
+      MaskTunableValueString  "on,on"
+      MaskCallbackString      "|"
+      MaskEnableString	      "on,on"
+      MaskVisibilityString    "on,on"
+      MaskVariables	      "robot=@1;q0=@2;"
+      MaskInitialization      "n = robot.n;"
+      MaskDisplay	      "text(0.5, 0.8, robot.name, 'horizontalAlignment"
+"', 'center')\nport_label('input', 1, 'tau')\nport_label('output', 1, 'q')\npo"
+"rt_label('output', 2, 'qd')\nport_label('output', 3, 'qdd')"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "normalized"
+      MaskValueString	      "nofriction(p560, 'coulomb')|[0 0 0 0 0 0]"
+      System {
+	Name			"Robot"
+	Location		[436, 48, 968, 276]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	AutoZoom		on
+	Block {
+	  BlockType		  Inport
+	  Name			  "tau"
+	  Position		  [20, 98, 50, 112]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	  DataType		  "auto"
+	  SignalType		  "auto"
+	  Interpolate		  on
+	}
+	Block {
+	  BlockType		  Integrator
+	  Name			  "Integrator"
+	  Ports			  [1, 1, 0, 0, 0]
+	  Position		  [265, 65, 295, 95]
+	  ShowName		  off
+	  ExternalReset		  "none"
+	  InitialConditionSource  "internal"
+	  InitialCondition	  "0"
+	  LimitOutput		  off
+	  UpperSaturationLimit	  "inf"
+	  LowerSaturationLimit	  "-inf"
+	  ShowSaturationPort	  off
+	  ShowStatePort		  off
+	  AbsoluteTolerance	  "auto"
+	  Port {
+	    PortNumber		    1
+	    Name		    "qd"
+	    TestPoint		    off
+	    RTWStorageClass	    "Auto"
+	  }
+	}
+	Block {
+	  BlockType		  Integrator
+	  Name			  "Integrator1"
+	  Ports			  [1, 1, 0, 0, 0]
+	  Position		  [345, 65, 375, 95]
+	  ShowName		  off
+	  ExternalReset		  "none"
+	  InitialConditionSource  "internal"
+	  InitialCondition	  "0"
+	  LimitOutput		  off
+	  UpperSaturationLimit	  "inf"
+	  LowerSaturationLimit	  "-inf"
+	  ShowSaturationPort	  off
+	  ShowStatePort		  off
+	  AbsoluteTolerance	  "auto"
+	}
+	Block {
+	  BlockType		  MATLABFcn
+	  Name			  "MATLAB Fcn"
+	  Position		  [155, 65, 215, 95]
+	  MATLABFcn		  "accel(robot, u)"
+	  OutputWidth		  "n"
+	  OutputSignalType	  "real"
+	  Port {
+	    PortNumber		    1
+	    Name		    "qdd"
+	    TestPoint		    off
+	    RTWStorageClass	    "Auto"
+	  }
+	}
+	Block {
+	  BlockType		  Mux
+	  Name			  "Mux"
+	  Ports			  [3, 1, 0, 0, 0]
+	  Position		  [105, 44, 115, 116]
+	  ShowName		  off
+	  Inputs		  "3"
+	  DisplayOption		  "bar"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "q"
+	  Position		  [435, 73, 465, 87]
+	  Port			  "1"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "qd"
+	  Position		  [440, 128, 470, 142]
+	  Port			  "2"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "qdd"
+	  Position		  [440, 173, 470, 187]
+	  Port			  "3"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Line {
+	  Name			  "qdd"
+	  Labels		  [0, 0]
+	  SrcBlock		  "MATLAB Fcn"
+	  SrcPort		  1
+	  Points		  [30, 0]
+	  Branch {
+	    Points		    [0, 100]
+	    DstBlock		    "qdd"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Integrator"
+	    DstPort		    1
+	  }
+	}
+	Line {
+	  SrcBlock		  "Mux"
+	  SrcPort		  1
+	  DstBlock		  "MATLAB Fcn"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "qd"
+	  Labels		  [0, 0]
+	  SrcBlock		  "Integrator"
+	  SrcPort		  1
+	  Points		  [30, 0]
+	  Branch {
+	    Points		    [0, 55]
+	    DstBlock		    "qd"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Integrator1"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Points		    [0, -50; -285, 0; 0, 50]
+	    DstBlock		    "Mux"
+	    DstPort		    2
+	  }
+	}
+	Line {
+	  SrcBlock		  "tau"
+	  SrcPort		  1
+	  DstBlock		  "Mux"
+	  DstPort		  3
+	}
+	Line {
+	  SrcBlock		  "Integrator1"
+	  SrcPort		  1
+	  Points		  [25, 0]
+	  Branch {
+	    DstBlock		    "q"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Points		    [0, -60; -325, 0; 0, 35]
+	    DstBlock		    "Mux"
+	    DstPort		    1
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      Sum
+      Name		      "Sum"
+      Ports		      [2, 1, 0, 0, 0]
+      Position		      [435, 20, 455, 40]
+      ForegroundColor	      "gray"
+      ShowName		      off
+      IconShape		      "round"
+      Inputs		      "|+-"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Sum
+      Name		      "Sum1"
+      Ports		      [2, 1, 0, 0, 0]
+      Position		      [465, 65, 485, 85]
+      ForegroundColor	      "gray"
+      ShowName		      off
+      IconShape		      "round"
+      Inputs		      "|+-"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Sum
+      Name		      "Sum2"
+      Ports		      [2, 1, 0, 0, 0]
+      Position		      [580, 20, 600, 40]
+      ForegroundColor	      "gray"
+      ShowName		      off
+      IconShape		      "round"
+      Inputs		      "|++"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      ToWorkspace
+      Name		      "To Workspace"
+      Position		      [535, 270, 595, 300]
+      VariableName	      "simout"
+      Buffer		      "inf"
+      Decimation	      "1"
+      SampleTime	      "-1"
+      SaveFormat	      "Matrix"
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "jtraj"
+      Ports		      [0, 2, 0, 0, 0]
+      Position		      [35, 115, 85, 170]
+      ForegroundColor	      "blue"
+      BackgroundColor	      "red"
+      ShowPortLabels	      on
+      MaskDescription	      "Robot Jacobian for end-effector coordinates"
+      MaskPromptString	      "q0|qf|tmax"
+      MaskStyleString	      "edit,edit,edit"
+      MaskTunableValueString  "on,on,on"
+      MaskCallbackString      "||"
+      MaskEnableString	      "on,on,on"
+      MaskVisibilityString    "on,on,on"
+      MaskVariables	      "q0=@1;qf=@2;tmax=@3;"
+      MaskInitialization      "n = length(q0);\nif length(q0) ~= length(qf) ,"
+"\n error('q0 and qf must be same length')\nend\nt=[0:100]'/100*tmax;\n[q,qd] "
+"= jtraj(q0, qf, t);"
+      MaskDisplay	      "port_label('output', 1, 'q')\nport_label('outpu"
+"t', 2, 'qd')"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "normalized"
+      MaskValueString	      "[0 0 0 0 0 0]|[pi/4 pi/2 -pi/2 0 0 0]|10"
+      System {
+	Name			"jtraj"
+	Location		[344, 507, 708, 656]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	AutoZoom		on
+	Block {
+	  BlockType		  Clock
+	  Name			  "Clock"
+	  Position		  [20, 30, 40, 50]
+	  DisplayTime		  off
+	  Decimation		  "10"
+	}
+	Block {
+	  BlockType		  MATLABFcn
+	  Name			  "MATLAB Fcn"
+	  Position		  [105, 25, 165, 55]
+	  MATLABFcn		  "interp1(t,q,u)"
+	  OutputWidth		  "n"
+	  OutputSignalType	  "auto"
+	}
+	Block {
+	  BlockType		  MATLABFcn
+	  Name			  "MATLAB Fcn1"
+	  Position		  [110, 75, 170, 105]
+	  MATLABFcn		  "interp1(t,qd,u)"
+	  OutputWidth		  "n"
+	  OutputSignalType	  "auto"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "q"
+	  Position		  [220, 33, 250, 47]
+	  Port			  "1"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "qd"
+	  Position		  [220, 83, 250, 97]
+	  Port			  "2"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Line {
+	  SrcBlock		  "MATLAB Fcn"
+	  SrcPort		  1
+	  DstBlock		  "q"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "MATLAB Fcn1"
+	  SrcPort		  1
+	  DstBlock		  "qd"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Clock"
+	  SrcPort		  1
+	  Points		  [30, 0]
+	  Branch {
+	    DstBlock		    "MATLAB Fcn"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Points		    [0, 50]
+	    DstBlock		    "MATLAB Fcn1"
+	    DstPort		    1
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "plot"
+      Ports		      [1, 0, 0, 0, 0]
+      Position		      [645, 97, 725, 153]
+      BackgroundColor	      "red"
+      ShowPortLabels	      on
+      MaskHelp		      "This block graphically displays the named robot"
+      MaskPromptString	      "Name of robot"
+      MaskStyleString	      "edit"
+      MaskTunableValueString  "on"
+      MaskEnableString	      "on"
+      MaskVisibilityString    "on"
+      MaskVariables	      "robot=@1;"
+      MaskInitialization      "plot(robot,zeros(1,robot.n))"
+      MaskDisplay	      "text(0.5, 0.5,  robot.name, 'horizontalAlignmen"
+"t', 'center')"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "normalized"
+      MaskValueString	      "p560"
+      System {
+	Name			"plot"
+	Location		[219, 514, 484, 596]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	AutoZoom		on
+	Block {
+	  BlockType		  Inport
+	  Name			  "q"
+	  Position		  [25, 33, 55, 47]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	  DataType		  "auto"
+	  SignalType		  "auto"
+	  Interpolate		  on
+	}
+	Block {
+	  BlockType		  "S-Function"
+	  Name			  "S-Function"
+	  Ports			  [1, 0, 0, 0, 0]
+	  Position		  [125, 25, 185, 55]
+	  FunctionName		  "slplotbot"
+	  Parameters		  "robot"
+	  PortCounts		  "[]"
+	  SFunctionModules	  "''"
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator"
+	  Position		  [220, 30, 240, 50]
+	}
+	Line {
+	  Points		  [190, 40]
+	  DstBlock		  "Terminator"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "q"
+	  SrcPort		  1
+	  DstBlock		  "S-Function"
+	  DstPort		  1
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "rne"
+      Ports		      [3, 1, 0, 0, 0]
+      Position		      [165, 117, 260, 183]
+      BackgroundColor	      "red"
+      ShowPortLabels	      on
+      MaskDescription	      "Robot Jacobian for end-effector coordinates"
+      MaskPromptString	      "Gravity|Robot object"
+      MaskStyleString	      "edit,edit"
+      MaskTunableValueString  "on,on"
+      MaskCallbackString      "|"
+      MaskEnableString	      "on,on"
+      MaskVisibilityString    "on,on"
+      MaskVariables	      "grav=@1;robot=@2;"
+      MaskInitialization      "n=robot.n;"
+      MaskDisplay	      "port_label('output', 1, 'tau')\nport_label('inp"
+"ut', 1, 'q')\nport_label('input', 2, 'qd')\nport_label('input', 3, 'qdd')\nte"
+"xt(1, 0.2, robot.name,  'horizontalAlignment', 'right')"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "normalized"
+      MaskValueString	      "[0 0 9.81]|perturb(nofriction(p560, 'coulomb'))"
+      System {
+	Name			"rne"
+	Location		[240, 487, 732, 638]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	AutoZoom		on
+	Block {
+	  BlockType		  Inport
+	  Name			  "q"
+	  Position		  [20, 33, 50, 47]
+	  Port			  "1"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	  DataType		  "auto"
+	  SignalType		  "auto"
+	  Interpolate		  on
+	}
+	Block {
+	  BlockType		  Inport
+	  Name			  "qd"
+	  Position		  [20, 73, 50, 87]
+	  Port			  "2"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	  DataType		  "auto"
+	  SignalType		  "auto"
+	  Interpolate		  on
+	}
+	Block {
+	  BlockType		  Inport
+	  Name			  "qdd"
+	  Position		  [15, 113, 45, 127]
+	  Port			  "3"
+	  PortWidth		  "-1"
+	  SampleTime		  "-1"
+	  DataType		  "auto"
+	  SignalType		  "auto"
+	  Interpolate		  on
+	}
+	Block {
+	  BlockType		  MATLABFcn
+	  Name			  "MATLAB Fcn"
+	  Position		  [115, 66, 290, 94]
+	  MATLABFcn		  "rne(robot, u(1:n)', u(n+1:2*n)', u(2*n+1:3*"
+"n)')"
+	  OutputWidth		  "n"
+	  OutputSignalType	  "auto"
+	}
+	Block {
+	  BlockType		  Mux
+	  Name			  "Mux"
+	  Ports			  [3, 1, 0, 0, 0]
+	  Position		  [85, 21, 90, 139]
+	  ShowName		  off
+	  Inputs		  "3"
+	  DisplayOption		  "bar"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "tau"
+	  Position		  [370, 73, 400, 87]
+	  Port			  "1"
+	  OutputWhenDisabled	  "held"
+	  InitialOutput		  "[]"
+	}
+	Line {
+	  SrcBlock		  "Mux"
+	  SrcPort		  1
+	  DstBlock		  "MATLAB Fcn"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "q"
+	  SrcPort		  1
+	  DstBlock		  "Mux"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "qd"
+	  SrcPort		  1
+	  DstBlock		  "Mux"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "qdd"
+	  SrcPort		  1
+	  DstBlock		  "Mux"
+	  DstPort		  3
+	}
+	Line {
+	  SrcBlock		  "MATLAB Fcn"
+	  SrcPort		  1
+	  DstBlock		  "tau"
+	  DstPort		  1
+	}
+      }
+    }
+    Line {
+      SrcBlock		      "Sum"
+      SrcPort		      1
+      DstBlock		      "Kp"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Kp"
+      SrcPort		      1
+      DstBlock		      "Sum2"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Robot"
+      SrcPort		      1
+      Points		      [20, 0]
+      Branch {
+	DstBlock		"plot"
+	DstPort			1
+      }
+      Branch {
+	Points			[0, 150]
+	DstBlock		"Mux"
+	DstPort			2
+      }
+      Branch {
+	DstBlock		"Sum"
+	DstPort			2
+      }
+    }
+    Line {
+      SrcBlock		      "Robot"
+      SrcPort		      2
+      Points		      [50, 0]
+      Branch {
+	Points			[0, 145]
+	DstBlock		"Mux"
+	DstPort			3
+      }
+      Branch {
+	DstBlock		"Sum1"
+	DstPort			2
+      }
+    }
+    Line {
+      SrcBlock		      "Sum2"
+      SrcPort		      1
+      Points		      [15, 0; 0, 190; -475, 0; 0, -50]
+      DstBlock		      "rne"
+      DstPort		      3
+    }
+    Line {
+      SrcBlock		      "rne"
+      SrcPort		      1
+      Points		      [10, 0]
+      Branch {
+	DstBlock		"Robot"
+	DstPort			1
+      }
+      Branch {
+	Points			[0, 165]
+	DstBlock		"Mux"
+	DstPort			4
+      }
+    }
+    Line {
+      SrcBlock		      "jtraj"
+      SrcPort		      1
+      Points		      [15, 0]
+      Branch {
+	Points			[0, -100]
+	DstBlock		"Sum"
+	DstPort			1
+      }
+      Branch {
+	DstBlock		"rne"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "jtraj"
+      SrcPort		      2
+      Points		      [30, 0; 0, -5]
+      Branch {
+	DstBlock		"rne"
+	DstPort			2
+      }
+      Branch {
+	Points			[0, -75]
+	DstBlock		"Sum1"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Mux"
+      SrcPort		      1
+      DstBlock		      "To Workspace"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Clock"
+      SrcPort		      1
+      DstBlock		      "Mux"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Sum1"
+      SrcPort		      1
+      DstBlock		      "Kd"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Kd"
+      SrcPort		      1
+      Points		      [30, 0]
+      DstBlock		      "Sum2"
+      DstPort		      2
+    }
+    Annotation {
+      Position		      [163, 18]
+      Text		      "Puma 560 computed torque control"
+      FontName		      "helvetica"
+      FontSize		      18
+      FontWeight	      "bold"
+    }
+    Annotation {
+      Position		      [57, 215]
+      ForegroundColor	      "blue"
+      Text		      "trajectory\n(demand)"
+    }
+    Annotation {
+      Position		      [514, 159]
+      ForegroundColor	      "orange"
+      Text		      "robot state\n(actual)"
+    }
+    Annotation {
+      Position		      [540, 211]
+      ForegroundColor	      "gray"
+      Text		      "error"
+    }
+  }
+}

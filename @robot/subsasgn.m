@@ -9,7 +9,13 @@
 %	ROBOT.lineopt = line options for display of robot
 %	ROBOT.shadowopt = line options for display of shadow
 %	ROBOT.qlim	set joint limits
-%	ROBOT.offset 		return joint offset vector
+%	ROBOT.offset 		set joint offset vector
+%	ROBOT.mdh 		set kinematic convention for all links
+%
+%	ROBOT.plotopt 	set options for plot(robot)
+%	ROBOT.q 	set joint angles for plot(robot)
+%	ROBOT.lineopt 	set graphical line drawing option string for links
+%	ROBOT.shadowopt set graphical line drawing option string for shadow
 %
 %	Copyright (C) Peter Corke 1999
 
@@ -54,6 +60,13 @@ function r = subsasgn(r, s, v)
 			error('base must be a homogeneous transform');
 		end
 		r.base = v;
+	case 'mdh',
+		L = r.link;
+		for i=1:r.n,
+			L{i}.mdh = v;
+		end
+		r.link = L;
+		r.mdh = v;
 	case 'name',
 		r.name = v;
 	case 'manuf',

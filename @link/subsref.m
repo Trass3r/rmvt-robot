@@ -148,10 +148,10 @@ function t = linktran(a, b, c, d)
 			0	sa	ca	dn
 			0	0	0	1];
 
-%MLINKTRANS	Compute the link transform from kinematic parameters
+%MLINKTRAN	Compute the link transform from kinematic parameters
 %
-%	MLINKTRANS(alpha, an, theta, dn)
-%	MLINKTRANS(DH, q) is a homogeneous 
+%	MLINKTRAN(alpha, an, theta, dn)
+%	MLINKTRAN(DH, q) is a homogeneous 
 %	transformation between link coordinate frames.
 %
 %	alpha is the link twist angle
@@ -165,7 +165,7 @@ function t = linktran(a, b, c, d)
 %	Based on the modified Denavit and Hartenberg notation.
 
 %	Copright (C) Peter Corke 1993
-function t = mlinktrans(a, b, c, d)
+function t = mlinktran(a, b, c, d)
 
 	if nargin == 4,
 		alpha = a;

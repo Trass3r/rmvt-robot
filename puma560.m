@@ -30,15 +30,13 @@
 
 %	Copright (C) Peter Corke 1990
 
-% 	m	rx	ry	rz	Ixx	Iyy	Izz	Ixy	Iyz	Ixz	Jm	G	B	Tc+	Tc-
-
 clear L
-L{1} = link([ pi/2	0	0	0	0]);
-L{2} = link([ 0		.4318	0	0	0]);
-L{3} = link([-pi/2	.0203	0	.15005	0]);
-L{4} = link([pi/2	0	0	.4318	0]);
-L{5} = link([-pi/2	0	0	0	0]);
-L{6} = link([0		0	0	0	0]);
+L{1} = link([ pi/2	0	0	0	0], 'standard');
+L{2} = link([ 0		.4318	0	0	0], 'standard');
+L{3} = link([-pi/2	.0203	0	.15005	0], 'standard');
+L{4} = link([pi/2	0	0	.4318	0], 'standard');
+L{5} = link([-pi/2	0	0	0	0], 'standard');
+L{6} = link([0		0	0	0	0], 'standard');
 
 L{1}.m = 0;
 L{2}.m = 17.4;

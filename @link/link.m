@@ -14,17 +14,31 @@
 %	Compute the link transform matrix for the link, given the joint
 %	variable q.
 %
+%	LINK([alpha A theta D])
 %	LINK([alpha A theta D sigma])
-%	LINK(DH_ROW)	create from row of legacy DH matrix
-%	LINK(DYN_ROW)	create from row of legacy DYN matrix
+%	LINK([alpha A theta D sigma offset])
+%	LINK([alpha A theta D], CONVENTION)
+%	LINK([alpha A theta D sigma], CONVENTION)
+%	LINK([alpha A theta D sigma offset], CONVENTION)
 %
-% Any of the last 3 forms can have an optional flag argument which is 0
-% for standard D&H parameters and 1 for modified D&H parameters.
+% If sigma or offset are not provided they default to zero.  Offset is a
+% constant amount added to the joint angle variable before forward kinematics
+% and is useful if you want the robot to adopt a 'sensible' pose for zero
+% joint angle configuration.
+%
+% The optional CONVENTION argument is 'standard' for standard D&H parameters 
+% or 'modified' for modified D&H parameters.
 % Handling the different kinematic conventions is now hidden within the LINK
 % object.
 %
 % Conceivably all sorts of stuff could live in the LINK object such as
 % graphical models of links and so on.
+%
+% For robot models prior to Toolbox release 5 (pre Matlab objects) the
+% following object constructors are provided.
+%
+%	LINK(DH_ROW)	create from row of legacy DH matrix
+%	LINK(DYN_ROW)	create from row of legacy DYN matrix
 
 % MOD HISTORY
 % 3/99	modify to use on a LINK object
@@ -33,11 +47,11 @@
 
 %	Copyright (C) 1999 Peter. I. Corke
 
-function l = link(dh, mdh)
+function l = link(dh, convention)
 
-	% link([alpha A theta D sigma])
 
 	if nargin == 0,
+		% create an 'empty' link
 		l.alpha = 0;
 		l.A = 0;
 		l.theta = 0;
@@ -53,17 +67,22 @@ function l = link(dh, mdh)
 		l.I = [];
 		l.Jm = [];
 		l.G = [];
-		l.B = [];
-		l.Tc = [];
+		l.B = 0;
+		l.Tc = [0 0];
 		l.qlim = [];
 
 		l = class(l, 'link');
 
 	elseif isa(dh, 'link')
+		% clone passed link
 		l = dh;
 	elseif length(dh) <= 6,
 		% legacy DH matrix
+		% link([alpha A theta D sigma])
 
+		if length(dh) < 4,
+				error('must provide <alpha A theta D> params');
+		end
 		l.alpha = dh(1);
 		l.A = dh(2);
 		l.theta = dh(3);
@@ -73,9 +92,15 @@ function l = link(dh, mdh)
 			l.sigma = dh(5);
 		end
 		if nargin > 1
-			l.mdh = mdh;
+			if strncmp(convention, 'mod', 3) == 1,
+				l.mdh = 1;
+			elseif strncmp(convention, 'sta', 3) == 1,
+				l.mdh = 0;
+			else
+				error('convention must be modified or standard');
+			end
 		else
-			l.mdh = 0;	% default to standard D&H
+				l.mdh = 0;	% default to standard D&H
 		end
 		l.offset = 0;
 		if length(dh) >= 6,
@@ -89,8 +114,8 @@ function l = link(dh, mdh)
 		l.I = [];
 		l.Jm = [];
 		l.G = [];
-		l.B = [];
-		l.Tc = [];
+		l.B = 0;
+		l.Tc = [0 0];
 		l.qlim = [];
 
 		l = class(l, 'link');
@@ -106,11 +131,7 @@ function l = link(dh, mdh)
 		else
 			l.sigma = dh(5);
 		end
-		if nargin > 1
-			l.mdh = mdh;
-		else
-			l.mdh = 0;	% default to standard D&H
-		end
+		l.mdh = 0;	% default to standard D&H
 		l.offset = 0;
 		
 		% it's a legacy DYN matrix

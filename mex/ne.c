@@ -2,25 +2,17 @@
  * \file ne.c
  * \author Peter Corke
  * \brief Compute the recursive Newton-Euler formulation
- */
-
-/*
- * Copyright (C) 1999-2008, by Peter I. Corke
  *
- * This file is part of The Robotics Toolbox for Matlab (RTB).
- * 
- * RTB is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * RTB is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Leser General Public License
- * along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (c) 2002  Peter I. Corke
+ *
+ * Permission to use and distribute is granted, provided that this message
+ * is retained, and due credit given when the results are incorporated in
+ * publised work.
+ *
+ * \todo Is code for MDH prismatic case correct?
+ * \todo Handle robot object base transform
+ *
+ * $Ident$
  *
  */
 
@@ -167,7 +159,7 @@ newton_euler (
 			 * calculate omega[j]
 			 */
 			if (j == 0)
-				*(OMEGA(j)) = qdv;
+				*(OMEGA(j)) = zero;
 			else
 				rot_trans_vect_mult (OMEGA(j), ROT(j), OMEGA(j-1));
 
@@ -175,7 +167,7 @@ newton_euler (
 			 * calculate alpha[j] 
 			 */
 			if (j == 0)
-				*(OMEGADOT(j)) = qddv;
+				*(OMEGADOT(j)) = zero;
 			else
 				rot_trans_vect_mult (OMEGADOT(j), ROT(j), OMEGADOT(j-1));
 
@@ -183,24 +175,19 @@ newton_euler (
 			 * compute acc[j]
 			 */
 			if (j == 0) {
-				*ACC(j) = *robot->gravity;
+				t1 = *robot->gravity;
 			} else {
-				vect_cross(&t1, OMEGADOT(j-1), PSTAR(j));
-
-				vect_cross(&t3, OMEGA(j-1), PSTAR(j));
-				vect_cross(&t2, OMEGA(j-1), &t3);
+				vect_cross(&t1, OMEGA(j-1), PSTAR(j));
+				vect_cross(&t2, OMEGA(j-1), &t1);
 				vect_add(&t1, &t1, &t2);
 				vect_add(&t1, &t1, ACC(j-1));
-				rot_trans_vect_mult(ACC(j), ROT(j), &t1);
-
-				rot_trans_vect_mult(&t2, ROT(j), OMEGA(j-1));
-				vect_cross(&t1, &t2, &qdv);
-				scal_mult(&t1, &t1, 2.0);
-				vect_add(ACC(j), ACC(j), &t1);
-
-				vect_add(ACC(j), ACC(j), &qddv);
 			}
+			rot_trans_vect_mult(ACC(j), ROT(j), &t1);
 
+			vect_cross(&t2, OMEGA(j), &qdv);
+			scal_mult(&t2, &t2, 2.0);
+			vect_add(ACC(j), ACC(j), &t2);
+			vect_add(ACC(j), ACC(j), &qddv);
 			break;
 		}
 
@@ -287,10 +274,9 @@ newton_euler (
 			/*
 			 * compute acc[j]
 			 */
-			if (j == 0) {
-				vect_add(&qddv, &qddv, robot->gravity);
+			if (j == 0)
 				rot_trans_vect_mult(ACC(j), ROT(j), &qddv);
-			} else {
+			else {
 				vect_add(&t1, &qddv, ACC(j-1));
 				rot_trans_vect_mult(ACC(j), ROT(j), &t1);
 
@@ -345,11 +331,12 @@ newton_euler (
 		/*
 		 * compute f[j]
 		 */
-		if (j == (robot->njoints-1))
-			t1 = f_tip;
-		else
+		if (j == (robot->njoints-1)) {
+			*f(j) = F;
+		} else {
 			rot_vect_mult (&t1, ROT(j+1), f(j+1));
-		vect_add (f(j), &t1, &F);
+			vect_add (f(j), &t1, &F);
+		}
 
 		 /*
 		  * compute N[j]
@@ -362,19 +349,21 @@ newton_euler (
 		 /*
 		  * compute n[j]
 		  */
-		if (j == (robot->njoints-1))
-			t1 = n_tip;
-		else {
+		if (j == (robot->njoints-1)) {
+			vect_cross(&t1, R_COG(j), &F);
+			vect_add(n(j), &t1, &N);
+		} else {
 			rot_vect_mult(&t1, ROT(j+1), n(j+1));
+
+			vect_cross(&t2, R_COG(j), &F);
+
 			rot_vect_mult(&t4, ROT(j+1), f(j+1));
 			vect_cross(&t3, PSTAR(j+1), &t4);
 
+			vect_add(&t1, &t1, &t2);
 			vect_add(&t1, &t1, &t3);
+			vect_add(n(j), &t1, &N);
 		}
-
-		vect_cross(&t2, R_COG(j), &F);
-		vect_add(&t1, &t1, &t2);
-		vect_add(n(j), &t1, &N);
 
 #ifdef	DEBUG
 		vect_print("f", f(j));
@@ -391,37 +380,29 @@ newton_euler (
 		/*
 		 * compute f[j]
 		 */
-		scal_mult (&t4, ACC_COG(j), M(j));
+		scal_mult (f(j), ACC_COG(j), M(j));
+		t4 = *f(j);
 		if (j != (robot->njoints-1)) {
 			rot_vect_mult (&t1, ROT(j+1), f(j+1));
-			vect_add (f(j), &t4, &t1);
-		} else
-			vect_add (f(j), &t4, &f_tip);
+			vect_add (f(j), f(j), &t1);
+		}
 
 		 /*
 		  * compute n[j]
 		  */
-
-			/* cross(pstar+r,Fm(:,j)) */
 		vect_add(&t2, PSTAR(j), R_COG(j));
 		vect_cross(&t1, &t2, &t4);
 
 		if (j != (robot->njoints-1)) {
-			/* cross(R'*pstar,f) */
-			rot_trans_vect_mult(&t2, ROT(j+1), PSTAR(j));
-			vect_cross(&t3, &t2, f(j+1));
+		/*
+		 * do the vector product properly
+		 */
+			rot_vect_mult(&t2, ROT(j+1), f(j+1));
+			vect_cross(&t3, PSTAR(j), &t2);
+			vect_add(&t1, &t1, &t3);
 
-			/* nn += R*(nn + cross(R'*pstar,f)) */
-			vect_add(&t3, &t3, n(j+1));
-			rot_vect_mult(&t2, ROT(j+1), &t3);
+			rot_vect_mult(&t2, ROT(j+1), n(j+1));
 			vect_add(&t1, &t1, &t2);
-		} else {
-			/* cross(R'*pstar,f) */
-			vect_cross(&t2, PSTAR(j), &f_tip);
-
-			/* nn += R*(nn + cross(R'*pstar,f)) */
-			vect_add(&t1, &t1, &t2);
-			vect_add(&t1, &t1, &n_tip);
 		}
 
 		mat_vect_mult(&t2, INERTIA(j), OMEGADOT(j));
@@ -462,10 +443,10 @@ newton_euler (
 		/*
 		 * add actuator dynamics and friction
 		 */
-		t +=   l->G * l->G * l->Jm * qdd[j*stride]; // inertia
-        t += l->G * l->G * l->B * qd[j*stride];    // viscous friction
-        t += fabs(l->G) * (
-			(qd[j*stride] > 0 ? l->Tc[0] : 0.0) +    // Coulomb friction
+		t +=  l->G * l->G * (
+			l->Jm * qdd[j*stride] +
+			l->B * qd[j*stride] +
+			(qd[j*stride] > 0 ? l->Tc[0] : 0.0) +
 			(qd[j*stride] < 0 ? l->Tc[1] : 0.0)
 		);
 		tau[j*stride] = t;

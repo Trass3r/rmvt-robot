@@ -6,6 +6,9 @@
 % 	QUATERNION(q)			from another quaternion
 
 %	Copright (C) Peter Corke 1999
+%
+% CHANGES:
+%	12/01	order of arguments to theta,v form, fix bug in same
 function q = quaternion(a1, a2)
 
 
@@ -28,7 +31,7 @@ function q = quaternion(a1, a2)
 			error('unknown dimension of input');
 		end
 	elseif nargin == 2
-		q = unit( quaternion( [sin(a1/2) a2(:).']) );
+		q = unit( quaternion( [cos(a2/2) sin(a2/2)*unit(a1(:).')]) );
 	end
 
 %TR2Q	Convert homogeneous transform to a unit-quaternion

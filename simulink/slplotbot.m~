@@ -1,10 +1,8 @@
 %SLPLOTBOT	S-function for robot animation
 %
-% This is the S-function for animating the robot.  It assumes input
+%  This is the S-function for animating the robot.  It assumes input
 % data u to be the joint angles q.
 %
-% Implemented as an S-function so as to update display at the end of
-% each Simulink major integration step.
 
 function [sys,x0,str,ts] = splotbot(t,x,u,flag, robot)
 	switch flag,
@@ -15,7 +13,6 @@ function [sys,x0,str,ts] = splotbot(t,x,u,flag, robot)
 		plot(robot, zeros(1, robot.n))
 
 	case 2
-		% come here on update
 		if ~isempty(u),
 			plot(robot, u');
 		end

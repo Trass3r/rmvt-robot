@@ -33,6 +33,9 @@ function qp = mtimes(q1, q2)
 
 	%	Copyright (C) 1993 Peter Corke
 
-		qp = q1 * quaternion([0 q2']);
+	% MOD HISTORY
+	%	fixed error in q-v product, added inv(q1) on RHS
+
+		qp = q1 * quaternion([0 q2']) * inv(q1);
 		qp = qp.v;
 	end

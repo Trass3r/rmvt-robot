@@ -18,31 +18,36 @@
 
 % MOD.HISTORY
 %	3/99	uses objects
+%	10/01	handle Craig's conventions
 %
 %	Copyright (C) Peter Corke 1999
 function J = jacobn(robot, q)
-	J = [];
-	n = robot.n;
 
-	if robot.mdh ~= 0,
-		error('Jacobian only valid for standard D&H parameters')
-	end
-	
-	T = robot.tool;
-	%T = eye(4,4);
-	L = robot.link;
+	n = robot.n;
+	L = robot.link;		% get the links
+
+	J = [];
+	U = robot.tool;
 	for j=n:-1:1,
-		T = L{j}( q(j) ) * T;
+		if robot.mdh == 0,
+			% standard DH convention
+			U = L{j}( q(j) ) * U;
+		end
 		if L{j}.RP == 'R',
 			% revolute axis
-			d = [	-T(1,1)*T(2,4)+T(2,1)*T(1,4)
-				-T(1,2)*T(2,4)+T(2,2)*T(1,4)
-				-T(1,3)*T(2,4)+T(2,3)*T(1,4)];
-			delta = T(3,1:3)';	% nz oz az
+			d = [	-U(1,1)*U(2,4)+U(2,1)*U(1,4)
+				-U(1,2)*U(2,4)+U(2,2)*U(1,4)
+				-U(1,3)*U(2,4)+U(2,3)*U(1,4)];
+			delta = U(3,1:3)';	% nz oz az
 		else
 			% prismatic axis
-			d = T(3,1:3)';		% nz oz az
+			d = U(3,1:3)';		% nz oz az
 			delta = zeros(3,1);	%  0  0  0
 		end
 		J = [[d; delta] J];
+
+		if robot.mdh ~= 0,
+			% modified DH convention
+			U = L{j}( q(j) ) * U;
+		end
 	end

@@ -14,8 +14,8 @@
 %		TAU = TORQFUN(T, X)
 %
 %	where X is a 2n-element column vector [Q; QD], and T is the current 
-%	time.	If TORQFUN is not specified then zero torque is applied to 
-%	the manipulator.
+%	time.	If TORQFUN is not specified, or is given as 0,  then zero 
+%	torque is applied to the manipulator joints.
 %
 %	See also ACCEL, RNE, ROBOT, ODE45.
 
@@ -30,7 +30,7 @@ function [t, q, qd] = fdyn(robot, t0, t1, torqfun, q0, qd0)
 	% check the Matlab version, since ode45 syntax has changed
 	v = ver;
 	if str2num(v(1).Version)<6,
-		error('fdyn now requires Matlab version >= 6');
+		%error('fdyn now requires Matlab version >= 6');
 	end
 
 	n = robot.n;
@@ -43,29 +43,7 @@ function [t, q, qd] = fdyn(robot, t0, t1, torqfun, q0, qd0)
 		x0 = [q0(:); qd0(:)];
 	end
 		
-	[t,y] = ode45(@fdyn2, [t0 t1], x0, [], robot, torqfun);
+	[t,y] = ode45('fdyn2', [t0 t1], x0, [], robot, torqfun);
 	q = y(:,1:n);
 	qd = y(:,n+1:2*n);
 
-
-
-% private function called by fdyn()
-%
-% MOD HISTORY
-% 4/99 add object support
-
-%	Copyright (C) 1999 Peter Corke
-function xd = fdyn2(t, x, robot, torqfun)
-
-	n = robot.n;
-
-	q = x(1:n);
-	qd = x(n+1:2*n);
-	if isstr(torqfun)
-		tau = feval(torqfun, t, q, qd);
-	else
-		tau = zeros(n,1);
-	end
-	
-	qdd = accel(robot, x(1:n,1), x(n+1:2*n,1), tau);
-	xd = [x(n+1:2*n,1); qdd];

@@ -1,9 +1,4 @@
 % check the Matlab version, since ode45 syntax has changed
-v = ver;
-if str2num(v(1).Version)<6,
-	disp('** this demo now requires Matlab version >= 6');
-	pause(2)
-else
 echo on
 %
 % Forward dynamics is the computation of joint accelerations given position and
@@ -51,4 +46,3 @@ pause	% hit any key to continue
     plot(p560, q)
 pause	% hit any key to continue
 echo off
-end

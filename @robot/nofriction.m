@@ -1,6 +1,6 @@
 %NOFRICTION	return robot object with zero link friction 
 %
-%	ROBORT = NOFRICTION(ROBOT)
+%	ROBOT = NOFRICTION(ROBOT)
 %
 %
 
@@ -8,12 +8,13 @@
 
 %	Copyright (C) 1999 Peter. I. Corke
 
-function  r2 = nofriction(r)
+function  r2 = nofriction(r, varargin)
 
 	r2 = robot(r);
 
 	for i=1:r2.n,
-		l2{i} = nofriction(r.link{i});
+		l2{i} = nofriction(r.link{i}, varargin{:});
 	end
 
 	r2.link = l2;
+	r2.name = ['NF/' r.name];
