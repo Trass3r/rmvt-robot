@@ -6,11 +6,15 @@
 % on fields in the LINK object viscous and/or Coulomb friction
 % are computed.
 %
+% SEE ALSO: ROBOT/FRICTION
 
 % MOD HISTORY
 % 3/99 modify to use on a LINK object
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 12:04:51  pic
+% General tidyup, comments, clarification, copyright, RCS keys, etc.
+%
+% $Revision: 1.3 $
 
 % Copyright (C) 1999-2002, by Peter I. Corke
 
