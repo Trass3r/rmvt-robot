@@ -12,7 +12,7 @@
  * \todo Is code for MDH prismatic case correct?
  * \todo Handle robot object base transform
  *
- * $Id: ne.c,v 1.2 2002-02-11 01:48:49 pic Exp $
+ * $Id: ne.c,v 1.3 2002-02-12 21:53:55 pic Exp $
  *
  */
 
@@ -331,12 +331,11 @@ newton_euler (
 		/*
 		 * compute f[j]
 		 */
-		if (j == (robot->njoints-1)) {
-			*f(j) = F;
-		} else {
+		if (j == (robot->njoints-1))
+			t1 = f_tip;
+		else
 			rot_vect_mult (&t1, ROT(j+1), f(j+1));
-			vect_add (f(j), &t1, &F);
-		}
+		vect_add (f(j), &t1, &F);
 
 		 /*
 		  * compute N[j]
@@ -349,21 +348,19 @@ newton_euler (
 		 /*
 		  * compute n[j]
 		  */
-		if (j == (robot->njoints-1)) {
-			vect_cross(&t1, R_COG(j), &F);
-			vect_add(n(j), &t1, &N);
-		} else {
+		if (j == (robot->njoints-1))
+			t1 = n_tip;
+		else {
 			rot_vect_mult(&t1, ROT(j+1), n(j+1));
-
-			vect_cross(&t2, R_COG(j), &F);
-
 			rot_vect_mult(&t4, ROT(j+1), f(j+1));
 			vect_cross(&t3, PSTAR(j+1), &t4);
 
-			vect_add(&t1, &t1, &t2);
 			vect_add(&t1, &t1, &t3);
-			vect_add(n(j), &t1, &N);
 		}
+
+		vect_cross(&t2, R_COG(j), &F);
+		vect_add(&t1, &t1, &t2);
+		vect_add(n(j), &t1, &N);
 
 #ifdef	DEBUG
 		vect_print("f", f(j));
@@ -380,30 +377,32 @@ newton_euler (
 		/*
 		 * compute f[j]
 		 */
-		scal_mult (f(j), ACC_COG(j), M(j));
-		t4 = *f(j);
+		scal_mult (&t4, ACC_COG(j), M(j));
 		if (j != (robot->njoints-1)) {
 			rot_vect_mult (&t1, ROT(j+1), f(j+1));
-			vect_add (f(j), f(j), &t1);
-		}
+			vect_add (f(j), &t4, &t1);
+		} else
+			vect_add (f(j), &t4, &f_tip);
 
 		 /*
 		  * compute n[j]
 		  */
+
+			/* cross(pstar+r,Fm(:,j)) */
 		vect_add(&t2, PSTAR(j), R_COG(j));
 		vect_cross(&t1, &t2, &t4);
 
 		if (j != (robot->njoints-1)) {
-		/*
-		 * do the vector product properly
-		 */
-			rot_vect_mult(&t2, ROT(j+1), f(j+1));
-			vect_cross(&t3, PSTAR(j), &t2);
-			vect_add(&t1, &t1, &t3);
+			/* cross(R'*pstar,f) */
+			rot_trans_vect_mult(&t2, ROT(j+1), PSTAR(j));
+			vect_cross(&t3, &t2, f(j+1));
 
-			rot_vect_mult(&t2, ROT(j+1), n(j+1));
+			/* nn += R*(nn + cross(R'*pstar,f)) */
+			vect_add(&t3, &t3, n(j+1));
+			rot_vect_mult(&t2, ROT(j+1), &t3);
 			vect_add(&t1, &t1, &t2);
-		}
+		} else 
+			vect_add(&t1, &t1, &n_tip);
 
 		mat_vect_mult(&t2, INERTIA(j), OMEGADOT(j));
 		mat_vect_mult(&t3, INERTIA(j), OMEGA(j));
