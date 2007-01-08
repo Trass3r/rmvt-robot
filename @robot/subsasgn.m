@@ -5,7 +5,6 @@
 %	ROBOT.tool = 4x4 homog xform
 %	ROBOT.qlim = [qlower qupper]	set joint limits
 %	ROBOT.offset 		set joint offset vector
-%	ROBOT.mdh 		set kinematic convention for all links
 %
 %	ROBOT.name = 'name'
 %	ROBOT.manuf = 'who built it'
@@ -18,7 +17,10 @@
 %	ROBOT.q 	set joint angles for plot(robot)
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 12:02:28  pic
+% General tidyup, comments, clarification, copyright, see also, RCS keys.
+%
+% $Revision: 1.4 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function r = subsasgn(r, s, v)
@@ -38,14 +40,6 @@ function r = subsasgn(r, s, v)
 			error('base must be a homogeneous transform');
 		end
 		r.base = v;
-	case 'mdh',
-		L = r.link;
-		for i=1:r.n,
-			L{i}.mdh = v;
-		end
-		r.link = L;
-		r.mdh = v;
-
 	case 'offset',
 		L = r.link;
 		for i=1:r.n,
