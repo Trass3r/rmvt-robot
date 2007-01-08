@@ -3,12 +3,17 @@
 %	[R P Y] = TR2RPY(TR)
 %
 % Returns a vector of roll/pitch/yaw angles corresponding to the rotational 
-% part of the homogeneous transform TR.
+% part of the homogeneous transform TR.  The angles correspond to rotations
+% about the Z, Y and X axes respectively.
 %
 % See also:  RPY2TR, TR2EUL
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:19  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function rpy = tr2rpy(m)
