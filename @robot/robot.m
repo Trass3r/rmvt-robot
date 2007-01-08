@@ -15,11 +15,14 @@
 % If the legacy matrix forms are used the default name is the workspace
 % matrix that held the data.
 %
-% See also: LINK.
+% See also: ROBOT/SUBSREF, ROBOT/SUBSASGN, LINK.
 
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 12:02:28  pic
+% General tidyup, comments, clarification, copyright, see also, RCS keys.
+%
+% $Revision: 1.4 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function r = robot(L, a1, a2, a3)
