@@ -9,16 +9,32 @@
 % See also: TR2RPY, EUL2TR
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/14 11:00:30  pic
+% Fixed error in axis rotation order.
+%
 % Revision 1.2  2002/04/01 11:47:16  pic
 % General cleanup of code: help comments, see also, copyright, remnant dh/dyn
 % references, clarification of functions.
 %
-% $Revision: 1.3 $
+% $Revision: 1.4 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
-function r = rpy2tr(roll, pitch, yaw)
-        if length(roll) == 3,
-                r = rotz(roll(1)) * roty(roll(2)) * rotx(roll(3));
-        else
-                r = rotz(roll) * roty(pitch) * rotx(yaw);
-        end
+function T = rpy2tr(roll, pitch, yaw)
+	if (nargin == 1),
+		if numcols(roll) ~= 3,
+			error('bad arguments')
+		end
+		pitch = roll(:,2);
+		yaw = roll(:,3);
+		roll = roll(:,1);
+	end
+
+	if numrows(roll) == 1,
+		r = rotz(roll) * roty(pitch) * rotx(yaw);
+		T = r2t(r);
+	else
+		for i=1:numrows(roll),
+			r = rotz(roll(i)) * roty(pitch(i)) * rotx(yaw(i));
+			T(:,:,i) = r2t(r);
+		end
+	end
