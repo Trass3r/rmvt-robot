@@ -1,76 +1,38 @@
-%EUL2R Convert Euler angles to rotation matrix
+%EUL2R Convert Euler angles to homogeneous transformation
 %
-% R = EUL2R(PHI, THETA, PSI, OPTIONS) is an SO(2) orthonornal rotation
-% matrix (3x3) equivalent to the specified Euler angles.  These correspond
-% to rotations about the Z, Y, Z axes respectively. If PHI, THETA, PSI are
-% column vectors (Nx1) then they are assumed to represent a trajectory and
-% R is a three-dimensional matrix (3x3xN), where the last index corresponds
-% to rows of PHI, THETA, PSI.
+% 	TR = EUL2TR([PHI THETA PSI])
+% 	TR = EUL2TR(PHI, THETA, PSI)
 %
-% R = EUL2R(EUL, OPTIONS) as above but the Euler angles are taken from
-% consecutive columns of the passed matrix EUL = [PHI THETA PSI].  If EUL
-% is a matrix (Nx3) then they are assumed to represent a trajectory and R
-% is a three-dimensional matrix (3x3xN), where the last index corresponds
-% to rows of EUL which are assumed to be [PHI, THETA, PSI].
+% Returns a homogeneous tranformation for the specified Euler angles.  These 
+% correspond to rotations about the Z, Y, Z axes respectively.
 %
-% Options::
-%  'deg'      Compute angles in degrees (radians default)
-%
-% Note::
-% - The vectors PHI, THETA, PSI must be of the same length.
-%
-% See also EUL2TR, RPY2TR, TR2EUL.
+% See also: TR2EUL, RPY2TR
 
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/14 10:12:47  pic
+% Change comment to reflect correct axis rotation sequence.
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+% Revision 1.3  2002/04/01 11:47:12  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
 %
-% http://www.petercorke.com
+% $Revision: 1.1 $
+% Copyright (C) 1993-2002, by Peter I. Corke
 
-function R = eul2r(phi, varargin)
-    opt.deg = false;
-    [opt,args] = tb_optparse(opt, varargin);
-
-    % unpack the arguments
-    if numcols(phi) == 3
+function r = eul2r(phi, theta, psi)
+	if (nargin == 1),
+		if numcols(phi) ~= 3,
+			error('bad arguments')
+		end
 		theta = phi(:,2);
 		psi = phi(:,3);
 		phi = phi(:,1);
-	elseif nargin >= 3
-        theta = args{1};
-        psi = args{2};
-    else
-        error('RTB:eul2r:badarg', 'expecting 3 inputs, 3-vector or 3-column matrix')
-    end
+	end
 
-    % optionally convert from degrees
-    if opt.deg
-        d2r = pi/180.0;
-        phi = phi * d2r;
-        theta = theta * d2r;
-        psi = psi * d2r;
-    end
-
-    if numrows(phi) == 1
-        R = rotz(phi) * roty(theta) * rotz(psi);
-    else
-        R = zeros(3,3,numrows(phi));
-        for i=1:numrows(phi)
-            R(:,:,i) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
-        end
-    end
+	if numrows(phi) == 1,
+                r = rotz(phi) * roty(theta) * rotz(psi);
+	else
+		for i=1:numrows(phi),
+			r(:,:,1) = rotz(phi) * roty(theta) * rotz(psi);
+		end
+	end

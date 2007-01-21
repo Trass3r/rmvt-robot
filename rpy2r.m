@@ -1,94 +1,38 @@
-%RPY2R Roll-pitch-yaw angles to rotation matrix
+%RPY2TR Roll/pitch/yaw to homogenous transform
 %
-% R = RPY2R(ROLL, PITCH, YAW, OPTIONS) is an SO(3) orthonornal rotation
-% matrix (3x3) equivalent to the specified roll, pitch, yaw angles angles.
-% These correspond to rotations about the X, Y, Z axes respectively. If
-% ROLL, PITCH, YAW are column vectors (Nx1) then they are assumed to
-% represent a trajectory and R is a three-dimensional matrix (3x3xN), where
-% the last index corresponds to rows of ROLL, PITCH, YAW.
+% 	TR = RPY2R([R P Y])
+%	TR = RPY2R(R,P,Y)
 %
-% R = RPY2R(RPY, OPTIONS) as above but the roll, pitch, yaw angles angles
-% angles are taken from consecutive columns of the passed matrix RPY =
-% [ROLL, PITCH, YAW].  If RPY is a matrix (Nx3) then they are assumed to
-% represent a trajectory and R is a three-dimensional matrix (3x3xN), where
-% the last index corresponds to rows of RPY which are assumed to be [ROLL,
-% PITCH, YAW].
+% Returns a 3x3 rotation matrix for the specified roll/pitch/yaw angles.
+% These correspond to rotations about the Z, Y, X axes respectively.
 %
-% Options::
-%  'deg'   Compute angles in degrees (radians default)
-%  'zyx'   Return solution for sequential rotations about Z, Y, X axes (Paul book)
-%
-% Note::
-% - In previous releases (<8) the angles corresponded to rotations about ZYX. Many 
-%   texts (Paul, Spong) use the rotation order ZYX. This old behaviour can be enabled 
-%   by passing the option 'zyx'
-%
-% See also TR2RPY, EUL2TR.
+% See also: TR2RPY, EUL2TR
 
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/14 11:00:30  pic
+% Fixed error in axis rotation order.
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+% Revision 1.2  2002/04/01 11:47:16  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
 %
-% http://www.petercorke.com
+% $Revision: 1.1 $
+% Copyright (C) 1993-2002, by Peter I. Corke
 
-function R = rpy2r(roll, varargin)
-    opt.zyx = false;
-    opt.deg = false;
-    [opt,args] = tb_optparse(opt, varargin);
-
-    % unpack the arguments
-    if numcols(roll) == 3
+function r = rpy2r(roll, pitch, yaw)
+	if (nargin == 1),
+		if numcols(roll) ~= 3,
+			error('bad arguments')
+		end
 		pitch = roll(:,2);
 		yaw = roll(:,3);
 		roll = roll(:,1);
-	elseif nargin >= 3
-        pitch = args{1};
-        yaw = args{2};
-    else
-        error('RTB:rpy2r:badarg', 'bad arguments')
-    end
+	end
 
-    % optionally convert from degrees
-    if opt.deg
-        d2r = pi/180.0;
-        roll = roll * d2r;
-        pitch = pitch * d2r;
-        yaw = yaw * d2r;
-    end
-
-    if ~opt.zyx
-        % XYZ order
-        if numrows(roll) == 1
-            R = rotx(roll) * roty(pitch) * rotz(yaw);
-        else
-            R = zeros(3,3,numrows(roll));
-            for i=1:numrows(roll)
-                R(:,:,i) = rotx(roll(i)) * roty(pitch(i)) * rotz(yaw(i));
-            end
-        end
-    else
-        % old ZYX order (as per Paul book)
-        if numrows(roll) == 1
-            R = rotz(roll) * roty(pitch) * rotx(yaw);
-        else
-            R = zeros(3,3,numrows(roll));
-            for i=1:numrows(roll)
-                R(:,:,i) = rotz(roll(i)) * roty(pitch(i)) * rotx(yaw(i));
-            end
-        end
-    end
+	if numrows(roll) == 1,
+		r = rotz(roll) * roty(pitch) * rotx(yaw);
+	else
+		for i=1:numrows(roll),
+			r(:,:,i) = rotz(roll(i)) * roty(pitch(i)) * rotx(yaw(i));
+		end
+	end
