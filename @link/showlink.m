@@ -16,7 +16,11 @@ function showlink(l)
 		v = getfield(l, char(n));
 		name = char(n);
 		spaces = char(' '*ones(1,llab-length(name)));
-		val = num2str(v);
+		if min(size(v)) == 1,
+			val = num2str(v(:)');
+		else
+			val = num2str(v);
+		end
 		label = [name spaces ' = '];
 		if numrows(val) > 1,
 			pad = {label; char(' '*ones(numrows(val)-1,1))};
