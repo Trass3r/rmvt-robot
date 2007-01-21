@@ -43,10 +43,13 @@
 % 11/96	bug for prismatic case 
 % 3/99	uses objects
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/11 04:53:43  pic
+% Fixed bug with gear ratio and friction.
+%
 % Revision 1.3  2002/04/02 11:24:40  pic
 % Updated comment blocks, fix function names.
 %
-% $Revision: 1.4 $
+% $Revision: 1.5 $
 
 function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 
@@ -111,14 +114,19 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 		for j=1:n,
 			link = robot.link{j};
 			Tj = link(q(j));
-			Rm{j} = tr2rot(Tj);
 			if link.RP == 'R',
 				D = link.D;
 			else
 				D = q(j);
 			end
 			alpha = link.alpha;
-			pstarm(:,j) = [link.A; D*sin(alpha); D*cos(alpha)];
+			pstar = [link.A; D*sin(alpha); D*cos(alpha)];
+			if j == 1,
+				pstar = t2r(robot.base) * pstar;
+				Tj = robot.base * Tj;
+			end
+			pstarm(:,j) = pstar;
+			Rm{j} = tr2rot(Tj);
 			if debug>1,
 				Rm{j}
 				Pstarm(:,j)'
