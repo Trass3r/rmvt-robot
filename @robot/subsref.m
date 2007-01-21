@@ -14,6 +14,7 @@
 %	ROBOT.name		return name of robot
 %	ROBOT.manuf		return who built it
 %	ROBOT.comment		return general comment
+%	ROBOT.config		return joint configuration string
 %
 %	ROBOT.plotopt 		return options for plot(robot)
 %	ROBOT.lineopt 		return line drawing option string for links
@@ -25,7 +26,10 @@
 %	ROBOT.dyn		return legacy DYN matrix
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 12:02:29  pic
+% General tidyup, comments, clarification, copyright, see also, RCS keys.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function v = subsref(r, s)
@@ -82,6 +86,12 @@ function v = subsref(r, s)
 		v = r.manuf;
 	case 'comment',
 		v = r.comment;
+	case 'config',
+		L = r.link;
+		v = '';
+		for i=1:r.n,
+			v(i) = L{i}.RP;
+		end
 
 	%%%%%%%%% joint limit test
 	case 'islimit',
@@ -99,9 +109,17 @@ function v = subsref(r, s)
 		end
 	%%%%%%%%% legacy DH/DYN support
 	case 'dh',
-		v = rdh(r);
+		v = [];
+		L = r.link;
+		for i=1:r.n,
+			v = [v; L{i}.dh];
+		end
 	case 'dyn'
-		v = rdyn(r);
+		v = [];
+		L = r.link;
+		for i=1:r.n,
+			v = [v; L{i}.dyn];
+		end
 
 	%%%%%%%%% graphics support
 	case 'q',
