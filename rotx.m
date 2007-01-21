@@ -8,13 +8,16 @@
 % See also: ROTY, ROTZ, ROTVEC.
 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:16  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function r = rotx(t)
 	ct = cos(t);
 	st = sin(t);
-	r =    [1	0	0	0
-		0	ct	-st	0
-		0	st	ct	0
-		0	0	0	1];
+	r =    [1	0	0
+		0	ct	-st
+		0	st	ct];
