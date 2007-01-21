@@ -28,10 +28,13 @@
 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/14 10:21:54  pic
+% Error if islimit method called with no limits defined.
+%
 % Revision 1.3  2002/04/01 12:04:51  pic
 % General tidyup, comments, clarification, copyright, RCS keys, etc.
 %
-% $Revision: 1.4 $
+% $Revision: 1.5 $
 % Copyright (C) 1999-2002, by Peter I. Corke
 
 function v = subsref(l, s)
@@ -107,8 +110,7 @@ function v = subsref(l, s)
 		case 'dh',
 			v = [l.alpha l.A l.theta l.D l.sigma];
 		case 'dyn',
-			v = [l.alpha l.A l.theta l.D l.sigma ...
-			l.m l.r diag(l.I)' l.I(2,1) l.I(2,3) l.I(1,3) l.Jm l.G l.B l.Tc];
+			v = [l.alpha l.A l.theta l.D l.sigma l.m l.r(:)' diag(l.I)' l.I(2,1) l.I(2,3) l.I(1,3) l.Jm l.G l.B l.Tc(:)'];
 		otherwise, disp('Unknown method')
 		end
 	end
