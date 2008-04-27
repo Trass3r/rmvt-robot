@@ -34,7 +34,6 @@ function ovar = gcamera(a1, a2, a3, a4)
 		name = a1;
 		name
 		C = a2;
-		C
 		%dimcheck(C, 'calibration matrix', 3, 4);
 		dims = a3;
 		%dimcheck(dims, 'pixel dimensions', 4);
@@ -43,21 +42,22 @@ function ovar = gcamera(a1, a2, a3, a4)
 		if isempty(h),
 			h = figure;
 			set(h, 'Name', name);
+            set(h, 'NextPlot', 'new');
 		else
-			figure(h);
-			clf
+			figure(h)
+            clf
 		end
 		ovar = axes('XLim', dims(1:2), 'YLim', dims(3:4), ...
 			 'UserData', C, ...
-			'Xgrid', 'on', 'Ygrid', 'on', 'Ydir' , 'reverse');
+			'Xgrid', 'on', 'Ygrid', 'on', 'Ydir' , 'reverse', 'NextPlot', 'new');
 		%line('LineStyle', 'o', 'Color', 'black');
 		line('LineStyle', 'none', ...
 			'Marker', 'o', ...
 			'Color', 'black', ...
 			'EraseMode', 'xor');
 		title(name);
-	else
-		h = a1;
+    else
+        h = a1;
 		points = a2;
 		nc = numcols(points);
 		C = get(h, 'UserData');
