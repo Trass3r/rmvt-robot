@@ -41,6 +41,19 @@ function theta = ikine560(robot, T,configuration)
 	if robot.mdh ~= 0,
 		error('Solution only applicable for standard DH conventions');
 	end
+
+	if ndims(T) == 3,
+		theta = [];
+		for k=1:size(T,3),
+			if nargin < 3,
+				theta = [theta; ikine560(robot, T(:,:,k))];
+			else
+				theta = [theta; ikine560(robot, T(:,:,k), configuration)];
+			end
+		end
+
+		return;
+	end
 	L = robot.links;
 	a1 = L{1}.A;
 	a2 = L{2}.A;
@@ -147,6 +160,9 @@ function theta = ikine560(robot, T,configuration)
 	V114= Px*cos(theta(1)) + Py*sin(theta(1));
 	r=sqrt(V114^2 + Pz^2);
 	Psi = acos((a2^2-d4^2-a3^2+V114^2+Pz^2)/(2.0*a2*r));
+	if ~isreal(Psi),
+		error('point not reachable');
+	end
 	theta(2) = atan2(Pz,V114) + n2*Psi;
 
 	%
@@ -173,6 +189,7 @@ function theta = ikine560(robot, T,configuration)
 	V323 = cos(theta(1))*Ay - sin(theta(1))*Ax;
 	V313 = cos(theta(2)+theta(3))*V113 + sin(theta(2)+theta(3))*Az;
 	theta(4) = atan2((n4*V323),(n4*V313));
+	%[(n4*V323),(n4*V313)]
 
 	%
 	% Solve for theta(5)
@@ -185,6 +202,7 @@ function theta = ikine560(robot, T,configuration)
 	num = -cos(theta(4))*V313 - V323*sin(theta(4));
 	den = -V113*sin(theta(2)+theta(3)) + Az*cos(theta(2)+theta(3));
 	theta(5) = atan2(num,den);
+	%[num den]
 
 	%
 	% Solve for theta(6)
@@ -209,3 +227,4 @@ function theta = ikine560(robot, T,configuration)
 	num = -V412*cos(theta(5)) - V332*sin(theta(5));
 	den = - V432;
 	theta(6) = atan2(num,den);
+	%[num den]
