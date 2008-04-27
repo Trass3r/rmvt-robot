@@ -1,9 +1,12 @@
 %QUATERNION Constructor for quaternion objects
 % 
 %	Q = QUATERNION([s v1 v2 v3])	from 4 elements
+%	Q = QUATERNION([s v1 v2 v3])	from 4 elements
 %	Q = QUATERNION(v, theta)	from vector plus angle
 %	Q = QUATERNION(R)		from a 3x3 or 4x4 matrix
 %	Q = QUATERNION(q)		from another quaternion
+%	Q = QUATERNION(s)		from a scalar
+%	Q = QUATERNION(v)		from a vector
 %
 % All versions, except the first, are guaranteed to return a unit quaternion.
 %
@@ -31,13 +34,16 @@
 % CHANGES:
 % 12/01	order of arguments to theta,v form, fix bug in same
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/14 11:03:30  pic
+% Mention overloaded functions and operators in the help info.
+%
 % Revision 1.5  2002/04/02 12:27:26  pic
 % Remove remnant CVS clash tag.
 %
 % Revision 1.4  2002/04/01 12:06:48  pic
 % General tidyup, help comments, copyright, see also, RCS keys.
 %
-% $Revision: 1.6 $
+% $Revision: 1.7 $
 %
 % Copyright (C) 1999-2002, by Peter I. Corke
 
@@ -58,10 +64,22 @@ function q = quaternion(a1, a2)
 			q = quaternion( tr2q(a1) );
 		elseif all(size(a1) == [4 4])
 			q = quaternion( tr2q(a1(1:3,1:3)) );
-		elseif all(size(a1) == [1 4])
+		elseif all(size(a1) == [1 4]) | all(size(a1) == [4 1])
 %	Q = QUATERNION([s v1 v2 v3])	from 4 elements
+			a1 = a1(:);
 			q.s = a1(1);
-			q.v = a1(2:4);
+			q.v = a1(2:4)';
+			q = class(q, 'quaternion');
+		elseif length(a1) == 3,
+%	Q = QUATERNION(v)		from a vector
+
+			q.s = 0;
+			q.v = a1(:)';
+			q = class(q, 'quaternion');
+		elseif length(a1) == 1,
+%	Q = QUATERNION(s)		from a scalar
+			q.s = a1(1);
+			q.v = [0 0 0];
 			q = class(q, 'quaternion');
 		else
 			error('unknown dimension of input');
