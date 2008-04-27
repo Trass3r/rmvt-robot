@@ -34,7 +34,11 @@
 % 8/95 fix bugs in COG data for Puma 560. This led to signficant errors in
 %  inertia of joint 1. 
 % $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
+% Revision 1.3  2002/04/01 11:47:16  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.4 $
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 
@@ -103,7 +107,9 @@ L{6}.Tc = [ 3.96e-3 -10.5e-3];
 %
 qz = [0 0 0 0 0 0]; % zero angles, L shaped pose
 qr = [0 pi/2 -pi/2 0 0 0]; % ready pose, arm up
-qstretch = [0 0 -pi/2 0 0 0];
+qs = [0 0 -pi/2 0 0 0];
+qn=[0 pi/4 pi 0 pi/4  0];
+
 
 p560 = robot(L, 'Puma 560', 'Unimation', 'params of 8/95');
 clear L
