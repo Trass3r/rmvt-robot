@@ -11,20 +11,24 @@
 %
 % The graphical robot object holds a copy of the robot object and
 % the graphical element is tagged with the robot's name (.name method).
-% This state also holds the last joint configuration 
-% drawn (.q method).
+% This state also holds the last joint configuration which can be retrieved,
+% see PLOT(robot) below.
 %
 % If no robot of this name is currently displayed then a robot will
-% be drawn in the current figure.  If the robot already exists then
-% that graphical model will be found and moved.
+% be drawn in the current figure.  If hold is enabled (hold on) then the
+% robot will be added to the current figure.
+%
+% If the robot already exists then that graphical model will be found 
+% and moved.
 %
 % MULTIPLE VIEWS OF THE SAME ROBOT
 % If one or more plots of this robot already exist then these will all
-% be moved according to the argument Q.
+% be moved according to the argument Q.  All robots in all windows with 
+% the same name will be moved.
 %
 % MULTIPLE ROBOTS
 % Multiple robots can be displayed in the same plot, by using "hold on"
-% before calls to plot(robot).
+% before calls to plot(robot).  
 %
 % options is a list of any of the following:
 % 'workspace' [xmin, xmax ymin ymax zmin zmax]
@@ -63,6 +67,16 @@
 % graphical representation of the specified robot.  If multiple
 % instances exist, that of the first one returned by findobj() is
 % given.
+%
+% MOVING JUST ONE INSTANCE oF A ROBOT:
+%
+%  r = PLOT(robot, q)
+%
+% Returns a copy of the robot object, with the .handle element set.
+%
+%  PLOT(r, q)
+%
+% will animate just this instance, not all robots of the same name.
 %
 % See also: PLOTBOTOPT, DRIVEBOT, FKINE, ROBOT.
 
@@ -105,7 +119,7 @@
 % Revision 1.2  2002/04/01 12:02:27  pic
 % General tidyup, comments, clarification, copyright, see also, RCS keys.
 %
-% $Revision: 1.5 $
+% $Revision: 1.6 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function rnew = plot(robot, tg, varargin)
@@ -121,7 +135,10 @@ function rnew = plot(robot, tg, varargin)
 			rnew = r.q;
 		end
 		return
-	end
+    end
+    
+    % process options
+	opt = plot_options(robot, varargin);
 
 	%
 	% robot2 = ROBOT(robot, q, varargin)
@@ -133,31 +150,25 @@ function rnew = plot(robot, tg, varargin)
 		error('Insufficient columns in q')
 	end
 
-	% process options
-	opt = plot_options(robot, varargin);
-
-	if isfield(robot, 'handles'),
+	if ~isempty(robot.handle),
+        %disp('has handles')
 		% handles provided, animate just that robot
-		disp('has handles');
-		for r=1:repeat,
+		for r=1:opt.repeat,
 		    for p=1:np,
-			animate( robot, tg(p,:), opt);
+			animate( robot, tg(p,:));
+            pause(opt.delay)
 		    end
 		end
 
 		return;
-	end
+    end
 
 	% Do the right thing with figure windows.
+    ax = newplot();
+    
+    % if this figure has no robot in it, create one
+    if isempty( findobj(ax, 'Tag', robot.name) ),
 
-	% get handle of any existing robot of same name in the current
-	% set of axes (full figure or a subplot)
-	rh = findobj(gca, 'Tag', robot.name);
-
-	if isempty(rh),
-		% this robot doesn't exist in this set of axes so let's
-		% create a new instance of that robot
-		%disp('creating robot in current fig')
 		h = create_new_robot(robot, opt);
 
 		% save the handles in the passed robot object, and
@@ -165,23 +176,19 @@ function rnew = plot(robot, tg, varargin)
 		robot.handle = h;
 		set(h.robot, 'Tag', robot.name);
 		set(h.robot, 'UserData', robot);
-	end
+    end
 
-	% get the handle of instances of the robot by this name that exist
-	% in any axis in any figure
+    % get handle of any existing robot of same name
 	rh = findobj('Tag', robot.name);
-	if isempty(rh),
-		error('shouldnt happen'); % since we just created one
-	end
 
-	% now animate all these robots 
-	%disp('animate it');
+	% now animate all robots tagged with this name
+
+	rh = findobj('Tag', robot.name);
 	for r=1:opt.repeat,
 	    for p=1:np,
 		for r=rh',
-			animate( get(r, 'UserData'), tg(p,:), opt);
+			animate( get(r, 'UserData'), tg(p,:));
 		end
-		pause(opt.delay);
 	    end
 	end
 
@@ -192,10 +199,6 @@ function rnew = plot(robot, tg, varargin)
 		set(r, 'UserData', rr);
 	end
 
-	% optionally return the robot object, with additional element 
-	% called handles which are set to the graphical handles of the
-	% robot just built.  Can be useful if you want to animate just one
-	% of the many robot instances
 	if nargout > 0,
 		rnew = robot;
 	end
@@ -208,8 +211,7 @@ function rnew = plot(robot, tg, varargin)
 
 function o = plot_options(robot, optin)
 	%%%%%%%%%%%%%% process options
-	%o.erasemode = 'xor';
-	o.erasemode = 'none';
+	o.erasemode = 'xor';
 	o.joints = 1;
 	o.wrist = 1;
 	o.repeat = 1;
@@ -221,7 +223,7 @@ function o = plot_options(robot, optin)
 	o.projection = 'orthographic';
 	o.magscale = 1;
 	o.name = 1;
-	o.delay = 0;
+    o.delay = 0;
 
 	% read options string in the order
 	%	1. robot.plotopt
@@ -241,9 +243,6 @@ function o = plot_options(robot, optin)
 			i = i+1;
 		case 'mag'
 			o.magscale = options{i+1};
-			i = i+1;
-		case 'delay'
-			o.delay = options{i+1};
 			i = i+1;
 		case 'perspective'
 			o.projection = 'perspective';
@@ -281,6 +280,9 @@ function o = plot_options(robot, optin)
 			o.joints = 1;
 		case 'nojoints'
 			o.joints = 0;
+        case 'delay'
+            o.delay = options{i+1};
+            i = i + 1;
 		otherwise
 			error(['unknown option: ' options{i}]);
 		end
@@ -312,21 +314,22 @@ function o = plot_options(robot, optin)
 %
 % Returns a structure of handles to graphical objects.
 %
-% If current axis is empty, draw robot in it
-% If current axis has hold on, add robot to it
-% Otherwise, create new axis and draw robot in it.
+% If current figure is empty, draw robot in it
+% If current figure has hold on, add robot to it
+% Otherwise, create new figure and draw robot in it.
 %	
 
 function h = create_new_robot(robot, opt)
 	h.mag = opt.mag;
 
+	%
+	% setup an axis in which to animate the robot
+	%
+	% handles not provided, create graphics
 	%disp('in creat_new_robot')
 	if ~ishold,
 		% if current figure has hold on, then draw robot here
 		% otherwise, create a new figure
-		%disp('not hold')
-		%disp('Create new axes')
-		cla
 		axis(opt.dims);
 	end
 	xlabel('X')
@@ -385,7 +388,7 @@ function h = create_new_robot(robot, opt)
 	end
 
 	%
-	% display cylinders (revolute) or boxes (prismatic) at
+	% display cylinders (revolute) or boxes (pristmatic) at
 	% each joint, as well as axis centerline.
 	%
 	if opt.joints == 1,
@@ -430,7 +433,7 @@ function h = create_new_robot(robot, opt)
 % Move the graphical robot to the pose specified by the joint coordinates q.
 % Graphics are defined by the handle structure robot.handle.
 
-function animate(robot, q, opt)
+function animate(robot, q)
 
 	n = robot.n;
 	h = robot.handle;
@@ -496,7 +499,6 @@ function animate(robot, q, opt)
 			set(h.jointaxis(j), 'Xdata', xyzl(1,:), ...
 				'Ydata', xyzl(2,:), ...
 				'Zdata', xyzl(3,:));
-
 		end
 	end
 
