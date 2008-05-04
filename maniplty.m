@@ -33,7 +33,11 @@
 % 4/99	object support, matlab local functions
 % 6/99	change switch to allow abbreviations of measure type
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002/04/01 11:47:14  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 
@@ -50,14 +54,11 @@ function w = maniplty(robot, q, which)
 
 	w = [];
 	switch which,
-	case 'yoshikawa',
-	case 'yoshi',
-	case 'y',
+	case {'yoshikawa', 'yoshi', 'y'}
 		for Q = q',
 			w = [w; yoshi(robot, Q)];
 		end
-	case 'asada'
-	case 'a'
+	case {'asada', 'a'}
 		for Q = q',
 			w = [w; asada(robot, Q)];
 		end
