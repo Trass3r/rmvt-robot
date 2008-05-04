@@ -9,15 +9,26 @@
 % See also:  RPY2TR, TR2EUL
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007-01-08 05:59:01  cor134
+% Expanded the comments
+%
 % Revision 1.2  2002/04/01 11:47:19  pic
 % General cleanup of code: help comments, see also, copyright, remnant dh/dyn
 % references, clarification of functions.
 %
-% $Revision: 1.3 $
+% $Revision: 1.4 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function rpy = tr2rpy(m)
 	
+	s = size(m);
+	if length(s) > 2,
+		rpy = [];
+		for i=1:s(3),
+			rpy = [rpy; tr2rpy(m(:,:,i))];
+		end
+		return
+	end
 	rpy = zeros(1,3);
 
 	if abs(m(1,1)) < eps & abs(m(2,1)) < eps,
