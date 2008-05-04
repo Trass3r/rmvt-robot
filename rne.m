@@ -43,9 +43,9 @@
 
 function tau = rne(robot, a1, a2, a3, a4, a5)
 	if robot.mdh ~= 0,
-		error('Jacobian only valid for standard D&H parameters')
+		error('rne only valid for standard D&H parameters')
 	end
-
+888
 	z0 = [0;0;1];
 	grav = robot.gravity;	% default gravity from the object
 	fext = zeros(6, 1);
@@ -81,7 +81,7 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 	
 	tau = zeros(np,n);
 
-	for p=1:np,
+	for p=1:np,		% for all points on path
 		q = Q(p,:)';
 		qd = Qd(p,:)';
 		qdd = Qdd(p,:)';
@@ -101,7 +101,6 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 		for j=1:n,
 			link = robot.link{j};
 			Tj = link(q(j));
-			Rm{j} = tr2rot(Tj);
 			if link.RP == 'R',
 				D = link.D;
 			else
@@ -109,6 +108,12 @@ function tau = rne(robot, a1, a2, a3, a4, a5)
 			end
 			alpha = link.alpha;
 			pstarm(:,j) = [link.A; D*sin(alpha); D*cos(alpha)];
+			if j == 1,
+				robot.base
+				%pstarm(:,j) = t2r(robot.base) * pstar(:,j);
+				Tj = robot.base * Tj;
+			end
+			Rm{j} = t2r(Tj);
 		end
 
 	%
