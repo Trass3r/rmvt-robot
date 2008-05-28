@@ -14,14 +14,18 @@
 % 4/99 add objects
 % 6/99	init M to zeros rather than [], problem with cat() v 5.3
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002-04-01 11:47:13  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 
 % Copyright (C) Peter Corke 1993
 
 function M = inertia(robot, q)
 	n = robot.n;
 
-	if length(q) == robot.n,
+	if numel(q) == robot.n,
 		q = q(:)';
 	end
 
