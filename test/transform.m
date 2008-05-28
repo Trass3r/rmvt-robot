@@ -78,15 +78,18 @@ oa2tr(v1, v2)
 t = oa2tr(v1, v2)
 trnorm(t)
 
-angvec2r( 0.1, mat([1,2,3]) )
+rotvec2r( mat([1,2,3]), 0.1 )
 
 % special matrices
-%diff2tr( mat([.1, .2 ,.3]) )
-%m = diff2tr( mat([.1, .2 ,.3]) )
-%diff2tr(m)
-diff2tr( mat([.1, .2 ,.3, .4, .5, .6]) )
-m = diff2tr( mat([.1, .2 ,.3, .4, .5, .6]) )
-tr2diff(m)
+skew( mat([.1, .2 ,.3]) )
+m = skew( mat([.1, .2 ,.3]) )
+skew(m)
+skew( mat([.1, .2 ,.3, .4, .5, .6]) )
+m = skew( mat([.1, .2 ,.3, .4, .5, .6]) )
+skew(m)
+
+m = diff2tr( [.1, .2 ,.3, .5, .6, .7] )
+tr2diff( m )
 
 % quaternions
 
