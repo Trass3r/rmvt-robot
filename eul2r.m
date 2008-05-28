@@ -9,6 +9,9 @@
 % See also: TR2EUL, RPY2TR
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007-01-21 06:34:30  cor134
+% Initial version.  Angles to 3x3 rotation matrix, not 4x4.
+%
 % Revision 1.4  2002/04/14 10:12:47  pic
 % Change comment to reflect correct axis rotation sequence.
 %
@@ -16,7 +19,7 @@
 % General cleanup of code: help comments, see also, copyright, remnant dh/dyn
 % references, clarification of functions.
 %
-% $Revision: 1.1 $
+% $Revision: 1.2 $
 % Copyright (C) 1993-2002, by Peter I. Corke
 
 function r = eul2r(phi, theta, psi)
@@ -30,9 +33,11 @@ function r = eul2r(phi, theta, psi)
 	end
 
 	if numrows(phi) == 1,
-                r = rotz(phi) * roty(theta) * rotz(psi);
-	else
-		for i=1:numrows(phi),
-			r(:,:,1) = rotz(phi) * roty(theta) * rotz(psi);
-		end
+        r = rotz(phi) * roty(theta) * rotz(psi);
+    else
+        for i=1:numrows(phi),
+            r(:,:,1) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
+        end
+
+                
 	end
