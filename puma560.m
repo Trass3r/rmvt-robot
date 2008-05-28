@@ -3,7 +3,7 @@
 %	PUMA560
 %
 % Defines the object 'p560' in the current workspace which describes the 
-% kinematic and dynamic % characterstics of a Unimation Puma 560 manipulator
+% kinematic and dynamic characterstics of a Unimation Puma 560 manipulator
 % using standard DH conventions.
 % The model includes armature inertia and gear ratios.
 %
@@ -34,11 +34,14 @@
 % 8/95 fix bugs in COG data for Puma 560. This led to signficant errors in
 %  inertia of joint 1. 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2008/04/27 11:36:54  cor134
+% Add nominal (non singular) pose qn
+%
 % Revision 1.3  2002/04/01 11:47:16  pic
 % General cleanup of code: help comments, see also, copyright, remnant dh/dyn
 % references, clarification of functions.
 %
-% $Revision: 1.4 $
+% $Revision: 1.5 $
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 
