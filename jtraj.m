@@ -26,7 +26,11 @@
 % 8/95 fix bug with initial conditions
 % 8/96 fix another bug with initial conditions
 % $Log: not supported by cvs2svn $
-% $Revision: 1.2 $
+% Revision 1.2  2002-04-01 11:47:14  pic
+% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
+% references, clarification of functions.
+%
+% $Revision: 1.3 $
 
 function [qt,qdt,qddt] = jtraj(q0, q1, tv, qd0, qd1)
 	if length(tv) > 1,
@@ -43,6 +47,11 @@ function [qt,qdt,qddt] = jtraj(q0, q1, tv, qd0, qd1)
 	if nargin == 3,
 		qd0 = zeros(size(q0));
 		qd1 = qd0;
+    elseif nargin == 5,
+        qd0 = qd0(:);
+        qd1 = qd1(:);
+    else
+        error('incorrect number of arguments')
 	end
 
 	% compute the polynomial coefficients
