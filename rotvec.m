@@ -5,18 +5,21 @@
 % Returns a homogeneous transformation representing a rotation of THETA 
 % about the vector V.
 %
-% See also: ROTX, ROTY, ROTZ.
+% See also: TROTX, ROTX, ROTY, ROTZ.
 
 % Copyright (C) 1993-2002, by Peter I. Corke
 %
 % CHANGES:
 % 7/01	unitize the vector
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2008-04-27 09:50:54  cor134
+% Remove debug print
+%
 % Revision 1.3  2002/04/01 11:47:16  pic
 % General cleanup of code: help comments, see also, copyright, remnant dh/dyn
 % references, clarification of functions.
 %
-% $Revision: 1.4 $
+% $Revision: 1.5 $
 
 function r = rotvec(v, t)
 
