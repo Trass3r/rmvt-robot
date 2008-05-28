@@ -1,7 +1,7 @@
 \documentclass{article}
 %\documentstyle[titlepage,ref,twoside]{article}
 \usepackage{verbatim}
-\usepackage{fancyheadings}
+\usepackage{fancyhdr}
 
 
 \setlength{\topmargin}{10.4mm}      % top header - top paper
@@ -114,8 +114,8 @@
 %\pagestyle{headings}        % Gives page headings at top of page
 \pagestyle{fancyplain}
 \rhead{\rm\thepage}
-\lfoot{Robotics Toolbox Release 7}
-\rfoot{Peter Corke, April 2002}
+\lfoot{Robotics Toolbox Release 8}  %% CHANGE
+\rfoot{Peter Corke, May 2008}       %% CHANGE
 \cfoot{}
 \setlength{\headrulewidth}{0pt}
 
@@ -243,15 +243,18 @@ are represented.
 {|p{1.25in}p{3.25in}|}\cline{1-2}
 &\\
 \multicolumn{2}{|c|}{\tmsss Manipulator Models} \\ \hline
+{\Mono Fanuc10L} & Fanuc 10L arm data (DH, kine)\\
 {\Mono link} & construct a robot link object \\
+{\Mono MotomanHP6} & Motoman HP6 arm data (DH, kine)\\
 {\Mono nofriction} & remove friction from a robot object \\
 {\Mono perturb} & randomly modify some dynamic parameters\\
-{\Mono puma560} & Puma 560 data \\
-{\Mono puma560akb} & Puma 560 data (modified Denavit-Hartenberg)\\
+{\Mono puma560} & Puma 560 data (DH, kine, dyn)\\
+{\Mono puma560akb} & Puma 560 data (MDH, kine, dyn)\\
 {\Mono robot} & construct a robot object \\ 
+{\Mono S4ABB2p8} & ABB S4 2.8 arm data (DH, kine)\\
 {\Mono showlink} & show link/robot data in detail\\ 
-{\Mono stanford} & Stanford arm data \\ 
-{\Mono twolink} & simple 2-link example \\ \hline
+{\Mono stanford} & Stanford arm data (DH, kine, dyn)\\
+{\Mono twolink} & simple 2-link example (DH, kine)\\ \hline
 \end{tabular}
 
 \begin{tabular}
@@ -658,6 +661,28 @@ for example in the aerospace community.}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{Fanuc10L}
+\mpur{Create a Fanuc 10L robot object}
+
+\msyn{
+Fanuc10L
+}
+
+\mdes{Creates the \textbf{robot} object \var{R} which describes the kinematic 
+characteristics of a AM120iB/10L manipulator.
+The kinematic conventions used are as per Paul and Zhang, and
+all quantities are in standard SI units.
+
+Also defined is the joint coordinate vector \var{q0}
+corresponding to the mastering position.}
+
+\msa{robot, puma560akb, stanford, MotomanHP6, S4ABB2p8}
+
+\mauthor{Wynand Swart, Mega Robots CC, P/O Box 8412, Pretoria, 0001, South Africa,
+wynand.swart@gmail.com}
+
+\vfil\eject 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{fdyn}
 \mpur{Integrate forward dynamics}
 
@@ -1054,7 +1079,7 @@ a function of joint angles 2 and 3 the following code could be used.}
       >> [q2,q3] = meshgrid(-pi:0.2:pi, -pi:0.2:pi);
       >> q = [zeros(length(q2(:)),1) q2(:) q3(:) zeros(length(q2(:)),3)];
       >> I = inertia(p560, q);
-      >> surfl(q2, q3, squeeze(I(1,1,:)));
+      >> surfl(q2, q3, reshape(squeeze(I(1,1,:)), size(q2)));
 \end{verbatim}}
 \centerline{\psfig{figure=figs/surfl.eps,width=10cm}}
 
@@ -1420,6 +1445,28 @@ practice will be less than 1.}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{MotomanHP6}
+\mpur{Create a Motoman HP 6 robot object}
+
+\msyn{
+MotomanHP6
+}
+
+\mdes{Creates the \textbf{robot} object \var{R} which describes the kinematic 
+characteristics of a Motoman HP6 manipulator.
+The kinematic conventions used are as per Paul and Zhang, and
+all quantities are in standard SI units.
+
+Also defined is the joint coordinate vector \var{q0}
+corresponding to the zero position.}
+
+\msa{robot, puma560akb, stanford, Fanuc10L, S4ABB2p8}
+
+\mauthor{Wynand Swart, Mega Robots CC, P/O Box 8412, Pretoria, 0001, South Africa,
+wynand.swart@gmail.com}
+
+\vfil\eject 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{robot/nofriction}
 \mpur{Remove friction from robot object}
 
@@ -1536,7 +1583,7 @@ poses respectively.}
 \centerline{\psfig{figure=figs/pumaaxis.eps,height=8cm}}
 Details of coordinate frames used for the Puma 560 shown here in its zero angle pose.
 
-\msa{robot, puma560akb, stanford}
+\msa{robot, puma560akb, stanford, Fanuc10L, MotomanHP6, S4ABB2p8}
 \mref{R.~P. Paul and H.~Zhang, ``Computationally efficient kinematics for
   manipulators with spherical wrists,'' {\em Int. J. Robot. Res.}, vol.~5,
     no.~2, pp.~32--44, 1986.
@@ -1571,7 +1618,7 @@ Also defines the joint coordinate vectors \var{qz}, \var{qr} and \var{qstretch}
 corresponding to the zero-angle, ready and fully extended 
 (in X-direction) poses respectively.}
 
-\msa{robot, puma560, stanford}
+\msa{robot, puma560, stanford, Fanuc10L, MotomanHP6, S4ABB2p8}
 \mref{
 B.~Armstrong, O.~Khatib, and J.~Burdick, ``The explicit dynamic model and
   inertial parameters of the {Puma} 560 arm,'' in {\em Proc. IEEE Int. Conf.
@@ -2178,6 +2225,28 @@ all figures.}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{S4ABB2p8}
+\mpur{Create a Motoman HP 6 robot object}
+
+\msyn{
+S4ABB2p8
+}
+
+\mdes{Creates the \textbf{robot} object \var{R} which describes the kinematic 
+characteristics of an ABB S4 2.8 manipulator.
+The kinematic conventions used are as per Paul and Zhang, and
+all quantities are in standard SI units.
+
+Also defined is the joint coordinate vector \var{q0}
+corresponding to the synchronization position.}
+
+\msa{robot, puma560akb, stanford, Fanuc10L, MotomanHP6}
+
+\mauthor{Wynand Swart, Mega Robots CC, P/O Box 8412, Pretoria, 0001, South Africa,
+wynand.swart@gmail.com}
+
+\vfil\eject 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{showlink}
 \mpur{Show robot link details}
 
@@ -2236,7 +2305,7 @@ Specifies armature inertia and gear ratios.
 All quantities are in standard SI units.}
 
 
-\msa{robot, puma560}
+\msa{robot, puma560, puma560akb, Fanuc10L, MotomanHP6, S4ABB2p8}
 \mref{R.~Paul, ``Modeling, trajectory calculation and servoing of a computer
   controlled arm,'' Tech. Rep. {AIM}-177, Stanford University, Artificial
     Intelligence Laboratory, 1972.

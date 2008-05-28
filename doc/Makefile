@@ -2,8 +2,9 @@
 
 doc.ps: ref.dvi tut.dvi
 	dviconcat -o robot.dvi tut.dvi ref.dvi
-	dvips -f robot > robot.ps
-	ps2pdf2 robot
+	#dvips -f robot > robot.ps
+	#ps2pdf2 robot
+	dvipdf robot
 
 tut.dvi:	tut.tex
 	pslatex tut

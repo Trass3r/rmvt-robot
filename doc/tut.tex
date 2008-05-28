@@ -2,7 +2,8 @@
 \documentclass{article}
 %\documentstyle[titlepage,ref,twoside]{article}
 \usepackage{verbatim}
-\usepackage{fancyheadings,fancybox,longtable}
+%\usepackage{fancyheadings,fancybox,longtable}
+\usepackage{fancyhdr,fancybox,longtable}
 \usepackage{times}
 
 \def\topfraction{.9}
@@ -77,28 +78,16 @@
 %
 %
 \vspace*{\fill}
-{\Headingi Robotics}
 
-\vspace{2mm}
-{\Heading TOOLBOX\\}
-
-\vspace{5mm}
-{\Afon for MATLAB}
-
+\psfig{figure=montage/montage.eps,width=12cm}
 \vspace*{2cm}
-{\Afon (Release 7)}
-
-\vspace*{\fill}
-
-\begin{tabular}{ll}
-\psfig{figure=figs/plot.eps,width=6cm} &\psfig{figure=figs/surfl.eps,width=6cm}
-\end{tabular}
+{\Afon (Release 8)}                             %% CHANGE
 
 \vspace*{\fill}
 \hrule
 \parbox{50mm}{{\Afon Peter I. Corke}\\
-Peter.Corke@csiro.au} \hfill {\Afon April 2002}\\
-http://www.cat.csiro.au/cmst/staff/pic/robot
+Peter.Corke@csiro.au} \hfill {\Afon May 2008}\\    %% CHANGE
+http://www.ict.csiro.au/staff/Peter.Corke
 \newpage
 \vspace*{\fill}
 \setlength{\fboxsep}{10pt}%
@@ -106,14 +95,15 @@ http://www.cat.csiro.au/cmst/staff/pic/robot
 \begin{Bflushleft}[b]
 Peter I. Corke\\
 CSIRO\\
-Manufacturing Science and Technology\\
+ICT Centre\\
+Queensland Centre for Advanced Technologies\\
 Pullenvale, AUSTRALIA, 4069.\\
 2002\\
-http://www.cat.csiro.au/cmst/staff/pic/robot
+http://www.ict.csiro.au/staff/Peter.Corke
 \end{Bflushleft}}
 \vspace*{\fill}
 
-\copyright 2002 by Peter I. Corke.
+\copyright 2008 by Peter I. Corke.                  %% CHANGE
 \noindent
 \cleardoublepage
 
@@ -150,7 +140,7 @@ http://www.cat.csiro.au/cmst/staff/pic/robot
 \vskip 5mm
 
 \section{Introduction}
-This, the seventh release of the Toolbox, represents nearly a decade of
+This, the eighth release of the Toolbox, represents nearly a decade of %% CHANGE
 tinkering and a substantial level of maturity.  It finally includes many of
 the features I've been planning to add for some time, particularly MEX files,
 Simulink support and modified Denavit-Hartenberg support.
@@ -183,22 +173,12 @@ compile the M-file using the Matlab compiler, or
 create a MEX version.
 
 \subsection{What's new}
-This release has some significant new functionality as well as some
-bug fixes.
+This release is primarily fixing issues caused by changes in Matlab and Simulink
+R2008a.
 \begin{itemize}
-\item	Full support for modified (Craig's) Denavit-Hartenberg notation,
-	forward and inverse kinematics, Jacobians and forward and inverse
-	dynamics.
-\item	Simulink blockset library and demonstrations included, see Section
-	\ref{sec:simulink}
-\item	MEX implementation of recursive Newton-Euler algorithm written in
-	portable C.  Speed improvements of at least 1000.  Tested on Solaris,
-	Linux and Windows. See Section \ref{sec:mex}.
-\item	Fixed still more bugs and missing files in quaternion code.
-\item	Remove `@' notation from \var{fdyn} to allow operation under
-	Matlab 5 and 6.
-\item	Fairly major update of documentation to ensure consistency between
-	code, online help and this manual.
+\item	Simulink blockset and demos 1--6 all work with R2008a
+\item   Some additional robot models were contributed by Wynand Swart of Mega Robots CC:
+Fanuc AM120iB/10L, Motoman HP and S4 ABB 2.8.
 \end{itemize}
 
 All code is now under CVS control which should eliminate many of the
@@ -220,7 +200,11 @@ off that web page.
 The Robotics Toolbox is freely available from the Toolbox home
 page at 
 \begin{quote}
-http://www.cat.csiro.au/cmst/staff/pic/robot
+http://www.petercorke.com
+\end{quote}
+or the CSIRO mirror
+\begin{quote}
+http://www.ict.csiro.au/downloads.php
 \end{quote}
 
 The files are available in either gzipped tar format (.gz) or zip
