@@ -1,7 +1,14 @@
-<productinfo>
+<productinfo
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="optional">
+<?xml-stylesheet type="text/xsl" href="optional"?>
 
-<matlabrelease>12</matlabrelease>
-<name>Robot Toolbox</name>
+<matlabrelease>14</matlabrelease>
+<name>Robotics</name>
+<type>toolbox</type>
+<icon>ApplicationIcon.MATLAB</icon>
+<help_location>./htmldoc</help_location>
+
 <area>matlab</area>
 <icon>$toolbox/matlab/general/unknownicon.gif</icon>
 
@@ -21,7 +28,7 @@
 
 <listitem>
 <label>Product Page (Web)</label>
-<callback>web http://www.cat.csiro.au/cmst/staff/pic/robot/ -browser;</callback>
+<callback>web http://www.petercorke.com -browser;</callback>
 <icon>$toolbox/matlab/general/webicon.gif</icon>
 </listitem>
 
