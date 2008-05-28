@@ -62,21 +62,17 @@
 %   unit        - unitize a vector
 %
 % Creation of robot models.
+%   Fanuc10L    - Fanuc 10L (DH, kine)
 %   link        - construct a robot link object 
-%   puma560     - Puma 560 data 
-%   puma560akb  - Puma 560 data (modified Denavit-Hartenberg)
+%   MotomanHP6  - Motoman HP6 (DH, kine)
+%   puma560     - Puma 560 data (DH, kine, dyn)
+%   puma560akb  - Puma 560 data (MDH, kine, dyn)
 %   robot       - construct a robot object 
-%   stanford    - Stanford arm data 
-%   twolink     - simple 2-link example 
+%   stanford    - Stanford arm data (DH, kine, dyn)
+%   S4ABB2p8    - ABB S4 2.8 (DH, kine)
+%   twolink     - simple 2-link example (DH, kine)
 %
 % Demonstrations.
 %   rtdemo      - toolbox demonstration
 %   
-
-% Copyright (C) 2002, by Peter I. Corke
-%   $Log: not supported by cvs2svn $
-%   Revision 1.1  2002/04/01 11:47:11  pic
-%   General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-%   references, clarification of functions.
-%
-%   $Revision: 1.2 $
+% Copyright (C) 2008, by Peter I. Corke
