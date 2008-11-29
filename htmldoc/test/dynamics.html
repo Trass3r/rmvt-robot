@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of dynamics</title>
+  <meta name="keywords" content="dynamics">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="#">test</a> &gt; dynamics.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ./test&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>dynamics
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="mat.html" class="code" title="function x = mat(y)">mat</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="test.html" class="code" title="">test</a>	</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 q1 = <a href="mat.html" class="code" title="function x = mat(y)">mat</a>(ones(1,6))
+0002 
+0003 <span class="comment">% test the RNE primitive for DH</span>
+0004 p560
+0005 rne(p560, qz, qz, qz)
+0006 rne(p560, qz, qz, qz, [1,2,3])
+0007 rne(p560, qz, qz, qz, [0,0,9.81], [1,2,3,0,0,0])
+0008 rne(p560, qz, 0.2*q1, qz)
+0009 rne(p560, qz, 0.2*q1, 0.2*q1)
+0010 
+0011 z = [qr qz qz]
+0012 rne(p560, z, [1,2,3])
+0013 rne(p560, z, [0,0,9.81], [1,2,3,0,0,0])
+0014 rne(p560, [z;z;z])
+0015 
+0016 <span class="comment">% test the RNE primitive for MDH</span>
+0017 puma560akb
+0018 rne(p560m, qz, qz, qz)
+0019 rne(p560m, qz, qz, qz, [1,2,3])
+0020 rne(p560m, qz, qz, qz, [0,0,9.81], [1,2,3,0,0,0])
+0021 rne(p560m, qz, 0.2*q1, qz)
+0022 rne(p560m, qz, 0.2*q1, 0.2*q1)
+0023 
+0024 z = [qr qz qz]
+0025 rne(p560m, z, [1,2,3])
+0026 rne(p560m, z, [0,0,9.81], [1,2,3,0,0,0])
+0027 rne(p560m, [z;z;z])
+0028 
+0029 <span class="comment">% at zero pose</span>
+0030 gravload(p560, qz)
+0031 gravload(p560, qz, [9,0,0])
+0032 gravload(p560, [qz;qz;qz])
+0033 
+0034 inertia(p560, qz)
+0035 inertia(p560, [qz;qr])
+0036 
+0037 accel(p560, qz, 0.2*q1, 0.5*q1)
+0038 
+0039 <span class="comment">% need to pick a non-singular configuration for cinertia()</span>
+0040 cinertia(p560, qn)
+0041 
+0042 coriolis(p560, qn, 0.5*q1)
+0043 
+0044 <span class="comment">% along trajectory</span>
+0045 [q,qd,qdd] = jtraj(qz, qr, 20)
+0046 rne(p560, q, qd, qdd)</pre></div>
+<hr><address>Generated on Sun 18-May-2008 11:54:27 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

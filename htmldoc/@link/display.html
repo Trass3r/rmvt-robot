@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of display</title>
+  <meta name="keywords" content="display">
+  <meta name="description" content="DISPLAY Display the value of a LINK object">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="#">@link</a> &gt; display.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ./@link&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>display
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>DISPLAY Display the value of a LINK object</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function display(l, full) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">DISPLAY Display the value of a LINK object
+
+ This method is invoked to display a link object by the Matlab interpreter,
+ and gives a terse single line description of link kinematics.
+
+ If invoked with a second argument (value ignored) it will display a long
+ form description which includes all defined inertial parameters.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="char.html" class="code" title="function s = char(l)">char</a>	CHAR Create string representation of LINK object</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%DISPLAY Display the value of a LINK object</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% This method is invoked to display a link object by the Matlab interpreter,</span>
+0004 <span class="comment">% and gives a terse single line description of link kinematics.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% If invoked with a second argument (value ignored) it will display a long</span>
+0007 <span class="comment">% form description which includes all defined inertial parameters.</span>
+0008 
+0009 <span class="comment">% $Log: display.m,v $</span>
+0010 <span class="comment">% Revision 1.3  2002-04-01 12:04:51  pic</span>
+0011 <span class="comment">% General tidyup, comments, clarification, copyright, RCS keys, etc.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% $Revision: 1.3 $</span>
+0014 <span class="comment">% Copyright (C) Peter Corke 1999</span>
+0015 
+0016 <a name="_sub0" href="#_subfunctions" class="code">function display(l, full)</a>
+0017 
+0018     disp(<span class="string">' '</span>);
+0019     disp([inputname(1), <span class="string">' = '</span>])
+0020     disp(<span class="string">' '</span>);
+0021     disp([<span class="string">'  '</span> <a href="char.html" class="code" title="function s = char(l)">char</a>(l)])
+0022     disp(<span class="string">' '</span>);
+0023 
+0024     <span class="keyword">if</span> nargin &gt; 1,
+0025         <span class="keyword">if</span> ~isempty(l.m)
+0026             fprintf(<span class="string">'  m    = %f\n'</span>, l.m)
+0027         <span class="keyword">end</span>
+0028         <span class="keyword">if</span> ~isempty(l.r)
+0029             fprintf(<span class="string">'  r    = %f %f %f\n'</span>, l.r);
+0030         <span class="keyword">end</span>
+0031         <span class="keyword">if</span> ~isempty(l.I)
+0032             fprintf(<span class="string">'  I    = | %f %f %f |\n'</span>, l.I(1,:));
+0033             fprintf(<span class="string">'         | %f %f %f |\n'</span>, l.I(2,:));
+0034             fprintf(<span class="string">'         | %f %f %f |\n'</span>, l.I(3,:));
+0035         <span class="keyword">end</span>
+0036         <span class="keyword">if</span> ~isempty(l.Jm)
+0037             fprintf(<span class="string">'  Jm   = %f\n'</span>, l.Jm);
+0038         <span class="keyword">end</span>
+0039         <span class="keyword">if</span> ~isempty(l.B)
+0040             fprintf(<span class="string">'  B    = %f\n'</span>, l.B);
+0041         <span class="keyword">end</span>
+0042         <span class="keyword">if</span> ~isempty(l.Tc)
+0043             fprintf(<span class="string">'  Tc   = %f(+) %f(-)\n'</span>, l.Tc(1), l.Tc(2));
+0044         <span class="keyword">end</span>
+0045         <span class="keyword">if</span> ~isempty(l.G)
+0046             fprintf(<span class="string">'  G    = %f\n'</span>, l.G);
+0047         <span class="keyword">end</span>
+0048         <span class="keyword">if</span> ~isempty(l.qlim)
+0049             fprintf(<span class="string">'  qlim = %f to %f\n'</span>, l.qlim(1), l.qlim(2));
+0050         <span class="keyword">end</span>
+0051     <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

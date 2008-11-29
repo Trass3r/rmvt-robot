@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of rotx</title>
+  <meta name="keywords" content="rotx">
+  <meta name="description" content="ROTX Rotation about X axis">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="./m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="./index.html">Home</a> &gt;  <a href="index.html">.</a> &gt; rotx.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="./index.html"><img alt="<" border="0" src="./left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for .&nbsp;<img alt=">" border="0" src="./right.png"></a></td></tr></table>-->
+
+<h1>rotx
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>ROTX Rotation about X axis</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>function r = rotx(t) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre class="comment">ROTX Rotation about X axis
+
+    TR = ROTX(theta)
+
+ Returns a homogeneous transformation representing a rotation of theta 
+ about the X axis.
+
+ See also: <a href="roty.html" class="code" title="function r = roty(t)">ROTY</a>, <a href="rotz.html" class="code" title="function r = rotz(t)">ROTZ</a>, <a href="rotvec.html" class="code" title="function r = rotvec(v, t)">ROTVEC</a>.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(./matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="rpy2r.html" class="code" title="function r = rpy2r(roll, pitch, yaw)">rpy2r</a>	RPY2TR Roll/pitch/yaw to homogenous transform</li><li><a href="rpy2tr.html" class="code" title="function T = rpy2tr(roll, pitch, yaw)">rpy2tr</a>	RPY2TR Roll/pitch/yaw to homogenous transform</li><li><a href="trotx.html" class="code" title="function r = trotx(t)">trotx</a>	ROTX Rotation about X axis</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%ROTX Rotation about X axis</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    TR = ROTX(theta)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Returns a homogeneous transformation representing a rotation of theta</span>
+0006 <span class="comment">% about the X axis.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% See also: ROTY, ROTZ, ROTVEC.</span>
+0009 
+0010 <span class="comment">% $Log: rotx.m,v $</span>
+0011 <span class="comment">% Revision 1.3  2007-01-21 06:30:46  cor134</span>
+0012 <span class="comment">% Generate rotation matrices as 3x3 matrices, not 4x4 as previously.  This</span>
+0013 <span class="comment">% might break a few things...</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Revision 1.2  2002/04/01 11:47:16  pic</span>
+0016 <span class="comment">% General cleanup of code: help comments, see also, copyright, remnant dh/dyn</span>
+0017 <span class="comment">% references, clarification of functions.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% $Revision: 1.3 $</span>
+0020 <span class="comment">% Copyright (C) 1993-2002, by Peter I. Corke</span>
+0021 
+0022 <a name="_sub0" href="#_subfunctions" class="code">function r = rotx(t)</a>
+0023     ct = cos(t);
+0024     st = sin(t);
+0025     r =    [1    0    0
+0026         0    ct    -st
+0027         0    st    ct];</pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

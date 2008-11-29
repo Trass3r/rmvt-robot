@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of tlspb</title>
+  <meta name="keywords" content="tlspb">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="./m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="./index.html">Home</a> &gt;  <a href="index.html">.</a> &gt; tlspb.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="./index.html"><img alt="<" border="0" src="./left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for .&nbsp;<img alt=">" border="0" src="./right.png"></a></td></tr></table>-->
+
+<h1>tlspb
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>function [q,qd,qdd] = lspb(q0, q1, t, V) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(./matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(./matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [q,qd,qdd] = lspb(q0, q1, t, V)</a>
+0002 
+0003     <span class="keyword">if</span> size(t) == [1 1],
+0004         t = [0:t-1]';
+0005     <span class="keyword">end</span>
+0006 
+0007     tf = max(t(:));
+0008 
+0009     <span class="keyword">if</span> nargin &lt; 4,
+0010         V = (q1-q0)/tf * 1.5;
+0011     <span class="keyword">else</span>
+0012         <span class="keyword">if</span> V &lt; (q1-q0)/tf,
+0013             error(<span class="string">'V too small\n'</span>);
+0014         <span class="keyword">elseif</span> V &gt; 2*(q1-q0)/tf,
+0015             error(<span class="string">'V too big\n'</span>);
+0016         <span class="keyword">end</span>
+0017     <span class="keyword">end</span>
+0018 
+0019     tb = (q0 - q1 + V*tf)./V;
+0020     a = V./tb;
+0021 
+0022     <span class="keyword">for</span> i = 1:length(t),
+0023         ti = t(i);
+0024 
+0025         <span class="keyword">if</span> ti &lt;= tb,
+0026             p(i) = q0 + a/2*ti^2;
+0027             pd(i) = a*ti;
+0028             pdd(i) = a;
+0029         <span class="keyword">elseif</span> ti &lt;= (tf-tb),
+0030             p(i) = (q1+q0-V*tf)/2 + V*ti;
+0031             pd(i) = V;
+0032             pdd(i) = 0;
+0033         <span class="keyword">else</span>
+0034             p(i) = q1 - a/2*tf^2 + a*tf*ti - a/2*ti^2;
+0035             pd(i) = -a*ti + a*tf;
+0036             pdd(i) = -a;
+0037         <span class="keyword">end</span>
+0038     <span class="keyword">end</span>
+0039 
+0040     <span class="keyword">if</span> nargout == 0,
+0041         hold on
+0042         k = t&lt;= tb;
+0043         plot(t(k), p(k), <span class="string">'r-o'</span>);
+0044         k = (t&gt;=tb) &amp; (t&lt;= (tf-tb));
+0045         plot(t(k), p(k), <span class="string">'b-o'</span>);
+0046         k = t&gt;= (tf-tb);
+0047         plot(t(k), p(k), <span class="string">'g-o'</span>);
+0048         grid
+0049         hold off
+0050     <span class="keyword">else</span>
+0051         q = p';
+0052         qd = pd';
+0053         qdd = pdd';
+0054     <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

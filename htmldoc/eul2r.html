@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of eul2r</title>
+  <meta name="keywords" content="eul2r">
+  <meta name="description" content="EUL2R Convert Euler angles to homogeneous transformation">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="./m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="./index.html">Home</a> &gt;  <a href="index.html">.</a> &gt; eul2r.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="./index.html"><img alt="<" border="0" src="./left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for .&nbsp;<img alt=">" border="0" src="./right.png"></a></td></tr></table>-->
+
+<h1>eul2r
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>EUL2R Convert Euler angles to homogeneous transformation</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>function r = eul2r(phi, theta, psi) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre class="comment">EUL2R Convert Euler angles to homogeneous transformation
+
+     TR = EUL2TR([PHI THETA PSI])
+     TR = EUL2TR(PHI, THETA, PSI)
+
+ Returns a homogeneous tranformation for the specified Euler angles.  These 
+ correspond to rotations about the Z, Y, Z axes respectively.
+
+ See also: <a href="tr2eul.html" class="code" title="function euler = tr2eul(m)">TR2EUL</a>, <a href="rpy2tr.html" class="code" title="function T = rpy2tr(roll, pitch, yaw)">RPY2TR</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="numcols.html" class="code" title="function c = numcols(m)">numcols</a>	NUMCOLS Return number of columns in matrix</li><li><a href="numrows.html" class="code" title="function r = numrows(m)">numrows</a>	NUMROWS Return number of rows in matrix</li><li><a href="roty.html" class="code" title="function r = roty(t)">roty</a>	ROTY Rotation about Y axis</li><li><a href="rotz.html" class="code" title="function r = rotz(t)">rotz</a>	ROTZ Rotation about Z axis</li></ul>
+This function is called by:
+<ul style="list-style-image:url(./matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%EUL2R Convert Euler angles to homogeneous transformation</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%     TR = EUL2TR([PHI THETA PSI])</span>
+0004 <span class="comment">%     TR = EUL2TR(PHI, THETA, PSI)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Returns a homogeneous tranformation for the specified Euler angles.  These</span>
+0007 <span class="comment">% correspond to rotations about the Z, Y, Z axes respectively.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% See also: TR2EUL, RPY2TR</span>
+0010 
+0011 <span class="comment">% $Log: eul2r.m,v $</span>
+0012 <span class="comment">% Revision 1.1  2007-01-21 06:34:30  cor134</span>
+0013 <span class="comment">% Initial version.  Angles to 3x3 rotation matrix, not 4x4.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Revision 1.4  2002/04/14 10:12:47  pic</span>
+0016 <span class="comment">% Change comment to reflect correct axis rotation sequence.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Revision 1.3  2002/04/01 11:47:12  pic</span>
+0019 <span class="comment">% General cleanup of code: help comments, see also, copyright, remnant dh/dyn</span>
+0020 <span class="comment">% references, clarification of functions.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% $Revision: 1.1 $</span>
+0023 <span class="comment">% Copyright (C) 1993-2002, by Peter I. Corke</span>
+0024 
+0025 <a name="_sub0" href="#_subfunctions" class="code">function r = eul2r(phi, theta, psi)</a>
+0026     <span class="keyword">if</span> (nargin == 1),
+0027         <span class="keyword">if</span> <a href="numcols.html" class="code" title="function c = numcols(m)">numcols</a>(phi) ~= 3,
+0028             error(<span class="string">'bad arguments'</span>)
+0029         <span class="keyword">end</span>
+0030         theta = phi(:,2);
+0031         psi = phi(:,3);
+0032         phi = phi(:,1);
+0033     <span class="keyword">end</span>
+0034 
+0035     <span class="keyword">if</span> <a href="numrows.html" class="code" title="function r = numrows(m)">numrows</a>(phi) == 1,
+0036         r = <a href="rotz.html" class="code" title="function r = rotz(t)">rotz</a>(phi) * <a href="roty.html" class="code" title="function r = roty(t)">roty</a>(theta) * <a href="rotz.html" class="code" title="function r = rotz(t)">rotz</a>(psi);
+0037     <span class="keyword">else</span>
+0038         <span class="keyword">for</span> i=1:<a href="numrows.html" class="code" title="function r = numrows(m)">numrows</a>(phi),
+0039             r(:,:,1) = <a href="rotz.html" class="code" title="function r = rotz(t)">rotz</a>(phi(i)) * <a href="roty.html" class="code" title="function r = roty(t)">roty</a>(theta(i)) * <a href="rotz.html" class="code" title="function r = rotz(t)">rotz</a>(psi(i));
+0040         <span class="keyword">end</span>
+0041 
+0042                 
+0043     <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

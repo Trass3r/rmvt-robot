@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of maniplty</title>
+  <meta name="keywords" content="maniplty">
+  <meta name="description" content="MANIPLTY Manipulability measure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="./m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="./index.html">Home</a> &gt;  <a href="index.html">.</a> &gt; maniplty.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="./index.html"><img alt="<" border="0" src="./left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for .&nbsp;<img alt=">" border="0" src="./right.png"></a></td></tr></table>-->
+
+<h1>maniplty
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>MANIPLTY Manipulability measure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>function w = maniplty(robot, q, which) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre class="comment">MANIPLTY Manipulability measure
+
+    M = MANIPLTY(ROBOT, Q)
+    M = MANIPLTY(ROBOT, Q, WHICH)
+
+ Computes the manipulability index for the manipulator at the given pose.
+
+ For an n-axis manipulator Q may be an n-element vector, or an m x n
+ joint space trajectory.
+
+ If Q is a vector MANIPLTY returns a scalar manipulability index.
+ If Q is a matrix MANIPLTY returns a column vector of  manipulability 
+ indices for each pose specified by Q.
+
+ The argument WHICH can be either 'yoshikawa' (default) or 'asada' and
+ selects one of two manipulability measures.
+ Yoshikawa's manipulability measure gives an indication of how far 
+ the manipulator is from singularities and thus able to move and 
+ exert forces uniformly in all directions.
+
+ Asada's manipulability measure is based on the manipulator's
+ Cartesian inertia matrix.  An n-dimensional inertia ellipsoid
+     X' M(q) X = 1
+ gives an indication of how well the manipulator can accelerate
+ in each of the Cartesian directions.  The scalar measure computed
+ here is the ratio of the smallest/largest ellipsoid axis.  Ideally
+ the ellipsoid would be spherical, giving a ratio of 1, but in
+ practice will be less than 1.
+
+ See also: <a href="inertia.html" class="code" title="function M = inertia(robot, q)">INERTIA</a>, <a href="jacob0.html" class="code" title="function J0 = jacob0(robot, q)">JACOB0</a>.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="inertia.html" class="code" title="function M = inertia(robot, q)">inertia</a>	INERTIA Compute the manipulator inertia matrix</li><li><a href="jacob0.html" class="code" title="function J0 = jacob0(robot, q)">jacob0</a>	JACOB0 Compute manipulator Jacobian in world coordinates</li></ul>
+This function is called by:
+<ul style="list-style-image:url(./matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="#_sub1" class="code">function m = yoshi(robot, q)</a></li><li><a href="#_sub2" class="code">function m = asada(robot, q)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%MANIPLTY Manipulability measure</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    M = MANIPLTY(ROBOT, Q)</span>
+0004 <span class="comment">%    M = MANIPLTY(ROBOT, Q, WHICH)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Computes the manipulability index for the manipulator at the given pose.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% For an n-axis manipulator Q may be an n-element vector, or an m x n</span>
+0009 <span class="comment">% joint space trajectory.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% If Q is a vector MANIPLTY returns a scalar manipulability index.</span>
+0012 <span class="comment">% If Q is a matrix MANIPLTY returns a column vector of  manipulability</span>
+0013 <span class="comment">% indices for each pose specified by Q.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% The argument WHICH can be either 'yoshikawa' (default) or 'asada' and</span>
+0016 <span class="comment">% selects one of two manipulability measures.</span>
+0017 <span class="comment">% Yoshikawa's manipulability measure gives an indication of how far</span>
+0018 <span class="comment">% the manipulator is from singularities and thus able to move and</span>
+0019 <span class="comment">% exert forces uniformly in all directions.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% Asada's manipulability measure is based on the manipulator's</span>
+0022 <span class="comment">% Cartesian inertia matrix.  An n-dimensional inertia ellipsoid</span>
+0023 <span class="comment">%     X' M(q) X = 1</span>
+0024 <span class="comment">% gives an indication of how well the manipulator can accelerate</span>
+0025 <span class="comment">% in each of the Cartesian directions.  The scalar measure computed</span>
+0026 <span class="comment">% here is the ratio of the smallest/largest ellipsoid axis.  Ideally</span>
+0027 <span class="comment">% the ellipsoid would be spherical, giving a ratio of 1, but in</span>
+0028 <span class="comment">% practice will be less than 1.</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% See also: INERTIA, JACOB0.</span>
+0031 
+0032 <span class="comment">% MOD HISTORY</span>
+0033 <span class="comment">% 4/99    object support, matlab local functions</span>
+0034 <span class="comment">% 6/99    change switch to allow abbreviations of measure type</span>
+0035 <span class="comment">% $Log: maniplty.m,v $</span>
+0036 <span class="comment">% Revision 1.3  2008-05-04 01:06:31  cor134</span>
+0037 <span class="comment">% Fix switch statement syntax.</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">% Revision 1.2  2002/04/01 11:47:14  pic</span>
+0040 <span class="comment">% General cleanup of code: help comments, see also, copyright, remnant dh/dyn</span>
+0041 <span class="comment">% references, clarification of functions.</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">% $Revision: 1.3 $</span>
+0044 
+0045 <span class="comment">% Copyright (C) 1993-2002, by Peter I. Corke</span>
+0046 
+0047 <a name="_sub0" href="#_subfunctions" class="code">function w = maniplty(robot, q, which)</a>
+0048     n = robot.n;
+0049 
+0050     <span class="keyword">if</span> nargin == 2,
+0051         which = <span class="string">'yoshikawa'</span>;
+0052     <span class="keyword">end</span>
+0053 
+0054     <span class="keyword">if</span> length(q) == robot.n,
+0055         q = q(:)';
+0056     <span class="keyword">end</span>
+0057 
+0058     w = [];
+0059     <span class="keyword">switch</span> which,
+0060     <span class="keyword">case</span> {<span class="string">'yoshikawa'</span>, <span class="string">'yoshi'</span>, <span class="string">'y'</span>}
+0061         <span class="keyword">for</span> Q = q',
+0062             w = [w; <a href="#_sub1" class="code" title="subfunction m = yoshi(robot, q)">yoshi</a>(robot, Q)];
+0063         <span class="keyword">end</span>
+0064     <span class="keyword">case</span> {<span class="string">'asada'</span>, <span class="string">'a'</span>}
+0065         <span class="keyword">for</span> Q = q',
+0066             w = [w; <a href="#_sub2" class="code" title="subfunction m = asada(robot, q)">asada</a>(robot, Q)];
+0067         <span class="keyword">end</span>
+0068     <span class="keyword">end</span>
+0069 
+0070 <a name="_sub1" href="#_subfunctions" class="code">function m = yoshi(robot, q)</a>
+0071     J = <a href="jacob0.html" class="code" title="function J0 = jacob0(robot, q)">jacob0</a>(robot, q);
+0072     m = sqrt(det(J * J'));
+0073 
+0074 <a name="_sub2" href="#_subfunctions" class="code">function m = asada(robot, q)</a>
+0075     J = <a href="jacob0.html" class="code" title="function J0 = jacob0(robot, q)">jacob0</a>(robot, q);
+0076     Ji = inv(J);
+0077     M = <a href="inertia.html" class="code" title="function M = inertia(robot, q)">inertia</a>(robot, q);
+0078     Mx = Ji' * M * Ji;
+0079     e = eig(Mx);
+0080     m = min(e) / max(e);</pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

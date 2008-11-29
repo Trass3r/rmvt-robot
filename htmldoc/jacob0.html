@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of jacob0</title>
+  <meta name="keywords" content="jacob0">
+  <meta name="description" content="JACOB0 Compute manipulator Jacobian in world coordinates">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="./m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="./index.html">Home</a> &gt;  <a href="index.html">.</a> &gt; jacob0.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="./index.html"><img alt="<" border="0" src="./left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for .&nbsp;<img alt=">" border="0" src="./right.png"></a></td></tr></table>-->
+
+<h1>jacob0
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>JACOB0 Compute manipulator Jacobian in world coordinates</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="box"><strong>function J0 = jacob0(robot, q) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre class="comment">JACOB0 Compute manipulator Jacobian in world coordinates
+
+    J0 = JACOB0(ROBOT, Q)
+
+ Returns a Jacobian matrix for the robot ROBOT in pose Q.
+
+ The manipulator Jacobian matrix maps differential changes in joint space
+ to differential Cartesian motion (world coord frame) of the end-effector.
+         dX = J dQ
+
+ For an n-axis manipulator the Jacobian is a 6 x n matrix.
+
+ See also: <a href="jacobn.html" class="code" title="function J = jacobn(robot, q)">JACOBN</a>, <a href="diff2tr.html" class="code" title="function delta = diff2tr(d)">DIFF2TR</a>, <a href="tr2diff.html" class="code" title="function d = tr2diff(t1, t2)">TR2DIFF</a>.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="fkine.html" class="code" title="function t = fkine(robot, q)">fkine</a>	FKINE  Forward robot kinematics for serial link manipulator</li><li><a href="jacobn.html" class="code" title="function J = jacobn(robot, q)">jacobn</a>	JACOBN Compute manipulator Jacobian in end-effector frame</li><li><a href="tr2rot.html" class="code" title="function R = tr2rot(T)">tr2rot</a>	TR2ROT Return rotational submatrix of a homogeneous transformation</li></ul>
+This function is called by:
+<ul style="list-style-image:url(./matlabicon.gif)">
+<li><a href="cinertia.html" class="code" title="function Mx = cinertia(robot, q)">cinertia</a>	CINERTIA Compute the Cartesian (operational space) manipulator inertia matrix</li><li><a href="ikine.html" class="code" title="function qt = ikine(robot, tr, q, m)">ikine</a>	IKINE Inverse manipulator kinematics</li><li><a href="maniplty.html" class="code" title="function w = maniplty(robot, q, which)">maniplty</a>	MANIPLTY Manipulability measure</li><li><a href="ospace.html" class="code" title="">ospace</a>	OSPACE Operational space coefficients</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="./up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%JACOB0 Compute manipulator Jacobian in world coordinates</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    J0 = JACOB0(ROBOT, Q)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Returns a Jacobian matrix for the robot ROBOT in pose Q.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% The manipulator Jacobian matrix maps differential changes in joint space</span>
+0008 <span class="comment">% to differential Cartesian motion (world coord frame) of the end-effector.</span>
+0009 <span class="comment">%         dX = J dQ</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% For an n-axis manipulator the Jacobian is a 6 x n matrix.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% See also: JACOBN, DIFF2TR, TR2DIFF.</span>
+0014 
+0015 
+0016 <span class="comment">% Copyright (C) 1999-2002, by Peter I. Corke</span>
+0017 <span class="comment">% MOD.HISTORY</span>
+0018 <span class="comment">% 3/99    uses objects</span>
+0019 <span class="comment">% $Log: jacob0.m,v $</span>
+0020 <span class="comment">% Revision 1.2  2002-04-01 11:47:14  pic</span>
+0021 <span class="comment">% General cleanup of code: help comments, see also, copyright, remnant dh/dyn</span>
+0022 <span class="comment">% references, clarification of functions.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% $Revision: 1.2 $</span>
+0025 
+0026 <a name="_sub0" href="#_subfunctions" class="code">function J0 = jacob0(robot, q)</a>
+0027     <span class="comment">%</span>
+0028     <span class="comment">%   dX_tn = Jn dq</span>
+0029     <span class="comment">%</span>
+0030     Jn = <a href="jacobn.html" class="code" title="function J = jacobn(robot, q)">jacobn</a>(robot, q);    <span class="comment">% Jacobian from joint to wrist space</span>
+0031 
+0032     <span class="comment">%</span>
+0033     <span class="comment">%  convert to Jacobian in base coordinates</span>
+0034     <span class="comment">%</span>
+0035     Tn = <a href="fkine.html" class="code" title="function t = fkine(robot, q)">fkine</a>(robot, q);    <span class="comment">% end-effector transformation</span>
+0036     R = <a href="tr2rot.html" class="code" title="function R = tr2rot(T)">tr2rot</a>(Tn);
+0037     J0 = [R zeros(3,3); zeros(3,3) R] * Jn;</pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

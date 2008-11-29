@@ -1,0 +1,663 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plot</title>
+  <meta name="keywords" content="plot">
+  <meta name="description" content="PLOT Graphical robot animation">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="#">@robot</a> &gt; plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ./@robot&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOT Graphical robot animation</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function rnew = plot(robot, tg, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOT Graphical robot animation
+
+    PLOT(ROBOT, Q)
+    PLOT(ROBOT, Q, options)
+
+ Displays a graphical animation of a robot based on the
+ kinematic model.  A stick figure polyline joins the origins of
+ the link coordinate frames.
+ The robot is displayed at the joint angle Q, or if a matrix it is
+ animated as the robot moves along the trajectory.
+
+ The graphical robot object holds a copy of the robot object and
+ the graphical element is tagged with the robot's name (.name method).
+ This state also holds the last joint configuration which can be retrieved,
+ see PLOT(robot) below.
+
+ If no robot of this name is currently displayed then a robot will
+ be drawn in the current figure.  If hold is enabled (hold on) then the
+ robot will be added to the current figure.
+
+ If the robot already exists then that graphical model will be found 
+ and moved.
+
+ MULTIPLE VIEWS OF THE SAME ROBOT
+ If one or more plots of this robot already exist then these will all
+ be moved according to the argument Q.  All robots in all windows with 
+ the same name will be moved.
+
+ MULTIPLE ROBOTS
+ Multiple robots can be displayed in the same plot, by using &quot;hold on&quot;
+ before calls to plot(robot).  
+
+ options is a list of any of the following:
+ 'workspace' [xmin, xmax ymin ymax zmin zmax]
+ 'perspective' 'ortho'        controls camera view mode
+ 'erase' 'noerase'        controls erasure of arm during animation
+ 'loop' 'noloop'        controls endless loop mode
+ 'base' 'nobase'        controls display of base 'pedestal'
+ 'wrist' 'nowrist'        controls display of wrist
+ 'name', 'noname'        display the robot's name 
+ 'shadow' 'noshadow'        controls display of shadow
+ 'xyz' 'noa'            wrist axis label
+ 'joints' 'nojoints'        controls display of joints
+ 'mag' scale            annotation scale factor
+
+ The options come from 3 sources and are processed in the order:
+ 1. Cell array of options returned by the function PLOTBOTOPT
+ 2. Cell array of options returned by the .plotopt method of the
+    robot object.  These are set by the .plotopt method.
+ 3. List of arguments in the command line.
+
+ GRAPHICAL ANNOTATIONS:
+
+ The basic stick figure robot can be annotated with
+  shadow on the floor
+  XYZ wrist axes and labels
+  joint cylinders and axes
+
+ All of these require some kind of dimension and this is determined
+ using a simple heuristic from the workspace dimensions.  This dimension
+ can be changed by setting the multiplicative scale factor using the
+ 'mag' option above.
+
+ GETTING GRAPHICAL ROBOT STATE:
+ q = PLOT(ROBOT)
+ Returns the joint configuration from the state of an existing 
+ graphical representation of the specified robot.  If multiple
+ instances exist, that of the first one returned by findobj() is
+ given.
+
+ MOVING JUST ONE INSTANCE oF A ROBOT:
+
+  r = PLOT(robot, q)
+
+ Returns a copy of the robot object, with the .handle element set.
+
+  PLOT(r, q)
+
+ will animate just this instance, not all robots of the same name.
+
+ See also: PLOTBOTOPT, DRIVEBOT, FKINE, <a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">ROBOT</a>.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>	ROBOT Robot object constructor</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function o = plot_options(robot, optin)</a></li><li><a href="#_sub2" class="code">function h = create_new_robot(robot, opt)</a></li><li><a href="#_sub3" class="code">function animate(robot, q)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%PLOT Graphical robot animation</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    PLOT(ROBOT, Q)</span>
+0004 <span class="comment">%    PLOT(ROBOT, Q, options)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Displays a graphical animation of a robot based on the</span>
+0007 <span class="comment">% kinematic model.  A stick figure polyline joins the origins of</span>
+0008 <span class="comment">% the link coordinate frames.</span>
+0009 <span class="comment">% The robot is displayed at the joint angle Q, or if a matrix it is</span>
+0010 <span class="comment">% animated as the robot moves along the trajectory.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% The graphical robot object holds a copy of the robot object and</span>
+0013 <span class="comment">% the graphical element is tagged with the robot's name (.name method).</span>
+0014 <span class="comment">% This state also holds the last joint configuration which can be retrieved,</span>
+0015 <span class="comment">% see PLOT(robot) below.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% If no robot of this name is currently displayed then a robot will</span>
+0018 <span class="comment">% be drawn in the current figure.  If hold is enabled (hold on) then the</span>
+0019 <span class="comment">% robot will be added to the current figure.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% If the robot already exists then that graphical model will be found</span>
+0022 <span class="comment">% and moved.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% MULTIPLE VIEWS OF THE SAME ROBOT</span>
+0025 <span class="comment">% If one or more plots of this robot already exist then these will all</span>
+0026 <span class="comment">% be moved according to the argument Q.  All robots in all windows with</span>
+0027 <span class="comment">% the same name will be moved.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% MULTIPLE ROBOTS</span>
+0030 <span class="comment">% Multiple robots can be displayed in the same plot, by using &quot;hold on&quot;</span>
+0031 <span class="comment">% before calls to plot(robot).</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% options is a list of any of the following:</span>
+0034 <span class="comment">% 'workspace' [xmin, xmax ymin ymax zmin zmax]</span>
+0035 <span class="comment">% 'perspective' 'ortho'        controls camera view mode</span>
+0036 <span class="comment">% 'erase' 'noerase'        controls erasure of arm during animation</span>
+0037 <span class="comment">% 'loop' 'noloop'        controls endless loop mode</span>
+0038 <span class="comment">% 'base' 'nobase'        controls display of base 'pedestal'</span>
+0039 <span class="comment">% 'wrist' 'nowrist'        controls display of wrist</span>
+0040 <span class="comment">% 'name', 'noname'        display the robot's name</span>
+0041 <span class="comment">% 'shadow' 'noshadow'        controls display of shadow</span>
+0042 <span class="comment">% 'xyz' 'noa'            wrist axis label</span>
+0043 <span class="comment">% 'joints' 'nojoints'        controls display of joints</span>
+0044 <span class="comment">% 'mag' scale            annotation scale factor</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% The options come from 3 sources and are processed in the order:</span>
+0047 <span class="comment">% 1. Cell array of options returned by the function PLOTBOTOPT</span>
+0048 <span class="comment">% 2. Cell array of options returned by the .plotopt method of the</span>
+0049 <span class="comment">%    robot object.  These are set by the .plotopt method.</span>
+0050 <span class="comment">% 3. List of arguments in the command line.</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">% GRAPHICAL ANNOTATIONS:</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">% The basic stick figure robot can be annotated with</span>
+0055 <span class="comment">%  shadow on the floor</span>
+0056 <span class="comment">%  XYZ wrist axes and labels</span>
+0057 <span class="comment">%  joint cylinders and axes</span>
+0058 <span class="comment">%</span>
+0059 <span class="comment">% All of these require some kind of dimension and this is determined</span>
+0060 <span class="comment">% using a simple heuristic from the workspace dimensions.  This dimension</span>
+0061 <span class="comment">% can be changed by setting the multiplicative scale factor using the</span>
+0062 <span class="comment">% 'mag' option above.</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">% GETTING GRAPHICAL ROBOT STATE:</span>
+0065 <span class="comment">% q = PLOT(ROBOT)</span>
+0066 <span class="comment">% Returns the joint configuration from the state of an existing</span>
+0067 <span class="comment">% graphical representation of the specified robot.  If multiple</span>
+0068 <span class="comment">% instances exist, that of the first one returned by findobj() is</span>
+0069 <span class="comment">% given.</span>
+0070 <span class="comment">%</span>
+0071 <span class="comment">% MOVING JUST ONE INSTANCE oF A ROBOT:</span>
+0072 <span class="comment">%</span>
+0073 <span class="comment">%  r = PLOT(robot, q)</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">% Returns a copy of the robot object, with the .handle element set.</span>
+0076 <span class="comment">%</span>
+0077 <span class="comment">%  PLOT(r, q)</span>
+0078 <span class="comment">%</span>
+0079 <span class="comment">% will animate just this instance, not all robots of the same name.</span>
+0080 <span class="comment">%</span>
+0081 <span class="comment">% See also: PLOTBOTOPT, DRIVEBOT, FKINE, ROBOT.</span>
+0082 
+0083 
+0084 <span class="comment">% HANDLES:</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%  A robot comprises a bunch of individual graphical elements and these are</span>
+0087 <span class="comment">% kept in a structure which can be stored within the .handle element of a</span>
+0088 <span class="comment">% robot object:</span>
+0089 <span class="comment">%    h.robot        the robot stick figure</span>
+0090 <span class="comment">%    h.shadow    the robot's shadow</span>
+0091 <span class="comment">%    h.x        wrist vectors</span>
+0092 <span class="comment">%    h.y</span>
+0093 <span class="comment">%    h.z</span>
+0094 <span class="comment">%    h.xt        wrist vector labels</span>
+0095 <span class="comment">%    h.yt</span>
+0096 <span class="comment">%    h.zt</span>
+0097 <span class="comment">%</span>
+0098 <span class="comment">%  The plot function returns a new robot object with the handle element set.</span>
+0099 <span class="comment">%</span>
+0100 <span class="comment">% For the h.robot object we additionally:</span>
+0101 <span class="comment">%    - save this new robot object as its UserData</span>
+0102 <span class="comment">%    - tag it with the name field from the robot object</span>
+0103 <span class="comment">%</span>
+0104 <span class="comment">%  This enables us to find all robots with a given name, in all figures,</span>
+0105 <span class="comment">% and update them.</span>
+0106 
+0107 <span class="comment">% MOD.HISTORY</span>
+0108 <span class="comment">% 12/94    make axis scaling adjust to robot kinematic params</span>
+0109 <span class="comment">% 4/99    use objects</span>
+0110 <span class="comment">% 2/01    major rewrite, axis names, drivebot, state etc.</span>
+0111 <span class="comment">% $Log: plot.m,v $</span>
+0112 <span class="comment">% Revision 1.6  2008-04-27 10:18:37  cor134</span>
+0113 <span class="comment">% Changes to plot logic, use new function newplot().</span>
+0114 <span class="comment">% Additional comments about how this works.</span>
+0115 <span class="comment">%</span>
+0116 <span class="comment">% Revision 1.4  2002/04/28 03:03:22  pic</span>
+0117 <span class="comment">% Fixed up newplot logic.</span>
+0118 <span class="comment">%</span>
+0119 <span class="comment">% Revision 1.3  2002/04/14 02:35:36  pic</span>
+0120 <span class="comment">% Cleanup internal structure.</span>
+0121 <span class="comment">% Improve the newplot behavious, not complete.</span>
+0122 <span class="comment">%</span>
+0123 <span class="comment">% Revision 1.2  2002/04/01 12:02:27  pic</span>
+0124 <span class="comment">% General tidyup, comments, clarification, copyright, see also, RCS keys.</span>
+0125 <span class="comment">%</span>
+0126 <span class="comment">% $Revision: 1.6 $</span>
+0127 <span class="comment">% Copyright (C) 1993-2002, by Peter I. Corke</span>
+0128 
+0129 <a name="_sub0" href="#_subfunctions" class="code">function rnew = plot(robot, tg, varargin)</a>
+0130 
+0131     <span class="comment">%</span>
+0132     <span class="comment">% q = PLOT(robot)</span>
+0133     <span class="comment">% return joint coordinates from a graphical robot of given name</span>
+0134     <span class="comment">%</span>
+0135     <span class="keyword">if</span> nargin == 1,
+0136         rh = findobj(<span class="string">'Tag'</span>, robot.name);
+0137         <span class="keyword">if</span> ~isempty(rh),
+0138             r = get(rh(1), <span class="string">'UserData'</span>);
+0139             rnew = r.q;
+0140         <span class="keyword">end</span>
+0141         <span class="keyword">return</span>
+0142     <span class="keyword">end</span>
+0143     
+0144     <span class="comment">% process options</span>
+0145     opt = <a href="#_sub1" class="code" title="subfunction o = plot_options(robot, optin)">plot_options</a>(<a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>, varargin);
+0146 
+0147     <span class="comment">%</span>
+0148     <span class="comment">% robot2 = ROBOT(robot, q, varargin)</span>
+0149     <span class="comment">%</span>
+0150     np = numrows(tg);
+0151     n = robot.n;
+0152 
+0153     <span class="keyword">if</span> numcols(tg) ~= n,
+0154         error(<span class="string">'Insufficient columns in q'</span>)
+0155     <span class="keyword">end</span>
+0156 
+0157     <span class="keyword">if</span> ~isempty(robot.handle),
+0158         <span class="comment">%disp('has handles')</span>
+0159         <span class="comment">% handles provided, animate just that robot</span>
+0160         <span class="keyword">for</span> r=1:opt.repeat,
+0161             <span class="keyword">for</span> p=1:np,
+0162             <a href="#_sub3" class="code" title="subfunction animate(robot, q)">animate</a>( <a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>, tg(p,:));
+0163             pause(opt.delay)
+0164             <span class="keyword">end</span>
+0165         <span class="keyword">end</span>
+0166 
+0167         <span class="keyword">return</span>;
+0168     <span class="keyword">end</span>
+0169 
+0170     <span class="comment">% Do the right thing with figure windows.</span>
+0171     ax = newplot();
+0172     
+0173     <span class="comment">% if this figure has no robot in it, create one</span>
+0174     <span class="keyword">if</span> isempty( findobj(ax, <span class="string">'Tag'</span>, robot.name) ),
+0175 
+0176         h = <a href="#_sub2" class="code" title="subfunction h = create_new_robot(robot, opt)">create_new_robot</a>(<a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>, opt);
+0177 
+0178         <span class="comment">% save the handles in the passed robot object, and</span>
+0179         <span class="comment">% attach it to the robot as user data.</span>
+0180         robot.handle = h;
+0181         set(h.robot, <span class="string">'Tag'</span>, robot.name);
+0182         set(h.robot, <span class="string">'UserData'</span>, <a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>);
+0183     <span class="keyword">end</span>
+0184 
+0185     <span class="comment">% get handle of any existing robot of same name</span>
+0186     rh = findobj(<span class="string">'Tag'</span>, robot.name);
+0187 
+0188     <span class="comment">% now animate all robots tagged with this name</span>
+0189 
+0190     rh = findobj(<span class="string">'Tag'</span>, robot.name);
+0191     <span class="keyword">for</span> r=1:opt.repeat,
+0192         <span class="keyword">for</span> p=1:np,
+0193         <span class="keyword">for</span> r=rh',
+0194             <a href="#_sub3" class="code" title="subfunction animate(robot, q)">animate</a>( get(r, <span class="string">'UserData'</span>), tg(p,:));
+0195         <span class="keyword">end</span>
+0196         <span class="keyword">end</span>
+0197     <span class="keyword">end</span>
+0198 
+0199     <span class="comment">% save the last joint angles away in the graphical robot</span>
+0200     <span class="keyword">for</span> r=rh',
+0201         rr = get(r, <span class="string">'UserData'</span>);
+0202         rr.q = tg(<span class="keyword">end</span>,:);
+0203         set(r, <span class="string">'UserData'</span>, rr);
+0204     <span class="keyword">end</span>
+0205 
+0206     <span class="keyword">if</span> nargout &gt; 0,
+0207         rnew = <a href="robot.html" class="code" title="function r = robot(L, a1, a2, a3)">robot</a>;
+0208     <span class="keyword">end</span>
+0209 
+0210 <span class="comment">%PLOT_OPTIONS</span>
+0211 <span class="comment">%</span>
+0212 <span class="comment">%    o = PLOT_OPTIONS(robot, options)</span>
+0213 <span class="comment">%</span>
+0214 <span class="comment">% Returns an options structure</span>
+0215 
+0216 <a name="_sub1" href="#_subfunctions" class="code">function o = plot_options(robot, optin)</a>
+0217     <span class="comment">%%%%%%%%%%%%%% process options</span>
+0218     o.erasemode = <span class="string">'xor'</span>;
+0219     o.joints = 1;
+0220     o.wrist = 1;
+0221     o.repeat = 1;
+0222     o.shadow = 1;
+0223     o.wrist = 1;
+0224     o.dims = [];
+0225     o.base = 0;
+0226     o.wristlabel = <span class="string">'xyz'</span>;
+0227     o.projection = <span class="string">'orthographic'</span>;
+0228     o.magscale = 1;
+0229     o.name = 1;
+0230     o.delay = 0;
+0231 
+0232     <span class="comment">% read options string in the order</span>
+0233     <span class="comment">%    1. robot.plotopt</span>
+0234     <span class="comment">%    2. the M-file plotbotopt if it exists</span>
+0235     <span class="comment">%    3. command line arguments</span>
+0236     <span class="keyword">if</span> exist(<span class="string">'plotbotopt'</span>, <span class="string">'file'</span>) == 2,
+0237         options = plotbotopt;
+0238         options = [options robot.plotopt optin];
+0239     <span class="keyword">else</span>
+0240         options = [robot.plotopt optin];
+0241     <span class="keyword">end</span>
+0242     i = 1;
+0243     <span class="keyword">while</span> i &lt;= length(options),
+0244         <span class="keyword">switch</span> lower(options{i}),
+0245         <span class="keyword">case</span> <span class="string">'workspace'</span>
+0246             o.dims = options{i+1};
+0247             i = i+1;
+0248         <span class="keyword">case</span> <span class="string">'mag'</span>
+0249             o.magscale = options{i+1};
+0250             i = i+1;
+0251         <span class="keyword">case</span> <span class="string">'perspective'</span>
+0252             o.projection = <span class="string">'perspective'</span>;
+0253         <span class="keyword">case</span> <span class="string">'ortho'</span>
+0254             o.projection = <span class="string">'orthographic'</span>;
+0255         <span class="keyword">case</span> <span class="string">'erase'</span>
+0256             o.erasemode = <span class="string">'xor'</span>;
+0257         <span class="keyword">case</span> <span class="string">'noerase'</span>
+0258             o.erasemode = <span class="string">'none'</span>;
+0259         <span class="keyword">case</span> <span class="string">'base'</span>
+0260             o.base = 1;
+0261         <span class="keyword">case</span> <span class="string">'nobase'</span>
+0262             o.base = 0;
+0263         <span class="keyword">case</span> <span class="string">'loop'</span>
+0264             o.repeat = Inf;
+0265         <span class="keyword">case</span> <span class="string">'noloop'</span>
+0266             o.repeat = 1;
+0267         <span class="keyword">case</span> <span class="string">'name'</span>,
+0268             o.name = 1;
+0269         <span class="keyword">case</span> <span class="string">'noname'</span>,
+0270             o.name = 0;
+0271         <span class="keyword">case</span> <span class="string">'wrist'</span>
+0272             o.wrist = 1;
+0273         <span class="keyword">case</span> <span class="string">'nowrist'</span>
+0274             o.wrist = 0;
+0275         <span class="keyword">case</span> <span class="string">'shadow'</span>
+0276             o.shadow = 1;
+0277         <span class="keyword">case</span> <span class="string">'noshadow'</span>
+0278             o.shadow = 0;
+0279         <span class="keyword">case</span> <span class="string">'xyz'</span>
+0280             o.wristlabel = <span class="string">'XYZ'</span>;
+0281         <span class="keyword">case</span> <span class="string">'noa'</span>
+0282             o.wristlabel = <span class="string">'NOA'</span>;
+0283         <span class="keyword">case</span> <span class="string">'joints'</span>
+0284             o.joints = 1;
+0285         <span class="keyword">case</span> <span class="string">'nojoints'</span>
+0286             o.joints = 0;
+0287         <span class="keyword">case</span> <span class="string">'delay'</span>
+0288             o.delay = options{i+1};
+0289             i = i + 1;
+0290         <span class="keyword">otherwise</span>
+0291             error([<span class="string">'unknown option: '</span> options{i}]);
+0292         <span class="keyword">end</span>
+0293         i = i+1;
+0294     <span class="keyword">end</span>
+0295 
+0296     <span class="keyword">if</span> isempty(o.dims),
+0297         <span class="comment">%</span>
+0298         <span class="comment">% simple heuristic to figure the maximum reach of the robot</span>
+0299         <span class="comment">%</span>
+0300         L = robot.link;
+0301         reach = 0;
+0302         <span class="keyword">for</span> i=1:robot.n,
+0303             reach = reach + abs(L{i}.A) + abs(L{i}.D);
+0304         <span class="keyword">end</span>
+0305         o.dims = [-reach reach -reach reach -reach reach];
+0306         o.mag = reach/10;
+0307     <span class="keyword">else</span>
+0308         reach = min(abs(dims));
+0309     <span class="keyword">end</span>
+0310     o.mag = o.magscale * reach/10;
+0311 
+0312 <span class="comment">%CREATE_NEW_ROBOT</span>
+0313 <span class="comment">%</span>
+0314 <span class="comment">%    h = CREATE_NEW_ROBOT(robot, opt)</span>
+0315 <span class="comment">%</span>
+0316 <span class="comment">% Using data from robot object and options create a graphical robot in</span>
+0317 <span class="comment">% the current figure.</span>
+0318 <span class="comment">%</span>
+0319 <span class="comment">% Returns a structure of handles to graphical objects.</span>
+0320 <span class="comment">%</span>
+0321 <span class="comment">% If current figure is empty, draw robot in it</span>
+0322 <span class="comment">% If current figure has hold on, add robot to it</span>
+0323 <span class="comment">% Otherwise, create new figure and draw robot in it.</span>
+0324 <span class="comment">%</span>
+0325 
+0326 <a name="_sub2" href="#_subfunctions" class="code">function h = create_new_robot(robot, opt)</a>
+0327     h.mag = opt.mag;
+0328 
+0329     <span class="comment">%</span>
+0330     <span class="comment">% setup an axis in which to animate the robot</span>
+0331     <span class="comment">%</span>
+0332     <span class="comment">% handles not provided, create graphics</span>
+0333     <span class="comment">%disp('in creat_new_robot')</span>
+0334     <span class="keyword">if</span> ~ishold,
+0335         <span class="comment">% if current figure has hold on, then draw robot here</span>
+0336         <span class="comment">% otherwise, create a new figure</span>
+0337         axis(opt.dims);
+0338     <span class="keyword">end</span>
+0339     xlabel(<span class="string">'X'</span>)
+0340     ylabel(<span class="string">'Y'</span>)
+0341     zlabel(<span class="string">'Z'</span>)
+0342     set(gca, <span class="string">'drawmode'</span>, <span class="string">'fast'</span>);
+0343     grid on
+0344 
+0345 
+0346     zlim = get(gca, <span class="string">'ZLim'</span>);
+0347     h.zmin = zlim(1);
+0348 
+0349     <span class="keyword">if</span> opt.base,
+0350         b = transl(robot.base);
+0351         line(<span class="string">'xdata'</span>, [b(1);b(1)], <span class="keyword">...</span>
+0352             <span class="string">'ydata'</span>, [b(2);b(2)], <span class="keyword">...</span>
+0353             <span class="string">'zdata'</span>, [h.zmin;b(3)], <span class="keyword">...</span>
+0354             <span class="string">'LineWidth'</span>, 4, <span class="keyword">...</span>
+0355             <span class="string">'color'</span>, <span class="string">'red'</span>);
+0356     <span class="keyword">end</span>
+0357     <span class="keyword">if</span> opt.name,
+0358         b = transl(robot.base);
+0359         text(b(1), b(2)-opt.mag, [<span class="string">' '</span> robot.name])
+0360     <span class="keyword">end</span>
+0361     <span class="comment">% create a line which we will</span>
+0362     <span class="comment">% subsequently modify.  Set erase mode to xor for fast</span>
+0363     <span class="comment">% update</span>
+0364     <span class="comment">%</span>
+0365     h.robot = line(robot.lineopt{:}, <span class="keyword">...</span>
+0366         <span class="string">'Erasemode'</span>, opt.erasemode);
+0367     <span class="keyword">if</span> opt.shadow == 1,
+0368         h.shadow = line(robot.shadowopt{:}, <span class="keyword">...</span>
+0369             <span class="string">'Erasemode'</span>, opt.erasemode);
+0370     <span class="keyword">end</span>
+0371 
+0372     <span class="keyword">if</span> opt.wrist == 1,    
+0373         h.x = line(<span class="string">'xdata'</span>, [0;0], <span class="keyword">...</span>
+0374             <span class="string">'ydata'</span>, [0;0], <span class="keyword">...</span>
+0375             <span class="string">'zdata'</span>, [0;0], <span class="keyword">...</span>
+0376             <span class="string">'color'</span>, <span class="string">'red'</span>, <span class="keyword">...</span>
+0377             <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0378         h.y = line(<span class="string">'xdata'</span>, [0;0], <span class="keyword">...</span>
+0379             <span class="string">'ydata'</span>, [0;0], <span class="keyword">...</span>
+0380             <span class="string">'zdata'</span>, [0;0], <span class="keyword">...</span>
+0381             <span class="string">'color'</span>, <span class="string">'green'</span>, <span class="keyword">...</span>
+0382             <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0383         h.z = line(<span class="string">'xdata'</span>, [0;0], <span class="keyword">...</span>
+0384             <span class="string">'ydata'</span>, [0;0], <span class="keyword">...</span>
+0385             <span class="string">'zdata'</span>, [0;0], <span class="keyword">...</span>
+0386             <span class="string">'color'</span>, <span class="string">'blue'</span>, <span class="keyword">...</span>
+0387             <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0388         h.xt = text(0, 0, opt.wristlabel(1), <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0389         h.yt = text(0, 0, opt.wristlabel(2), <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0390         h.zt = text(0, 0, opt.wristlabel(3), <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0391 
+0392     <span class="keyword">end</span>
+0393 
+0394     <span class="comment">%</span>
+0395     <span class="comment">% display cylinders (revolute) or boxes (pristmatic) at</span>
+0396     <span class="comment">% each joint, as well as axis centerline.</span>
+0397     <span class="comment">%</span>
+0398     <span class="keyword">if</span> opt.joints == 1,
+0399         L = robot.link;
+0400         <span class="keyword">for</span> i=1:robot.n,
+0401 
+0402             <span class="comment">% cylinder or box to represent the joint</span>
+0403             <span class="keyword">if</span> L{i}.sigma == 0,
+0404                 N = 8;
+0405             <span class="keyword">else</span>
+0406                 N = 4;
+0407             <span class="keyword">end</span>
+0408             [xc,yc,zc] = cylinder(opt.mag/4, N);
+0409             zc(zc==0) = -opt.mag/2;
+0410             zc(zc==1) = opt.mag/2;
+0411 
+0412             <span class="comment">% add the surface object and color it</span>
+0413             h.joint(i) = surface(xc,yc,zc);
+0414             <span class="comment">%set(h.joint(i), 'erasemode', 'xor');</span>
+0415             set(h.joint(i), <span class="string">'FaceColor'</span>, <span class="string">'blue'</span>);
+0416 
+0417             <span class="comment">% build a matrix of coordinates so we</span>
+0418             <span class="comment">% can transform the cylinder in animate()</span>
+0419             <span class="comment">% and hang it off the cylinder</span>
+0420             xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
+0421             set(h.joint(i), <span class="string">'UserData'</span>, xyz);
+0422 
+0423             <span class="comment">% add a dashed line along the axis</span>
+0424             h.jointaxis(i) = line(<span class="string">'xdata'</span>, [0;0], <span class="keyword">...</span>
+0425                 <span class="string">'ydata'</span>, [0;0], <span class="keyword">...</span>
+0426                 <span class="string">'zdata'</span>, [0;0], <span class="keyword">...</span>
+0427                 <span class="string">'color'</span>, <span class="string">'blue'</span>, <span class="keyword">...</span>
+0428                 <span class="string">'linestyle'</span>, <span class="string">'--'</span>, <span class="keyword">...</span>
+0429                 <span class="string">'erasemode'</span>, <span class="string">'xor'</span>);
+0430         <span class="keyword">end</span>
+0431     <span class="keyword">end</span>
+0432 
+0433 <span class="comment">%ANIMATE   move an existing graphical robot</span>
+0434 <span class="comment">%</span>
+0435 <span class="comment">%    animate(robot, q)</span>
+0436 <span class="comment">%</span>
+0437 <span class="comment">% Move the graphical robot to the pose specified by the joint coordinates q.</span>
+0438 <span class="comment">% Graphics are defined by the handle structure robot.handle.</span>
+0439 
+0440 <a name="_sub3" href="#_subfunctions" class="code">function animate(robot, q)</a>
+0441 
+0442     n = robot.n;
+0443     h = robot.handle;
+0444     L = robot.link;
+0445 
+0446     mag = h.mag;
+0447 
+0448     b = transl(robot.base);
+0449     x = b(1);
+0450     y = b(2);
+0451     z = b(3);
+0452 
+0453     xs = b(1);
+0454     ys = b(2);
+0455     zs = h.zmin;
+0456 
+0457     <span class="comment">% compute the link transforms, and record the origin of each frame</span>
+0458     <span class="comment">% for the animation.</span>
+0459     t = robot.base;
+0460     Tn = t;
+0461     <span class="keyword">for</span> j=1:n,
+0462         Tn(:,:,j) = t;
+0463 
+0464         t = t * L{j}(q(j));
+0465 
+0466         x = [x; t(1,4)];
+0467         y = [y; t(2,4)];
+0468         z = [z; t(3,4)];
+0469         xs = [xs; t(1,4)];
+0470         ys = [ys; t(2,4)];
+0471         zs = [zs; h.zmin];
+0472     <span class="keyword">end</span>
+0473     t = t *robot.tool;
+0474 
+0475     <span class="comment">%</span>
+0476     <span class="comment">% draw the robot stick figure and the shadow</span>
+0477     <span class="comment">%</span>
+0478     set(h.robot,<span class="string">'xdata'</span>, x, <span class="string">'ydata'</span>, y, <span class="string">'zdata'</span>, z);
+0479     <span class="keyword">if</span> isfield(h, <span class="string">'shadow'</span>),
+0480         set(h.shadow,<span class="string">'xdata'</span>, xs, <span class="string">'ydata'</span>, ys, <span class="string">'zdata'</span>, zs);
+0481     <span class="keyword">end</span>
+0482     
+0483 
+0484     <span class="comment">%</span>
+0485     <span class="comment">% display the joints as cylinders with rotation axes</span>
+0486     <span class="comment">%</span>
+0487     <span class="keyword">if</span> isfield(h, <span class="string">'joint'</span>),
+0488         xyz_line = [0 0; 0 0; -2*mag 2*mag; 1 1];
+0489 
+0490         <span class="keyword">for</span> j=1:n,
+0491             <span class="comment">% get coordinate data from the cylinder</span>
+0492             xyz = get(h.joint(j), <span class="string">'UserData'</span>);
+0493             xyz = Tn(:,:,j) * xyz;
+0494             ncols = numcols(xyz)/2;
+0495             xc = reshape(xyz(1,:), 2, ncols);
+0496             yc = reshape(xyz(2,:), 2, ncols);
+0497             zc = reshape(xyz(3,:), 2, ncols);
+0498 
+0499             set(h.joint(j), <span class="string">'Xdata'</span>, xc, <span class="string">'Ydata'</span>, yc, <span class="keyword">...</span>
+0500                 <span class="string">'Zdata'</span>, zc);
+0501 
+0502             xyzl = Tn(:,:,j) * xyz_line;
+0503             set(h.jointaxis(j), <span class="string">'Xdata'</span>, xyzl(1,:), <span class="keyword">...</span>
+0504                 <span class="string">'Ydata'</span>, xyzl(2,:), <span class="keyword">...</span>
+0505                 <span class="string">'Zdata'</span>, xyzl(3,:));
+0506         <span class="keyword">end</span>
+0507     <span class="keyword">end</span>
+0508 
+0509     <span class="comment">%</span>
+0510     <span class="comment">% display the wrist axes and labels</span>
+0511     <span class="comment">%</span>
+0512     <span class="keyword">if</span> isfield(h, <span class="string">'x'</span>),
+0513         <span class="comment">%</span>
+0514         <span class="comment">% compute the wrist axes, based on final link transformation</span>
+0515         <span class="comment">% plus the tool transformation.</span>
+0516         <span class="comment">%</span>
+0517         xv = t*[mag;0;0;1];
+0518         yv = t*[0;mag;0;1];
+0519         zv = t*[0;0;mag;1];
+0520 
+0521         <span class="comment">%</span>
+0522         <span class="comment">% update the line segments, wrist axis and links</span>
+0523         <span class="comment">%</span>
+0524         set(h.x,<span class="string">'xdata'</span>,[t(1,4) xv(1)], <span class="string">'ydata'</span>, [t(2,4) xv(2)], <span class="keyword">...</span>
+0525             <span class="string">'zdata'</span>, [t(3,4) xv(3)]);
+0526         set(h.y,<span class="string">'xdata'</span>,[t(1,4) yv(1)], <span class="string">'ydata'</span>, [t(2,4) yv(2)], <span class="keyword">...</span>
+0527              <span class="string">'zdata'</span>, [t(3,4) yv(3)]);
+0528         set(h.z,<span class="string">'xdata'</span>,[t(1,4) zv(1)], <span class="string">'ydata'</span>, [t(2,4) zv(2)], <span class="keyword">...</span>
+0529              <span class="string">'zdata'</span>, [t(3,4) zv(3)]);
+0530         set(h.xt, <span class="string">'Position'</span>, xv(1:3));
+0531         set(h.yt, <span class="string">'Position'</span>, yv(1:3));
+0532         set(h.zt, <span class="string">'Position'</span>, zv(1:3));
+0533     <span class="keyword">end</span>
+0534     
+0535     drawnow</pre></div>
+<hr><address>Generated on Sun 18-May-2008 12:02:41 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>
