@@ -17,6 +17,7 @@ Jacobians, animations, path planning, forward and inverse kinematics, and forwar
    <demoitem>
       <label>Transform and quaternion primitives</label>
       <callback>rttrdemo</callback>
+      <description>Show the power of matrices</description>
    </demoitem>
    <demoitem>
       <label>Forward kinematics</label>

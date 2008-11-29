@@ -3,14 +3,11 @@
   xsi:noNamespaceSchemaLocation="optional">
 <?xml-stylesheet type="text/xsl" href="optional"?>
 
-<matlabrelease>14</matlabrelease>
+<matlabrelease>R14</matlabrelease>
 <name>Robotics</name>
 <type>toolbox</type>
 <icon>ApplicationIcon.MATLAB</icon>
 <help_location>./htmldoc</help_location>
-
-<area>matlab</area>
-<icon>$toolbox/matlab/general/unknownicon.gif</icon>
 
 <list>
 
@@ -22,7 +19,7 @@
 
 <listitem>
 <label>Demos</label>
-<callback>rtdemo</callback>
+<callback>rtbstartup</callback>
 <icon>$toolbox/matlab/general/demoicon.gif</icon>
 </listitem>
 
