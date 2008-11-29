@@ -1,0 +1,16 @@
+minor code rot and version change
+
+tr2X take R or T
+
+new robot models: Motoman, ABB, Fanuc
+
+more rpy2r and eul2r accept trajectories
+rot[xyz] -> trot[xyz]
+
+load models automatically for demoN
+fix errors in Simulink demos
+
+HTML doco, integrated with doc help browser
+demos integrated with doc demo system
+
+startup file that adds demo dir

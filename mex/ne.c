@@ -2,17 +2,25 @@
  * \file ne.c
  * \author Peter Corke
  * \brief Compute the recursive Newton-Euler formulation
+ */
+
+/*
+ * Copyright (C) 1999-2008, by Peter I. Corke
  *
- * Copyright (c) 2002  Peter I. Corke
- *
- * Permission to use and distribute is granted, provided that this message
- * is retained, and due credit given when the results are incorporated in
- * publised work.
- *
- * \todo Is code for MDH prismatic case correct?
- * \todo Handle robot object base transform
- *
- * $Id: ne.c,v 1.6 2002-09-11 04:53:18 pic Exp $
+ * This file is part of The Robotics Toolbox for Matlab (RTB).
+ * 
+ * RTB is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * RTB is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Leser General Public License
+ * along with RTB.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 

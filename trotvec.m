@@ -1,9 +1,13 @@
-%MPOWER Raise quaternion to integer power
+%TROTVEC Rotation about arbitrary axis
 %
-% Compound the quaternion with itself.  Invoked by means of the caret
-% operator.
+% 	TR = TROTVEC(V, THETA)
+%
+% Returns a homogeneous transformation representing a rotation of THETA 
+% about the vector V.
+%
+% See also: TROTX, ROTX, ROTY, ROTZ.
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -20,21 +24,6 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function qp = mpower(q, p)
+function T = trotvec(v, t)
 
-	% check that exponent is an integer
-	if (p - floor(p)) ~= 0,
-		error('quaternion exponent must be integer');
-	end
-
-	qp = q;
-
-	% multiply by itself so many times
-	for i = 2:abs(p),
-		qp = qp * q;
-	end
-
-	% if exponent was negative, invert it
-	if p<0,
-		qp = inv(qp);
-	end
+	T = r2t( rotvec(v, t) );

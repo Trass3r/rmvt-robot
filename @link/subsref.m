@@ -26,16 +26,22 @@
 %	LINK.dh		return legacy DH row
 %	LINK.dyn	return legacy DYN row
 
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2002/04/14 10:21:54  pic
-% Error if islimit method called with no limits defined.
+% Copyright (C) 1999-2008, by Peter I. Corke
 %
-% Revision 1.3  2002/04/01 12:04:51  pic
-% General tidyup, comments, clarification, copyright, RCS keys, etc.
-%
-% $Revision: 1.5 $
-% Copyright (C) 1999-2002, by Peter I. Corke
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function v = subsref(l, s)
 	if s(1).type  == '()'

@@ -1,30 +1,37 @@
 % Robotics Toolbox.
-% Version 7  April-2002
+% Version 8  December 2008
 %
 % What's new.
 %   Readme      - New features and enhancements in this version.
 %
 % Homogeneous transformations
-%   eul2tr      - Euler angle to transform 
-%   oa2tr       - orientation and approach vector to transform 
-%   rotx        - transform for rotation about X-axis 
-%   roty        - transform for rotation about Y-axis 
-%   rotz        - transform for rotation about Z-axis 
-%   rpy2tr      - roll/pitch/yaw angles to transform 
+%   eul2r       - Euler angle to rotation matrix 3x3
+%   eul2tr      - Euler angle to transform 4x4
+%   oa2r        - orientation and approach vector to rotation matrix 3x3
+%   oa2tr       - orientation and approach vector to transform 4x4
+%   r2t         - rotation submatrix to transform
+%   rotx        - transform for rotation about X-axis 3x3
+%   roty        - transform for rotation about Y-axis 3x3
+%   rotz        - transform for rotation about Z-axis 3x3
+%   rpy2r       - roll/pitch/yaw angles to rotation matrix 3x3
+%   rpy2tr      - roll/pitch/yaw angles to transform 4x4
+%   t2r         - transform to rotation submatrix
 %   tr2eul      - transform to Euler angles 
-%   tr2rot      - transform to rotation submatrix
 %   tr2rpy      - transform to roll/pitch/yaw angles
-%   transl      - set or extract the translational component of a transform 
+%   transl      - set or extract the translational component of a transform 4x4
 %   trnorm      - normalize a transform 
+%   trotx        - transform for rotation about X-axis 4x4
+%   troty        - transform for rotation about Y-axis 4x4
+%   trotz        - transform for rotation about Z-axis 4x4
 %   
-% Quaternions
+% Quaternion methods:
 %   /           - divide quaternion by quaternion or scalar
 %   *           - multiply quaternion by a quaternion or vector
 %   inv         - invert a quaternion 
 %   norm        - norm of a quaternion 
 %   plot        - display a quaternion as a 3D rotation
-%   qinterp     - interpolate quaternions
 %   unit        - unitize a quaternion 
+%   qinterp     - interpolate a quaternion
 %
 % Kinematics
 %   diff2tr     - differential motion vector to transform 
@@ -40,12 +47,11 @@
 %   accel       - compute forward dynamics
 %   cinertia    - compute Cartesian manipulator inertia matrix 
 %   coriolis    - compute centripetal/coriolis torque 
-%   friction    - joint friction
+%   fdyn        - forward dynamics
 %   ftrans      - transform force/moment 
 %   gravload    - compute gravity loading 
 %   inertia     - compute manipulator inertia matrix 
 %   itorque     - compute inertia torque 
-%   nofriction  - remove friction from a robot object 
 %   rne         - inverse dynamics 
 %   
 % Trajectory generation
@@ -58,8 +64,16 @@
 %   plot        - plot/animate robot 
 %   
 % Other
-%   manipblty   - compute manipulability 
+%   ishomog     - true if argument is a 4x4 matrix
+%   maniplty    - compute manipulability 
 %   unit        - unitize a vector
+%
+% Robot methods:
+%   *           - compound two robots
+%   friction    - return joint friction torques
+%   nofriction  - return a robot object with no friction
+%   perturb     - return a robot object with perturbed parameters
+%   plot        - plot/animate a robot
 %
 % Creation of robot models.
 %   Fanuc10L    - Fanuc 10L (DH, kine)
@@ -73,6 +87,6 @@
 %   twolink     - simple 2-link example (DH, kine)
 %
 % Demonstrations.
-%   rtdemo      - toolbox demonstration
+%   demos      - toolbox demonstration
 %   
 % Copyright (C) 2008, by Peter I. Corke

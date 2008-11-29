@@ -3,19 +3,26 @@
  * \author Peter Corke
  * \brief Simple vector/matrix maths library.
  *
- * Permission to use and distribute is granted, provided that this message
- * is retained, and due credit given when the results are incorporated in
- * publised work.
- *
  * \note All vectors and matrices are passed by reference.
+ */
+
+/*
+ * Copyright (C) 1999-2008, by Peter I. Corke
  *
- * Copyright (c) 2002  Peter I. Corke
- *
- * Permission to use and distribute is granted, provided that this message
- * is retained, and due credit given when the results are incorporated in
- * publised work.
- *
- * $Id: vmath.h,v 1.2 2002-02-11 01:48:51 pic Exp $
+ * This file is part of The Robotics Toolbox for Matlab (RTB).
+ * 
+ * RTB is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * RTB is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Leser General Public License
+ * along with RTB.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 #ifndef	_vmath_h_

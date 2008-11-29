@@ -1,25 +1,28 @@
 %ROTVEC Rotation about arbitrary axis
 %
-% 	TR = ROTVEC(V, THETA)
+% 	R = ROTVEC(V, THETA)
 %
-% Returns a homogeneous transformation representing a rotation of THETA 
+% Returns a 3x3 rotation matrix representing a rotation of THETA 
 % about the vector V.
 %
-% See also: TROTX, ROTX, ROTY, ROTZ.
+% See also: ROTX, ROTY, ROTZ.
 
-% Copyright (C) 1993-2002, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
-% CHANGES:
-% 7/01	unitize the vector
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2008-04-27 09:50:54  cor134
-% Remove debug print
-%
-% Revision 1.3  2002/04/01 11:47:16  pic
-% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-% references, clarification of functions.
-%
-% $Revision: 1.5 $
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function r = rotvec(v, t)
 
@@ -31,4 +34,4 @@ function r = rotvec(v, t)
 	r =    [ct		-v(3)*st	v(2)*st
 		v(3)*st		ct		-v(1)*st
 		-v(2)*st	v(1)*st		ct	];
-	r = [v*v'*vt+r zeros(3,1); 0 0 0 1];
+	r = v*v'*vt+r;

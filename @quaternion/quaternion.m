@@ -31,21 +31,22 @@
 %
 % SEE ALSO: QUATERNION/SUBSREF, QUATERNION/PLOT
 
-% CHANGES:
-% 12/01	order of arguments to theta,v form, fix bug in same
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2002/04/14 11:03:30  pic
-% Mention overloaded functions and operators in the help info.
+% Copyright (C) 1999-2008, by Peter I. Corke
 %
-% Revision 1.5  2002/04/02 12:27:26  pic
-% Remove remnant CVS clash tag.
-%
-% Revision 1.4  2002/04/01 12:06:48  pic
-% General tidyup, help comments, copyright, see also, RCS keys.
-%
-% $Revision: 1.7 $
-%
-% Copyright (C) 1999-2002, by Peter I. Corke
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 
 function q = quaternion(a1, a2)

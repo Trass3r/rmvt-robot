@@ -23,17 +23,22 @@
 %
 % See also: ACCEL, NOFRICTION, RNE, ROBOT, ODE45.
 
-% Copyright (C) 1993 Peter Corke
-% MOD HISTORY
-% 	4/99 add object support
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2002/04/01 11:47:13  pic
-% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-% references, clarification of functions.
+% Copyright (C) 1993-2008 Peter Corke
 %
-% $Revision: 1.4 $
-
-% Copyright (C) 1999 Peter Corke
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function [t, q, qd] = fdyn(robot, t0, t1, torqfun, q0, qd0, varargin)
 
