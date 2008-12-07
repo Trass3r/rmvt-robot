@@ -1,10 +1,10 @@
 %TR2EUL Convert a homogeneous transform matrix to Euler angle form
 %
-%	[PHI THETA PSI] = TR2EUL(TR)
+%	[PHI THETA PSI] = TR2EUL(M)
 %
-% Returns a vector of Euler angles corresponding to the rotational part of 
-% the homogeneous transform TR.  The 3 angles correspond to rotations about
-% the Z, Y and Z axes respectively.
+% Returns a vector of roll/pitch/yaw angles corresponding to M, either a rotation
+% matrix or the rotation part of a homogeneous transform.
+% The 3 angles correspond to rotations about the Z, Y and Z axes respectively.
 %
 % See also:  EUL2TR, TR2RPY
 
