@@ -124,7 +124,7 @@ function tau = rne_mdh(robot, a1, a2, a3, a4, a5)
 				Tj = robot.base * Tj;
 			end
 			Pm(:,j) = pm;
-			Rm{j} = tr2rot(Tj);
+			Rm{j} = t2r(Tj);
 			if debug>1,
 				Rm{j}
 				Pm(:,j)'

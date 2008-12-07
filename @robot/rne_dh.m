@@ -126,7 +126,7 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 				Tj = robot.base * Tj;
 			end
 			pstarm(:,j) = pstar;
-			Rm{j} = tr2rot(Tj);
+			Rm{j} = t2r(Tj);
 			if debug>1,
 				Rm{j}
 				Pstarm(:,j)'
