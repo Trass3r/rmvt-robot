@@ -1,10 +1,11 @@
 %TR2RPY Convert a homogeneous transform matrix to roll/pitch/yaw angles
 %
-%	[R P Y] = TR2RPY(TR)
+%	[R P Y] = TR2RPY(M)
 %
-% Returns a vector of roll/pitch/yaw angles corresponding to the rotational 
+% Returns a vector of roll/pitch/yaw angles corresponding to M, either a rotation
+% matrix or the rotation part of a homogeneous transform.
 % part of the homogeneous transform TR.  The angles correspond to rotations
-% about the Z, Y and X axes respectively.
+% about the X, Y and Z axes respectively.
 %
 % See also:  RPY2TR, TR2EUL
 
@@ -39,13 +40,13 @@ function rpy = tr2rpy(m)
 
 	if abs(m(1,1)) < eps & abs(m(2,1)) < eps,
 		% singularity
-		rpy(1) = 0;
+		rpy(3) = 0;
 		rpy(2) = atan2(-m(3,1), m(1,1));
-		rpy(3) = atan2(-m(2,3), m(2,2));
+		rpy(1) = atan2(-m(2,3), m(2,2));
 	else,
-		rpy(1) = atan2(m(2,1), m(1,1));
+		rpy(3) = atan2(m(2,1), m(1,1));
 		sp = sin(rpy(1));
 		cp = cos(rpy(1));
 		rpy(2) = atan2(-m(3,1), cp * m(1,1) + sp * m(2,1));
-		rpy(3) = atan2(sp * m(1,3) - cp * m(2,3), cp*m(2,2) - sp*m(1,2));
+		rpy(1) = atan2(sp * m(1,3) - cp * m(2,3), cp*m(2,2) - sp*m(1,2));
 	end

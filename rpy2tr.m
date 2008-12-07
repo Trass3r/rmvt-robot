@@ -4,7 +4,9 @@
 %	TR = RPY2TR(R,P,Y)
 %
 % Returns a homogeneous tranformation for the specified roll/pitch/yaw angles.
-% These correspond to rotations about the Z, Y, X axes respectively.
+% These correspond to rotations about the X, Y, Z axes respectively.
+%
+% NOTE: in previous releases (<8) the angles corresponded to rotations about Z, Y, X.
 %
 % See also: TR2RPY, EUL2TR
 
@@ -36,11 +38,11 @@ function T = rpy2tr(roll, pitch, yaw)
 	end
 
 	if numrows(roll) == 1,
-		r = rotz(roll) * roty(pitch) * rotx(yaw);
+		r = rotx(roll) * roty(pitch) * rotz(yaw);
 		T = r2t(r);
 	else
 		for i=1:numrows(roll),
-			r = rotz(roll(i)) * roty(pitch(i)) * rotx(yaw(i));
+			r = rotx(roll(i)) * roty(pitch(i)) * rotz(yaw(i));
 			T(:,:,i) = r2t(r);
 		end
 	end

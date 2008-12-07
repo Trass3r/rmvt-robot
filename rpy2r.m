@@ -1,10 +1,12 @@
 %RPY2R Roll/pitch/yaw to rotation matrix
 %
-% 	TR = RPY2R([R P Y])
-%	TR = RPY2R(R,P,Y)
+% 	R = RPY2R([R P Y])
+%	R = RPY2R(R,P,Y)
 %
 % Returns a 3x3 rotation matrix for the specified roll/pitch/yaw angles.
-% These correspond to rotations about the Z, Y, X axes respectively.
+% These correspond to rotations about the X, Y, Z axes respectively.
+%
+% NOTE: in previous releases (<8) the angles corresponded to rotations about Z, Y, X.
 %
 % See also: TR2RPY, EUL2TR
 
@@ -36,9 +38,9 @@ function r = rpy2r(roll, pitch, yaw)
 	end
 
 	if numrows(roll) == 1,
-		r = rotz(roll) * roty(pitch) * rotx(yaw);
+		r = rotx(roll) * roty(pitch) * rotz(yaw);
 	else
 		for i=1:numrows(roll),
-			r(:,:,i) = rotz(roll(i)) * roty(pitch(i)) * rotx(yaw(i));
+			r(:,:,i) = rotx(roll(i)) * roty(pitch(i)) * rotz(yaw(i));
 		end
 	end
