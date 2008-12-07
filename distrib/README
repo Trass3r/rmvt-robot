@@ -1,21 +1,9 @@
 Makefile        this does all the work
 
-robot/          code staging area
-  simulink/
-  mex/
-  examples/
-  demos/
-  info/         xml and html doco
-    html/       autogen doco
-common/     
-simulink/
+extras/         extra files to go into robot/htmldoc
+genhtml.m       Matlab script to build the HTML doco
+m2html/         Matlab library for HTML generation
 
-tmpdoc/         staging area for documentation build
-
-html/           autogen HTML doco for the web
-
-The results are:
+robot/          temporary working area
 robot.tgz       output file
 robot.zip       output file
-
-these are images of {robot,common,simulink} directories here.
