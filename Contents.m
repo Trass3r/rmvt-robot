@@ -5,6 +5,8 @@
 %   Readme      - New features and enhancements in this version.
 %
 % Homogeneous transformations
+%   angvec2r    - angle/vector to rotation matrix 3x3
+%   angvec2tr   - angle/vector to transform 4x4
 %   eul2r       - Euler angle to rotation matrix 3x3
 %   eul2tr      - Euler angle to transform 4x4
 %   oa2r        - orientation and approach vector to rotation matrix 3x3
@@ -16,13 +18,15 @@
 %   rpy2r       - roll/pitch/yaw angles to rotation matrix 3x3
 %   rpy2tr      - roll/pitch/yaw angles to transform 4x4
 %   t2r         - transform to rotation submatrix
+%   tr2angvec   - transform to angle/vector form
 %   tr2eul      - transform to Euler angles 
 %   tr2rpy      - transform to roll/pitch/yaw angles
 %   transl      - set or extract the translational component of a transform 4x4
 %   trnorm      - normalize a transform 
-%   trotx        - transform for rotation about X-axis 4x4
-%   troty        - transform for rotation about Y-axis 4x4
-%   trotz        - transform for rotation about Z-axis 4x4
+%   trplot      - plot a transform as a coordinate frame
+%   trotx       - transform for rotation about X-axis 4x4
+%   troty       - transform for rotation about Y-axis 4x4
+%   trotz       - transform for rotation about Z-axis 4x4
 %   
 % Quaternion methods:
 %   /           - divide quaternion by quaternion or scalar
@@ -65,6 +69,8 @@
 %   
 % Other
 %   ishomog     - true if argument is a 4x4 matrix
+%   isrot       - true if argument is a 3x3 matrix
+%   isvec       - true if argument is a 3-vector
 %   maniplty    - compute manipulability 
 %   unit        - unitize a vector
 %
