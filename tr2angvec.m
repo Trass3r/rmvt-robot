@@ -1,29 +1,16 @@
-%TR2ANGVEC Convert rotation matrix to angle-vector form
+%TR2ANGVEC Convert to angle/vector form
 %
-% [THETA,V] = TR2ANGVEC(R, OPTIONS) is rotation expressed in terms of an
-% angle THETA (1x1) about the axis V (1x3) equivalent to the orthonormal rotation
-% matrix R (3x3).
+% 	[THETA V] = TR2ANGVEC(M)
 %
-% [THETA,V] = TR2ANGVEC(T, OPTIONS) as above but uses the rotational part of the
-% homogeneous transform T (4x4).
+% Returns a vector/angle representation of the pose corresponding to M, either a rotation
+% matrix or the rotation part of a homogeneous transform.
+% This is a rotation of THETA about the vector V.
 %
-% If R (3x3xK) or T (4x4xK) represent a sequence then THETA (Kx1)is a vector 
-% of angles for corresponding elements of the sequence and V (Kx3) are the 
-% corresponding axes, one per row.
-%
-% Options::
-% 'deg'   Return angle in degrees
-%
-% Notes::
-% - If no output arguments are specified the result is displayed.
-%
-% See also ANGVEC2R, ANGVEC2TR.
+% See also: ANGVEC2R, ANGVEC2TR
 
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -37,109 +24,43 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
-function [theta_, n_] = tr2angvec(R, varargin)
+function [theta, v] = tr2angvec(t)
 
-    opt.deg = false;
-    
-    opt = tb_optparse(opt, varargin);
-    
-    % get the rotation submatrix(s)
-    if ~isrot(R)
-        R = t2r(R);
-    end
-    
-    % check the determinant
-    if abs(det(R)-1) > 10*eps
-           error('matrix not orthonormal rotation matrix');
-    end
-        
+	qs = sqrt(trace(t)+1)/2.0;
+	kx = t(3,2) - t(2,3);	% Oz - Ay
+	ky = t(1,3) - t(3,1);	% Ax - Nz
+	kz = t(2,1) - t(1,2);	% Ny - Ox
 
-    if size(R,3) > 1
-        theta = zeros(size(R,3),1);
-        v = zeros(size(R,3),3);
-    end
-    
-    for i=1:size(R,3)  % for each rotation matrix in the sequence
-        
-        % There are a few ways to do this:
-        %
-        % 1.
-        %
-        % e = 0.5*vex(R - R');  % R-R' is skew symmetric
-        % theta = asin(norm(e));
-        % n = unit(e);
-        %
-        %  but this fails for rotations > pi/2
-        %
-        % 2.
-        %
-        % e = vex(logm(R));
-        % theta = norm(e);
-        % n = unit(e);
-        %
-        %  elegant, but 40x slower than using eig
-        %
-        % 3.
-        %
-        % Use eigenvectors, get angle from trace which is defined over -pi to
-        % pi.  Don't use eigenvalues since they only give angles -pi/2 to pi/2.
-        
-        [v,d] = eig(R(:,:,i));
+	if (t(1,1) >= t(2,2)) & (t(1,1) >= t(3,3)) 
+		kx1 = t(1,1) - t(2,2) - t(3,3) + 1;	% Nx - Oy - Az + 1
+		ky1 = t(2,1) + t(1,2);			% Ny + Ox
+		kz1 = t(3,1) + t(1,3);			% Nz + Ax
+		add = (kx >= 0);
+	elseif (t(2,2) >= t(3,3))
+		kx1 = t(2,1) + t(1,2);			% Ny + Ox
+		ky1 = t(2,2) - t(1,1) - t(3,3) + 1;	% Oy - Nx - Az + 1
+		kz1 = t(3,2) + t(2,3);			% Oz + Ay
+		add = (ky >= 0);
+	else
+		kx1 = t(3,1) + t(1,3);			% Nz + Ax
+		ky1 = t(3,2) + t(2,3);			% Oz + Ay
+		kz1 = t(3,3) - t(1,1) - t(2,2) + 1;	% Az - Nx - Oy + 1
+		add = (kz >= 0);
+	end
 
-        unit_evec = abs(real(diag(d))-1) < 20*eps;
-        
-        switch sum(unit_evec)
-            case 0
-                % no unit eigenvalues, matrix is not orthonormal
-                error('matrix not orthonormal rotation matrix');
-                
-            case 1
-                % one unit eigenvalue, should always be this case
-                k = find(unit_evec);
-            otherwise
-                % for the case of a matrix very close to unity, the results
-                % become complex, with a conjugate pair of eigenvectors and one
-                % with zero complex part.
-                for k=1:3
-                    if isreal(v(:,k))
-                        break;
-                    end
-                end
-        end
-         
-        
-        % get the direction, eigenvector corresponding to real eigenvalue
-        n(i,:) = real(v(:,k));
+	if add
+		kx = kx + kx1;
+		ky = ky + ky1;
+		kz = kz + kz1;
+	else
+		kx = kx - kx1;
+		ky = ky - ky1;
+		kz = kz - kz1;
+	end
+	v = unit([kx ky kz]);
+    theta = 2*acos(qs);
 
-        % rotation comes from the trace
-        ac = (trace(R(:,:,i)) - 1) / 2;
-        ac = max( min(ac, 1), -1);  % clip it to robustly handle slight non-orthonormality
-        theta(i) = acos( ac );
-        
-        if nargout == 0
-            % if no output arguments display the angle and vector
-            if opt.deg
-                fprintf('Rotation: %f deg x [%f %f %f]\n', theta(i)*180/pi, n(i,1), n(i,2), n(i,3));
-            else
-                fprintf('Rotation: %f rad x [%f %f %f]\n', theta(i), n(i,1), n(i,2), n(i,3));
-            end
-        end
-    end
-    
-    if ~isreal(theta) || ~isreal(n)
-        error('complex');
-    end
-    
-    if opt.deg
-        theta = theta * 180/pi;
-    end
-    
-    if nargout == 1
-        theta_ = theta;
-    elseif nargout == 2
-        theta_ = theta;
-        n_ = n;
+    if nargout == 0
+        fprintf('Rotation: %f rad x [%f %f %f]\n', theta, v(1), v(2), v(3));
     end

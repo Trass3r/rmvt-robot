@@ -1,11 +1,8 @@
-%TRPLOT Plot a transformation
+%ISHOMOG Test if argument is a homogeneous transformation
 %
-%   TRPLOT(T)
-%   TRPLOT(T, name)
-%   TRPLOT(T, name, color)
+%	H = ISHOMOG(TR)
 %
-% In a set of axes draw a coordinate frame.  The frame can optionally
-% be named and have a specified color.
+%  Returns true (1) if the argument tr is of dimension 4x4.
 
 % Copyright (C) 2008, by Peter I. Corke
 %
@@ -24,16 +21,9 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function trplot(T, name, color)
-
-	if nargin == 1,
-		fmt = '%c';
+function h = isrot(r)
+	if ndims(r) == 2,
+		h =  all(size(r) == [3 3]);
 	else
-		fmt = sprintf('%%c%s', name);
+		h = 0;
 	end
-	if nargin < 3,
-		color = 'b';
-	end
-
-	q = quaternion(T);
-	plot(q, transl(T), fmt, color);

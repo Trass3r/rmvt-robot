@@ -1,13 +1,10 @@
-%TRPLOT Plot a transformation
+%ISVEC Test if argument is a homogeneous transformation
 %
-%   TRPLOT(T)
-%   TRPLOT(T, name)
-%   TRPLOT(T, name, color)
+%	H = ISVEC(V, l)
 %
-% In a set of axes draw a coordinate frame.  The frame can optionally
-% be named and have a specified color.
+%  Returns true (1) if the argument tr is of dimension 4x4.
 
-% Copyright (C) 2008, by Peter I. Corke
+% Copyright (C) 2002-2008, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -24,16 +21,12 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function trplot(T, name, color)
-
-	if nargin == 1,
-		fmt = '%c';
+function h = isvec(v, l)
+    if nargin == 1,
+            l = 3;
+    end
+	if min(size(v)) == 1,
+		h =  length(v) == l;
 	else
-		fmt = sprintf('%%c%s', name);
+		h = 0;
 	end
-	if nargin < 3,
-		color = 'b';
-	end
-
-	q = quaternion(T);
-	plot(q, transl(T), fmt, color);
