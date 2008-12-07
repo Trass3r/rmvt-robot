@@ -81,27 +81,27 @@
 
 \psfig{figure=montage/montage.eps,width=12cm}
 \vspace*{2cm}
-{\Afon (Release 8)}                             %% CHANGE
+{\Afon (Release 8)}\hfill\psfig{figure=figs/lgplv3-147x51.eps,width=2cm}                             %% CHANGE
 
 \vspace*{\fill}
 \hrule
 \parbox{50mm}{{\Afon Peter I. Corke}\\
-Peter.Corke@csiro.au} \hfill {\Afon May 2008}\\    %% CHANGE
-http://www.ict.csiro.au/staff/Peter.Corke
+Peter.I.Corke@gmail.com} \hfill {\Afon December 2008}\\    %% CHANGE
+http://www.petercorke.com
 \newpage
 \vspace*{\fill}
 \setlength{\fboxsep}{10pt}%
-\doublebox{%
-\begin{Bflushleft}[b]
-Peter I. Corke\\
-CSIRO\\
-ICT Centre\\
-Queensland Centre for Advanced Technologies\\
-Pullenvale, AUSTRALIA, 4069.\\
-2002\\
-http://www.ict.csiro.au/staff/Peter.Corke
-\end{Bflushleft}}
-\vspace*{\fill}
+%\doublebox{%
+%\begin{Bflushleft}[b]
+%Peter I. Corke\\
+%CSIRO\\
+%ICT Centre\\
+%Queensland Centre for Advanced Technologies\\
+%Pullenvale, AUSTRALIA, 4069.\\
+%2002\\
+%http://www.ict.csiro.au/staff/Peter.Corke
+%\end{Bflushleft}}
+%\vspace*{\fill}
 
 \copyright 2008 by Peter I. Corke.                  %% CHANGE
 \noindent
@@ -141,11 +141,9 @@ http://www.ict.csiro.au/staff/Peter.Corke
 
 \section{Introduction}
 This, the eighth release of the Toolbox, represents nearly a decade of %% CHANGE
-tinkering and a substantial level of maturity.  It finally includes many of
-the features I've been planning to add for some time, particularly MEX files,
-Simulink support and modified Denavit-Hartenberg support.
-The previous release has had thousands of downloads and the mailing list 
-has hundreds of subscribers.
+tinkering and a substantial level of maturity.  This release is largely a maintenance one, tracking
+changes in Matlab/Simulink and the way Matlab now handles help and demos.  There is also
+a change in licence, the toolbox is now released under LGPL.
 
 The Toolbox provides many functions that are useful in robotics
 including such things as kinematics, dynamics, and  trajectory generation.
@@ -179,22 +177,67 @@ R2008a.
 \item	Simulink blockset and demos 1--6 all work with R2008a
 \item   Some additional robot models were contributed by Wynand Swart of Mega Robots CC:
 Fanuc AM120iB/10L, Motoman HP and S4 ABB 2.8.
+\item   The toolbox is now released under the LGPL licence.
+\item  Some functions have disappeared: \var{dyn}, \var{dh}
+\item  Some functions have been redefined, beware:
+\begin{itemize}
+\item The toolbox used to use roll/pitch/yaw angles
+as per the book by  Paul\cite{Paul81a} in which the rotations were: roll about Z, pitch about Y and yaw about X.
+This is different to the more common robot conventions today, and as used in the vehicular and aerospace
+industry in which roll is about X, pitch about Y and yaw about Z.  The functions
+\var{tr2rpy} and \var{rpy2t}r have been changed accordingly.
+\item The functions \var{rotx}, \var{roty} and \var{rotz} all used to return a $ 4 \times 4$ transform matrix.  They now return a $3 \times 3$ rotation
+matrix.  Use the functions \var{trotx}, \var{troty} and \var{trotz} instead if you want a $ 4 \times 4$ transform matrix.
+\end{itemize}
+\item Some functions have been added:
+\begin{itemize}
+\item \var{r2t}, \var{t2r}, \var{isvec}, \var{isrot}.
+\end{itemize}
+\item HTML format documentation is provided in the directory \var{htmldoc} which was generated using the
+package \var{m2html}.  This help is accessible through \Mlab's inbuilt help browser, but you can also point your
+browser at \var{htmldoc/index.html}.
 \end{itemize}
 
-All code is now under CVS control which should eliminate many of the
+All code is now under SVN control which should eliminate many of the
 versioning problems I had previously due to developing the code across 
 multiple computers.
+A first cut at a test suite has been developed to aid in pre-release testing.
+
+\subsection{Other toolboxes}
+Also of interest might be:
+\begin{itemize}
+\item A python implementation of the toolbox.  All core functionality is present including kinematics, dynamics, Jacobians,
+quaternions etc.  It is based on the python numpy class.  The main current limitation is the lack of good 3D graphics support
+but people are working on this.  Nevertheless this version of the toolbox is very usable and of course you don't need a \Mlab\ licence
+to use it.
+\item Machine Vision toolbox (MVTB) for {\Mlab}.  This was described in an article
+\begin{verbatim}
+@article{Corke05d,
+        Author = {P.I. Corke},
+        Journal = {IEEE Robotics and Automation Magazine},
+        Month = nov,
+        Number = {4},
+        Pages = {16-25},
+        Title = {Machine Vision Toolbox},
+        Volume = {12},
+        Year = {2005}}
+\end{verbatim}
+
+It provides a very wide range of useful computer vision functions beyond the Mathwork's Image Processing
+Toolbox.  However the maturity of MVTB is less than that of the robotics toolbox.
+\end{itemize}
 
 \subsection{Contact}
 The Toolbox home page is at
 \begin{quote}
-http://www.cat.csiro.au/cmst/staff/pic/robot
+http://www.petercorke.com/robot
 \end{quote}
 This page will always list the current released version number as well as
 bug fixes and new code in between major releases. 
 
-A Mailing List is also available, subscriptions details are available
-off that web page.
+A Google Group called ``Robotics Toolbox'' has been created to handle discussion.
+This replaces all former discussion tools which have proved to be very problematic in the 
+past.  The URL is \texttt{http://groups.google.com.au/group/robotics-tool-box}.
 
 \subsection{How to obtain the Toolbox}
 The Robotics Toolbox is freely available from the Toolbox home
@@ -223,10 +266,10 @@ and details of each Toolbox function.
 A menu-driven demonstration can be invoked by the function {\tt rtdemo}.
 
 \subsection{MATLAB version issues}
-The Toolbox works with {\Mlab} version 6 and greater and has been tested 
-on a Sun with version 6.
+The Toolbox should in principle work with {\Mlab} version 6 and greater.  However features of
+Matlab keep changing so it best to use the latest versions R2007 or R2008.
 
-The Toolbox does not function under {\Mlab} v3.x or v4.x since those versions
+The Toolbox will not function under {\Mlab} v3.x or v4.x since those versions
 do not support objects.  An older version of the Toolbox, available from
 the Matlab4 ftp site is workable but lacks some features of this current
 Toolbox release.
@@ -234,12 +277,12 @@ Toolbox release.
 
 \subsection{Acknowledgements}
 I am grateful for the support of my employer, CSIRO, for supporting me in
-this activity and providing me with the Matlab tools and web server.
+this activity and providing me with access to the Matlab tools.
 
 I have corresponded with a great many people via email since the first 
 release of this Toolbox.  Some have identified bugs and shortcomings
 in the documentation, and even better, some have provided bug fixes and
-even new modules, thankyou.
+even new modules, thankyou.  See the file \var{CONTRIB} for details.
 
 \subsection{Support, use in teaching, bug fixes, etc.}
 I'm always happy to correspond with people who have found genuine
@@ -248,7 +291,7 @@ in the Toolbox, or who have suggestions about ways to improve its
 functionality.  However I draw the line at providing help for people
 with their assignments and homework!
 
-Many people are using the Toolbox for teaching and this is something that
+Many people use the Toolbox for teaching and this is something that
 I would encourage.  If you plan to duplicate the documentation for class
 use then every copy must include the front page.
 

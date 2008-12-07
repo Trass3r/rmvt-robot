@@ -99,6 +99,8 @@
 
 \renewcommand{\hom}{homogeneous transform}
 \newcommand{\Hom}{Homogeneous transform}
+\newcommand{\rot}{rotation matrix}
+\newcommand{\Rot}{Rotation matrix}
 \renewcommand{\vec}[1]{\underline{#1}}
 \input{psfig}
 
@@ -115,7 +117,7 @@
 \pagestyle{fancyplain}
 \rhead{\rm\thepage}
 \lfoot{Robotics Toolbox Release 8}  %% CHANGE
-\rfoot{Peter Corke, May 2008}       %% CHANGE
+\rfoot{Peter Corke, December 2008}       %% CHANGE
 \cfoot{}
 \setlength{\headrulewidth}{0pt}
 
@@ -199,18 +201,35 @@ are represented.
 {|p{1.25in}p{3.25in}|}\cline{1-2}
 &\\
 \multicolumn{2}{|c|}{\tmsss Homogeneous Transforms} \\ \hline
+{\Mono angvec2tr} & angle/vector form to \hom \\
 {\Mono eul2tr} & Euler angle to \hom \\
 {\Mono oa2tr} & orientation and approach vector to \hom \\
-{\Mono rotvec} & \hom\ for rotation about arbitrary vector \\
-{\Mono rotx} & \hom\ for rotation about X-axis \\
-{\Mono roty} & \hom\ for rotation about Y-axis \\
-{\Mono rotz} & \hom\ for rotation about Z-axis \\
 {\Mono rpy2tr} & Roll/pitch/yaw angles to \hom \\
-{\Mono tr2eul} & \hom\ to Euler angles \\
-{\Mono tr2rot} & \hom\ to rotation submatrix\\
-{\Mono tr2rpy} & \hom\ to roll/pitch/yaw angles\\ 
+{\Mono tr2angvec} & \hom\ or \rot\ to angle/vector form \\
+{\Mono tr2eul} & \hom\ or \rot\ to Euler angles \\
+{\Mono t2r} & \hom\ to rotation submatrix\\
+{\Mono tr2rpy} & \hom\ or \rot\ to roll/pitch/yaw angles\\ 
+{\Mono trotx} & \hom\ for rotation about X-axis \\
+{\Mono troty} & \hom\ for rotation about Y-axis \\
+{\Mono trotz} & \hom\ for rotation about Z-axis \\
 {\Mono transl} & set or extract the translational component of a \hom \\
-{\Mono trnorm} & normalize a \hom \\ \hline
+{\Mono trnorm} & normalize a \hom \\
+{\Mono trplot} & plot a \hom as a coordinate frame \\ \hline
+\end{tabular}
+Note that functions of the form \var{tr2X} will also accept a \rot as the argument.
+
+\begin{tabular}
+{|p{1.25in}p{3.25in}|}\cline{1-2}
+&\\
+\multicolumn{2}{|c|}{\tmsss Rotation matrices} \\ \hline
+{\Mono angvecr} & angle/vector form to \rot \\
+{\Mono eul2r} & Euler angle to \rot \\
+{\Mono oa2r} & orientation and approach vector to \hom \\
+{\Mono rotx} & \rot\ for rotation about X-axis \\
+{\Mono roty} & \rot\ for rotation about Y-axis \\
+{\Mono rotz} & \rot\ for rotation about Z-axis \\
+{\Mono rpy2r} & Roll/pitch/yaw angles to \rot \\
+{\Mono r2t} & \rot\ to \hom\ \\ \hline
 \end{tabular}
 
 \begin{tabular}
@@ -228,6 +247,8 @@ are represented.
 {|p{1.25in}p{3.25in}|}\cline{1-2}
 &\\
 \multicolumn{2}{|c|}{\tmsss Quaternions} \\ \hline
+{\Mono +} & elementwise addition\\
+{\Mono -} & elementwise addition\\
 {\Mono /} & divide quaternion by quaternion or scalar\\
 {\Mono *} & multiply quaternion by a quaternion or vector\\
 {\Mono inv} & invert a quaternion \\
@@ -242,17 +263,23 @@ are represented.
 \begin{tabular}
 {|p{1.25in}p{3.25in}|}\cline{1-2}
 &\\
-\multicolumn{2}{|c|}{\tmsss Manipulator Models} \\ \hline
-{\Mono Fanuc10L} & Fanuc 10L arm data (DH, kine)\\
+\multicolumn{2}{|c|}{\tmsss General serial link manipulators} \\ \hline
 {\Mono link} & construct a robot link object \\
-{\Mono MotomanHP6} & Motoman HP6 arm data (DH, kine)\\
 {\Mono nofriction} & remove friction from a robot object \\
 {\Mono perturb} & randomly modify some dynamic parameters\\
+{\Mono robot} & construct a robot object \\ 
+{\Mono showlink} & show link/robot data in detail\\ \hline
+\end{tabular}
+
+\begin{tabular}
+{|p{1.25in}p{3.25in}|}\cline{1-2}
+&\\
+\multicolumn{2}{|c|}{\tmsss Manipulator Models} \\ \hline
+{\Mono Fanuc10L} & Fanuc 10L arm data (DH, kine)\\
+{\Mono MotomanHP6} & Motoman HP6 arm data (DH, kine)\\
 {\Mono puma560} & Puma 560 data (DH, kine, dyn)\\
 {\Mono puma560akb} & Puma 560 data (MDH, kine, dyn)\\
-{\Mono robot} & construct a robot object \\ 
 {\Mono S4ABB2p8} & ABB S4 2.8 arm data (DH, kine)\\
-{\Mono showlink} & show link/robot data in detail\\ 
 {\Mono stanford} & Stanford arm data (DH, kine, dyn)\\
 {\Mono twolink} & simple 2-link example (DH, kine)\\ \hline
 \end{tabular}
@@ -300,7 +327,9 @@ are represented.
 &\\
 \multicolumn{2}{|c|}{\tmsss Other} \\ \hline
 %{\Mono cross} & vector cross product \\
-{\Mono ishomog} & test if matrix is $4 \times 4$\\
+{\Mono ishomog} & test if argument is $4 \times 4$\\
+{\Mono isrot} & test if argument is $3 \times 3$\\
+{\Mono isvec} & test if argument is a 3-vector\\
 {\Mono maniplty} & compute manipulability \\
 {\Mono rtdemo} & toolbox demonstration\\
 {\Mono unit} & unitize a vector\\ \hline
@@ -405,6 +434,22 @@ a numerical integration function.}
 \newblock {\em ASME Journal of Dynamic Systems, Measurement and Control},
   104:205--211, 1982.}
 
+\vfil\eject 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{angvec2tr, angvec2r}
+\mpur{Convert angle/vector form to a \hom\ or \rot}
+
+\msyn{
+T = angvec2tr(theta, v)\\[10pt]
+R = angvec2r(theta, v)\\[10pt]
+}
+
+\mdes{Returns a \hom\ or \rot\  representing a 
+rotation of \var{theta} radians about the vector \var{v}.
+For the \hom\ the translational component is set to zero.}
+
+\msa{rotx, roty, rotz, quaternion}
 \vfil\eject 
 
 
@@ -636,19 +681,22 @@ joint coordinates is taken from the graphical robot.
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{eul2tr}
-\mpur{Convert Euler angles to a \hom}
+\function{eul2tr, eul2r}
+\mpur{Convert Euler angles to a \hom\ or \rot}
 
 \msyn{
-T = eul2tr([r p y])\\[0pt]
-T = eul2tr(r,p,y)
+T = eul2tr([$\phi$ $\theta$ $\psi$])\\[0pt]
+T = eul2tr($\phi$, $\theta$, $\psi$)\\[10pt]
+R = eul2r([$\phi$ $\theta$ $\psi$])\\[0pt]
+R = eul2r($\phi$, $\theta$, $\psi$)
 }
 
-\mdes{\var{eul2tr} returns a homogeneous transformation for the specified
+\mdes{Returns a \hom\ or \rot\ for the specified
 Euler angles in radians.
 \[
-T = R_Z(a) R_Y(b) R_Z(c)
+ R_Z(\phi) R_Y(\theta) R_Z(\psi)
 \]
+For the \hom\ value the translational component is set to zero.
 }
 
 \mcau{Note that 12 different Euler angle sets or conventions exist.  The
@@ -1094,14 +1142,41 @@ a function of joint angles 2 and 3 the following code could be used.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{ishomog}
-\mpur{Test if argument is a homogeneous transformation}
+\mpur{Test if argument is a \hom}
 
 \msyn{
 ishomog(x)
 }
 
 \mdes{Returns true if \var{x} is a 4 $\times$ 4 matrix.}
+\msa{isrot, isvec}
 \vfil\eject 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{isrot}
+\mpur{Test if argument is a \rot}
+
+\msyn{
+isrot(x)
+}
+
+\mdes{Returns true if \var{x} is a 3 $\times$ 3 matrix.}
+\msa{ishomog, isvec}
+\vfil\eject 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{isvec}
+\mpur{Test if argument is a 3-vector}
+
+\msyn{
+isvec(x)
+}
+
+\mdes{Returns true if \var{x} is , either a $3 \times 1$ or $1 \times 3$ matrix.}
+\msa{ishomog, isrot}
+\vfil\eject 
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1515,24 +1590,28 @@ from converging.
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{oa2tr}
-\mpur{Convert OA vectors to \hom}
+\function{oa2tr, oa2r}
+\mpur{Convert OA vectors to \hom\ or \rot}
 
 \msyn{
-oa2tr(o, a)
+T = oa2tr(o, a)\\[10pt]
+R = oa2r(o, a)
 }
 
-\mdes{\var{oa2tr} returns a rotational homogeneous transformation specified in
+\mdes{Returns a \hom\ or \rot\ specified in
 terms of the Cartesian orientation and approach vectors \var{o} and
 \var{a} respectively.}
 
 \malg{\[
-{\bf T} = \left[ \begin{array}{cccc}
-	\vec{\hat{o}} \times \vec{\hat{a}} & \vec{\hat{o}} & \vec{\hat{a}} & 0 \\
-	0 & 0 & 0 & 1 \end{array} \right]
+{\bf R} = \left[ \begin{array}{ccc}
+	\vec{\hat{o}} \times \vec{\hat{a}} & \vec{\hat{o}} & \vec{\hat{a}}
+	 \end{array} \right]
 \]
 where $\vec{\hat{o}}$ and $\vec{\hat{a}}$ are unit vectors corresponding
 to \var{o} and \var{a} respectively.}
+
+\mcau{An extra cross-product is used to ensure orthonormality.  \var{a} is the only column that is 
+guaranteed to be unchanged from that specified in the call. }
 
 \msa{rpy2tr, eul2tr}
 \vfil\eject 
@@ -1724,6 +1803,8 @@ magnitude is unity.
 Some operators are overloaded for the quaternion class
 
 \begin{tabular}{lp{8cm}}
+\var{q1 + q2} & returns the elementwise sum of quaternion elements \\
+\var{q1 - q2} & returns he elementwise sum of quaternion elements \\
 \var{q1 * q2} & returns quaternion product or compounding \\
 \var{q * v}   & returns a quaternion vector product, that is the vector $v$ is 
 		rotated by the quaternion.  $v$ is a $ 3 \times 3$ vector \\
@@ -2156,51 +2237,40 @@ Thus if you wish to change options, clear the figure before replotting.}
 
 \msa{drivebot, fkine, robot}
 \vfil\eject 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{rotvec}
-\mpur{Rotation about a vector}
-
-\msyn{
-T = rotvec(v, theta)
-}
-
-\mdes{\var{rotvec} returns a homogeneous transformation representing a 
-rotation of \var{theta} radians about the vector \var{v}.}
-
-\msa{rotx, roty, rotz}
-\vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{rotx,roty,rotz}
+\function{rotx, roty, rotz}
 \mpur{Rotation about X, Y or Z axis}
 
 \msyn{
-T = rotx(theta)\\[0pt]
-T = roty(theta)\\[0pt]
-T = rotz(theta)
+R = rotx(theta)\\[0pt]
+R = roty(theta)\\[0pt]
+R = rotz(theta)
 }
 
-\mdes{Return a homogeneous transformation representing a 
+\mdes{Return a \rot\ representing a 
 rotation of \var{theta} radians about the X, Y or Z axes.}
 
 \msa{rotvec}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{rpy2tr}
-\mpur{Roll/pitch/yaw angles to \hom}
+\function{rpy2tr, rpy2r}
+\mpur{Roll/pitch/yaw angles to \hom\ or \rot}
 
 \msyn{
 T = rpy2tr([r p y])\\[0pt]
-T = rpy2tr(r,p,y)
+T = rpy2tr(r,p,y)\\[10pt]
+R = rpy2r([r p y])\\[0pt]
+R = rpy2r(r,p,y)
 }
 
-\mdes{\var{rpy2tr}
-returns a homogeneous transformation for the specified
+\mdes{Returns a \hom\ or \rot\ for the specified
 roll/pitch/yaw angles in radians.
 \[
-T = R_Z(r) R_Y(p) R_X(y)
+ R_X(r) R_Y(p) R_Z(y)
 \]
+For the \hom\ value the translational component is set to zero.
 }
 
 \msa{tr2rpy, eul2tr}
@@ -2217,11 +2287,18 @@ rtdemo
 }
 
 \mdes{This script provides demonstrations for most functions within
-the Robotics Toolbox.
+the Robotics Toolbox.  It pops up a graphical menu of demos which will run in
+the command window.  The demos display tutorial information and require the user
+to hit the enter key to display the next pageful of text.
+
+Demos can also be accessed through {\Mlab}'s own demo system, using the \var{demos}
+command or the command menu option.  Then the user can navigate to the Robot Toolbox demo
+menu.
 }
 
 \mcau{This script clears all variables in the workspace and deletes
-all figures.}
+all figures.  It also adds the \var{demos} directory to your {\Mlab} path on first
+invocation.}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2314,6 +2391,20 @@ R.~P. Paul, {\em Robot Manipulators: Mathematics, Programming, and Control}.
 \newblock Cambridge, Massachusetts: MIT Press, 1981.}
 \vfil\eject 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{tr2angvec}
+\mpur{Convert a \hom\ or \rot\ to angle/vector form}
+
+\msyn{
+[theta, v] = tr2angvec(T)
+}
+
+\mdes{Converts a \hom\ or \rot\ to a 
+rotation of \var{theta} radians about the vector \var{v}.}
+
+\msa{rotx, roty, rotz}
+\vfil\eject 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{tr2diff}
@@ -2360,17 +2451,18 @@ d = \left[ \begin{array}{c}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{tr2eul}
-\mpur{Convert a homogeneous transform to Euler angles}
+\mpur{Convert a \hom\ or \rot\  to Euler angles}
 
 \msyn{
-[a b c] = tr2eul(T)
+e = tr2eul(M)
 }
 
-\mdes{\var{tr2eul} returns a vector of Euler angles, in radians,
+\mdes{Returns a vector of Euler angles [$\phi$, $\theta$, $\psi$], in radians,
 corresponding
-to the rotational part of the homogeneous transform \var{T}.
+to  \var{M}.
+\var{M} is either a \rot, or the rotation part of the \hom\ is taken.
 \[
-T_{rot} = R_Z(a) R_Y(b) R_Z(c)
+R = R_Z(\phi) R_Y(\theta) R_Z(\psi)
 \]
 }
 \mcau{Note that 12 different Euler angle sets or conventions exist.  The
@@ -2410,16 +2502,18 @@ where ${}^B {\bf J}_A$ is given by \var{tr2jac(T)}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \function{tr2rpy}
-\mpur{Convert a homogeneous transform to roll/pitch/yaw angles}
+\mpur{Convert a \hom\ or \rot\ to roll/pitch/yaw angles}
 
 \msyn{
-[a b c] = tr2rpy(T)
+e = tr2rpy(T)
 }
 
-\mdes{\var{tr2rpy} returns a vector of roll/pitch/yaw angles, in radians,
-corresponding to the rotational part of the homogeneous transform \var{T}
+\mdes{Returns a vector of roll/pitch/yaw angles, [roll, pitch, yaw], in radians,
+corresponding
+to  \var{M}.
+\var{M} is either a \rot, or the rotation part of the \hom\ is taken.
 \[
-T_{rot} = R_Z(r) R_Y(p) R_X(y)
+R = R_X(r) R_Y(p) R_Z(y)
 \]
 }
 
@@ -2434,8 +2528,8 @@ T_{rot} = R_Z(r) R_Y(p) R_X(y)
 
 \msyn{
 T = transl(x, y, z)\\[0pt]
-T = transl(v)\\[0pt]
-v = transl(T)\\[0pt]
+T = transl(v)\\[10pt]
+v = transl(T)\\[10pt]
 xyz = transl(TC)
 }
 
@@ -2530,11 +2624,39 @@ Finite word length arithmetic can lead to homogeneous transformations in which
 the rotational submatrix is not orthogonal, that is, $det({\bf R}) \neq -1$.}
 
 \malg{Normalization is performed by orthogonalizing the
-rotation submatrix $\vec{n} = \vec{o} \times \vec{a}$.}
+rotation submatrix $\vec{n} = \vec{o} \times \vec{a}$, $\vec{o} = \vec{a} \times \vec{n}$.}
 
 \msa{oa2tr}
 \mref{J.~Funda, ``Quaternions and homogeneous transforms in robotics,'' Master's
   thesis, University of Pennsylvania, Apr. 1988.}
+\vfil\eject 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\function{trplot}
+\mpur{Plot a \hom}
+
+\msyn{
+trplot(T)
+}
+
+\mdes{Displays a 3D plot which shows how the standard axes are transformed
+by the transformation \var{T}.}
+
+\mex{Display the coordinate frame represented by a \hom.}
+\begin{verbatim}
+>> tr = trotx(.2)*troty(.3)*transl(1,2,3)
+ans =
+    0.9553         0    0.2955    1.8419
+    0.0587    0.9801   -0.1898    1.4495
+   -0.2896    0.1987    0.9363    2.9166
+         0         0         0    1.0000
+
+>> trplot(tr)
+\end{verbatim}
+
+\centerline{\psfig{figure=figs/trplot.eps,width=10cm}}
+
+\msa{@quaternion/plot}
 \vfil\eject 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2575,98 +2697,6 @@ vn = unit(v)
 \vec{v}_n = \frac{\vec{v}}{|| \vec{v} ||}
 \]}
 \vfil\eject
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{dh (legacy)}
-\mpur{Matrix representation of manipulator kinematics}
-
-\mdes{A \var{dh} matrix describes the
-kinematics of a manipulator in a general way using the standard
-Denavit-Hartenberg conventions.
-Each row represents one link of the manipulator and the columns are assigned
-according to the following table.
-
-\begin{center}
-\begin{tabular}{ccl}
-Column & Symbol & \multicolumn{1}{c}{Description}\\
-1 & $\alpha_i$ & link twist angle \\
-2 & $A_i$ & link length\\
-3 & $\theta_i$ & link rotation angle \\
-4 & $D_i$ & link offset distance \\
-5 & $\sigma_i$ & joint type; 0 for revolute, non-zero for prismatic \\
-\end{tabular}
-\end{center}
-
-If the last column is not given, toolbox functions assume that
-the manipulator is all-revolute.
-For an n-axis manipulator \var{dh} is an $n \times 4$ or $n\times 5$ matrix.
-
-The first 5 columns of a \var{dyn} matrix contain the kinematic parameters
-and maybe used anywhere that a \var{dh} kinematic matrix is required --- the
-dynamic data is ignored.}
-
-Lengths $A_i$ and $D_i$ may be expressed in any unit, and this choice will flow
-on to the units in which \hom s and Jacobians are represented.
-All angles are in radians.
-
-\msa{puma560,stanford,mdh}
-\mref{R.~P. Paul, {\em Robot Manipulators: Mathematics, Programming, and Control}.
-\newblock Cambridge, Massachusetts: MIT Press, 1981.}
-\vfil\eject 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\function{dyn (legacy)}
-\mpur{Matrix representation of manipulator kinematics and dynamics}
-
-\mdes{A \var{dyn} matrix describes the
-kinematics and dynamics of a manipulator in a general way using the standard
-Denavit-Hartenberg conventions.
-Each row represents one link of the manipulator and the columns are assigned
-according to the following table.
-
-\begin{center}
-\begin{tabular}{ccl}
-Column & Symbol & \multicolumn{1}{c}{Description}\\
-1 & $\alpha$ & link twist angle \\
-2 & A & link length \\
-3 & $\theta$ & link rotation angle \\
-4 & D & link offset distance \\
-5 & $\sigma$ & joint type; 0 for revolute, non-zero for prismatic \\
-6 & mass & mass of the link \\
-7 & rx & link COG with respect to the link coordinate frame \\
-8 & ry \\
-9 & rz \\
-10 & Ixx & elements of link inertia tensor about the link COG \\
-11 & Iyy \\
-12 & Izz \\
-13 & Ixy \\
-14 & Iyz \\
-15 & Ixz \\
-16 & Jm & armature inertia \\
-17 & G & reduction gear ratio; joint speed/link speed \\
-18 & B & viscous friction, motor referred\\
-19 & Tc+ & coulomb friction (positive rotation), motor referred\\
-20 & Tc- &     coulomb friction (negative rotation), motor referred\\
-\end{tabular}
-\end{center}
-
-For an n-axis manipulator, \var{dyn} is an $n \times 20$ matrix.
-The first 5 columns of a \var{dyn} matrix contain the kinematic parameters
-and maybe used anywhere that a \var{dh} kinematic matrix is required --- the
-dynamic data is ignored.
-}
-
-All angles are in radians.
-The choice of all other units is up to the user, and this choice will flow
-on to the units in which \hom s, Jacobians, inertias and torques
-are represented.
-
-\msa{dh}
-\vfil\eject 
-
 
 \cleardoublepage
 \end{document}
