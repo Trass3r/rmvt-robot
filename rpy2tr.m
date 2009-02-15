@@ -4,7 +4,8 @@
 %	TR = RPY2TR(R,P,Y)
 %
 % Returns a homogeneous tranformation for the specified roll/pitch/yaw angles.
-% These correspond to rotations about the X, Y, Z axes respectively.
+% These correspond to rotations about the X, Y, Z axes respectively, applied
+% in the order yaw, pitch, roll.
 %
 % NOTE: in previous releases (<8) the angles corresponded to rotations about Z, Y, X.
 %
