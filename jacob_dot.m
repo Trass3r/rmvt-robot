@@ -53,20 +53,22 @@ function Jdot = jacob2(robot, q, qd)
 
         if j>1,
             z(:,j) = T{j-1} * [0 0 1]'; % in world frame
-            %w = R{j}'*( w + z(:,j) * qd(j));
-            %v = v + cross(R{j}*w, R{j-1}*p(:,j));
-            v = R{j-1}'*v + cross(w, p(:,j));
-            w = R{j-1}'* w + z(:,j) * qd(j);
+            w = R{j}*( w + z(:,j) * qd(j));
+            v = v + cross(R{j}*w, R{j-1}*p(:,j));
+            %v = R{j-1}'*v + cross(w, p(:,j));
+            %w = R{j-1}'* w + z(:,j) * qd(j);
         else
             z(:,j) = [0 0 1]';
             v = [0 0 0]';
-            w = [0 0 0]';
+            w = z(:,j) * qd(j);
         end
 
         vel(:,j) = v;       % velocity of origin of link j
 
         omega(:,j) = w;         % omega of link j in link j frame
     end
+    omega
+    z
 
     J = [];
     Jdot = [];
