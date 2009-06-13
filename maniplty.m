@@ -75,6 +75,12 @@ function m = yoshi(robot, q)
 
 function m = asada(robot, q)
 	J = jacob0(robot, q);
+    
+    if rank(J) < 6,
+        warning('robot is in degenerate configuration')
+        m = 0;
+        return;
+    end
 	Ji = inv(J);
 	M = inertia(robot, q);
 	Mx = Ji' * M * Ji;
