@@ -30,13 +30,30 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function drivebot(a,b)
+%% TODO:
+%%  make the sliders change the animation while moving
+%% http://www.mathworks.com/matlabcentral/newsreader/view_thread/159374
+%% 1. download FINDJOBJ from the file exchange: http://www.mathworks.com/matlabcentral/fileexchange/14317
+%% 2. hSlider = uicontrol('style','slider', ...); %create the slider, get its Matlab handle
+%% 3. jSlider = findjobj(hSlider,'nomenu'); %get handle of the underlying java object
+%% 4. jSlider.AdjustmentValueChangedCallback = @myMatlabFunction; %set callback
+%% 
+%% Note: you can also use the familiar format:
+%% set(jSlider,'AdjustmentValueChangedCallback',@myMatlabFunction)
+%% 
+%% Feel free to explore many other properties (and ~30 callbacks)
+%% available in jSlider but not in its Matlab front-end interface hSlider.
+%% 
+%% Warning: FINDJOBJ relies on undocumented and unsupported Matlab/Java
+%% functionality.
+
+function drivebot(a, b)
     bgcol = [135 206 250]/255;
 
     if isstr(a)
         % drivebot(name, j), graphical callback function
         name = a; % name of the robot
-        j = b;  % joint index
+        j = b;    % joint index
         %disp(name)
         rh = findobj('Tag', name);
         %disp(rh)
@@ -141,6 +158,11 @@ function drivebot(a,b)
                 'Tag', sprintf('Slider%d', i), ...
                 'Callback', ['drivebot(''' r.name ''',' num2str(i) ')']);
 
+            if exist('findjobj'),
+                drawnow
+                jh = findjobj(h(i),'nomenu');
+                jh.AdjustmentValueChangedCallback = {@sliderCallbackFunc, r.name, i};
+            end
             h2(i) = uicontrol(fig, 'Style', 'edit', ...
                 'Units', 'pixels', ...
                 'Position', [width*0.8 height*(n-i-0.1) width*0.2 height*0.7], ...
@@ -267,5 +289,15 @@ function drivebot(a,b)
         if isempty(rh),
             figure
             plot(r, q);
+        end
+    end
+        
+function sliderCallbackFunc(src, ev, name, joint)
+    if get(src,'ValueIsAdjusting') == 1,
+        try
+            drivebot(name, joint);
+            drawnow
+        catch
+            return
         end
     end
