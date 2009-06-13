@@ -31,9 +31,10 @@
 % before calls to plot(robot).  
 %
 % options is a list of any of the following:
-% 'workspace' [xmin, xmax ymin ymax zmin zmax]
-% 'perspective' 'ortho'		controls camera view mode
-% 'erase' 'noerase'		controls erasure of arm during animation
+% 'workspace', [xmin, xmax ymin ymax zmin zmax]
+% 'perspective' 'ortho' controls camera view mode
+% 'raise' 'noraise'		controls autoraise of current figure on plot
+% 'render' 'norender'   controls shaded rendering after drawing
 % 'loop' 'noloop'		controls endless loop mode
 % 'base' 'nobase'		controls display of base 'pedestal'
 % 'wrist' 'nowrist'		controls display of wrist
@@ -41,7 +42,10 @@
 % 'shadow' 'noshadow'		controls display of shadow
 % 'xyz' 'noa'			wrist axis label
 % 'joints' 'nojoints'		controls display of joints
+% 'cylinder', [r g b]   color for joint cylinders
+% 'nocylinder'          don't draw joint cylinders
 % 'mag' scale			annotation scale factor
+% 'raise', 'noraise'    automatically raise the figure after plot
 %
 % The options come from 3 sources and are processed in the order:
 % 1. Cell array of options returned by the function PLOTBOTOPT
@@ -179,10 +183,15 @@ function rnew = plot(robot, tg, varargin)
 
     % get handle of any existing robot of same name
 	rh = findobj('Tag', robot.name);
+    
+    if opt.raise,
+        figure(gcf);
+    end
 
 	% now animate all robots tagged with this name
 
 	rh = findobj('Tag', robot.name);
+
 	for r=1:opt.repeat,
 	    for p=1:np,
 		for r=rh',
@@ -200,7 +209,8 @@ function rnew = plot(robot, tg, varargin)
 
 	if nargout > 0,
 		rnew = robot;
-	end
+    end
+    
 
 %PLOT_OPTIONS
 %
@@ -210,19 +220,21 @@ function rnew = plot(robot, tg, varargin)
 
 function o = plot_options(robot, optin)
 	%%%%%%%%%%%%%% process options
-	o.erasemode = 'xor';
-	o.joints = 1;
-	o.wrist = 1;
+	o.erasemode = 'normal';
+	o.joints = true;
+	o.wrist = true;
 	o.repeat = 1;
-	o.shadow = 1;
-	o.wrist = 1;
+	o.shadow = true;
+	o.wrist = true;
 	o.dims = [];
 	o.base = 0;
 	o.wristlabel = 'xyz';
-	o.projection = 'orthographic';
+	o.projection = 'perspective';
 	o.magscale = 1;
-	o.name = 1;
+	o.name = true;
     o.delay = 0;
+    o.raise = true;
+    o.cylinder = [0 0 0.7];
 
 	% read options string in the order
 	%	1. robot.plotopt
@@ -247,10 +259,15 @@ function o = plot_options(robot, optin)
 			o.projection = 'perspective';
 		case 'ortho'
 			o.projection = 'orthographic';
-		case 'erase'
-			o.erasemode = 'xor';
-		case 'noerase'
-			o.erasemode = 'none';
+        case 'raise'
+			o.raise = true;
+		case 'norender'
+			o.raise = false;
+        case 'cylinder'
+            o.cylinder = options{i+1};
+            i = i+1;
+        case 'nocylinder',
+            o.cylinder = [];
 		case 'base'
 			o.base = 1;
 		case 'nobase'
@@ -348,41 +365,39 @@ function h = create_new_robot(robot, opt)
 			'zdata', [h.zmin;b(3)], ...
 			'LineWidth', 4, ...
 			'color', 'red');
-	end
+    end
+    
 	if opt.name,
 		b = transl(robot.base);
-		text(b(1), b(2)-opt.mag, [' ' robot.name])
+		text(b(1), b(2)-opt.mag, [' ' robot.name], 'FontAngle', 'italic', 'FontWeight', 'bold')
 	end
 	% create a line which we will
 	% subsequently modify.  Set erase mode to xor for fast
 	% update
 	%
-	h.robot = line(robot.lineopt{:}, ...
-		'Erasemode', opt.erasemode);
-	if opt.shadow == 1,
+	h.robot = line(robot.lineopt{:});
+    
+	if opt.shadow,
 		h.shadow = line(robot.shadowopt{:}, ...
 			'Erasemode', opt.erasemode);
 	end
 
-	if opt.wrist == 1,	
+	if opt.wrist,	
 		h.x = line('xdata', [0;0], ...
 			'ydata', [0;0], ...
 			'zdata', [0;0], ...
-			'color', 'red', ...
-			'erasemode', 'xor');
+			'color', 'red');
 		h.y = line('xdata', [0;0], ...
 			'ydata', [0;0], ...
 			'zdata', [0;0], ...
-			'color', 'green', ...
-			'erasemode', 'xor');
+			'color', 'green');
 		h.z = line('xdata', [0;0], ...
 			'ydata', [0;0], ...
 			'zdata', [0;0], ...
-			'color', 'blue', ...
-			'erasemode', 'xor');
-		h.xt = text(0, 0, opt.wristlabel(1), 'erasemode', 'xor');
-		h.yt = text(0, 0, opt.wristlabel(2), 'erasemode', 'xor');
-		h.zt = text(0, 0, opt.wristlabel(3), 'erasemode', 'xor');
+			'color', 'blue');
+		h.xt = text(0, 0, opt.wristlabel(1), 'FontWeight', 'bold', 'HorizontalAlignment', 'Center');
+		h.yt = text(0, 0, opt.wristlabel(2), 'FontWeight', 'bold', 'HorizontalAlignment', 'Center');
+		h.zt = text(0, 0, opt.wristlabel(3), 'FontWeight', 'bold', 'HorizontalAlignment', 'Center');
 
 	end
 
@@ -390,38 +405,50 @@ function h = create_new_robot(robot, opt)
 	% display cylinders (revolute) or boxes (pristmatic) at
 	% each joint, as well as axis centerline.
 	%
-	if opt.joints == 1,
+	if opt.joints,
 		L = robot.link;
 		for i=1:robot.n,
+            
+            if ~isempty(opt.cylinder),
 
-			% cylinder or box to represent the joint
-			if L{i}.sigma == 0,
-				N = 8;
-			else
-				N = 4;
-			end
-			[xc,yc,zc] = cylinder(opt.mag/4, N);
-			zc(zc==0) = -opt.mag/2;
-			zc(zc==1) = opt.mag/2;
+                % cylinder or box to represent the joint
+                if L{i}.sigma == 0,
+                    N = 16;
+                else
+                    N = 4;
+                end
+                % define the vertices of the cylinder
+                [xc,yc,zc] = cylinder(opt.mag/4, N);
+                zc(zc==0) = -opt.mag/2;
+                zc(zc==1) = opt.mag/2;
 
-			% add the surface object and color it
-			h.joint(i) = surface(xc,yc,zc);
-			%set(h.joint(i), 'erasemode', 'xor');
-			set(h.joint(i), 'FaceColor', 'blue');
+                % create vertex color data
+                cdata = zeros(size(xc));
+                for j=1:3,
+                    cdata(:,:,j) = opt.cylinder(j);
+                end
+                % render the surface
+                h.joint(i) = surface(xc,yc,zc,cdata);
+                
+                % set the surfaces to be smoothed and translucent
+                set(h.joint(i), 'FaceColor', 'interp');
+                set(h.joint(i), 'EdgeColor', 'none');
+                set(h.joint(i), 'FaceAlpha', 0.7);
 
-			% build a matrix of coordinates so we
-			% can transform the cylinder in animate()
-			% and hang it off the cylinder
-			xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
-			set(h.joint(i), 'UserData', xyz);
-
+                % build a matrix of coordinates so we
+                % can transform the cylinder in animate()
+                % and hang it off the cylinder
+                xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
+                set(h.joint(i), 'UserData', xyz);
+            end
+            
 			% add a dashed line along the axis
 			h.jointaxis(i) = line('xdata', [0;0], ...
 				'ydata', [0;0], ...
 				'zdata', [0;0], ...
 				'color', 'blue', ...
-				'linestyle', '--', ...
-				'erasemode', 'xor');
+				'linestyle', ':');
+            h.jointlabel(i) = text(0, 0, 0, num2str(i), 'HorizontalAlignment', 'Center');
 		end
 	end
 
@@ -498,6 +525,7 @@ function animate(robot, q)
 			set(h.jointaxis(j), 'Xdata', xyzl(1,:), ...
 				'Ydata', xyzl(2,:), ...
 				'Zdata', xyzl(3,:));
+            set(h.jointlabel(j), 'Position', xyzl(1:3,1));
 		end
 	end
 
