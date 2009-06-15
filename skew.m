@@ -1,18 +1,18 @@
-%SKEW Create skew-symmetric matrix
+%SKEW Convert to/from skew symmetric form
 %
-% S = SKEW(V) is a skew-symmetric matrix formed from V (3x1).
+%   S = skew(v)
 %
-%           | 0   -vz  vy|
-%           | vz   0  -vx|
-%           |-vy   vx  0 |
+% Create 3x3 skew-symmetric matrix from 3x1 vector v
 %
-% See also VEX.
+%   v = skew(S);
+%
+% Assuming that S is skew-symmetric, extract the 3 unique values from it.  We
+% actually take the mean of the two elements that correspond to each unique
+% element, ie. vx = 0.5*(S(3,2)-S(2,3))
 
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -26,18 +26,13 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function S = skew(v)
-    if isvec(v,3)
-        % SO(3) case
+    if isvector(v),
         S = [  0   -v(3)  v(2)
               v(3)  0    -v(1)
              -v(2) v(1)   0];
-    elseif isvec(v,1)
-        % SO(2) case
-        S = [0 -v; v 0];
-    else
-        error('argument must be a 1- or 3-vector');
-    end
+	else
+		d = [	t1(1:3,4);
+			0.5*[t1(3,2)-t1(2,3); t1(1,3)-t1(3,1); t1(2,1)-t1(1,2)]];
+	end
