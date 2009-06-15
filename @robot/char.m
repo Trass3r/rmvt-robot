@@ -22,7 +22,7 @@ function s = char(r)
 	% build a configuration string
 	rp = [];
 	for i = 1:r.n,
-		rp = [rp r.link{i}.RP];
+		rp = [rp r.link(i).RP];
 	end
 
 	s = sprintf('%s (%d axis, %s)', r.name, r.n, rp);
@@ -42,5 +42,5 @@ function s = char(r)
 
 	s = strcat(s, sprintf('\n\n  alpha\t\t A\t\t theta\t\t D\t\tR/P\n'));
 	for i = 1:r.n,
-		s = strcat(s, sprintf('\n%s', char(r.link{i})));
+		s = strcat(s, sprintf('\n%s', char(r.link(i))));
 	end

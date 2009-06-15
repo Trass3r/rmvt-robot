@@ -40,7 +40,7 @@ function r = robot(L, a1, a2, a3)
 		r.name = 'noname';
 		r.manuf = '';
 		r.comment = '';
-		r.link = {};
+		r.link = [];
 		r.n = 0;
 		r.mdh = 0;
 		r.gravity = [0; 0; 9.81];
@@ -80,12 +80,12 @@ function r = robot(L, a1, a2, a3)
 			dh_dyn = L;
 			clear L
 			for j=1:numrows(dh_dyn)
-				L{j} = link(dh_dyn(j,:));
+				L(j) = link(dh_dyn(j,:));
 			end
 			% get name of variable
 			r.name = inputname(1);
 			r.link = L;
-		elseif iscell(L) & isa(L{1}, 'link')
+		elseif isa(L, 'link')
 
 			r.link = L;
 		else
@@ -96,7 +96,7 @@ function r = robot(L, a1, a2, a3)
 		% set the robot object mdh status flag
 		mdh = [];
 		for j = 1:length(L)
-			mdh = [mdh L{j}.mdh];
+			mdh = [mdh L.mdh];
 		end
 		if all(mdh == 0)
 			r.mdh = mdh(1);

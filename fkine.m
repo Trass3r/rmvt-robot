@@ -52,7 +52,7 @@ function t = fkine(robot, q)
 	if length(q) == n,
 		t = robot.base;
 		for i=1:n,
-			t = t * L{i}(q(i));
+			t = t * L(i).A(q(i));
 		end
 		t = t * robot.tool;
 	else
@@ -63,7 +63,7 @@ function t = fkine(robot, q)
 		for qv=q',		% for each trajectory point
 			tt = robot.base;
 			for i=1:n,
-				tt = tt * L{i}(qv(i));
+				tt = tt * L(i).A(qv(i));
 			end
 			t = cat(3, t, tt * robot.tool);
 		end
