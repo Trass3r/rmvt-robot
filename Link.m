@@ -311,6 +311,9 @@ classdef link
         end % A()
 
         function display(l)
+            disp(' ');
+            disp([inputname(1), ' = '])
+            disp(' ');
             disp( char(l) );
         end % display()
 
