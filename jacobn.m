@@ -38,16 +38,16 @@
 function J = jacobn(robot, q)
 
 	n = robot.n;
-	L = robot.link;		% get the links
+	L = robot.links;		% get the links
 
 	J = [];
 	U = robot.tool;
 	for j=n:-1:1,
 		if robot.mdh == 0,
 			% standard DH convention
-			U = L{j}( q(j) ) * U;
+			U = L(j).A(q(j)) * U;
 		end
-		if L{j}.RP == 'R',
+		if L(j).RP == 'R',
 			% revolute axis
 			d = [	-U(1,1)*U(2,4)+U(2,1)*U(1,4)
 				-U(1,2)*U(2,4)+U(2,2)*U(1,4)
@@ -62,6 +62,6 @@ function J = jacobn(robot, q)
 
 		if robot.mdh ~= 0,
 			% modified DH convention
-			U = L{j}( q(j) ) * U;
+			U = L(j).A(q(j)) * U;
 		end
 	end

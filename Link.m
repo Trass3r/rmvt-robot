@@ -322,7 +322,7 @@ classdef link
             if length(l) > 1,
                 s = '';
                 for ll=l,
-                    s = [s; char(ll)];
+                    s = strvcat(s, char(ll));
                 end
                 return;
             end

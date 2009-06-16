@@ -55,18 +55,18 @@ function theta = ikine560(robot, T,configuration)
 		return;
 	end
 	L = robot.links;
-	a1 = L{1}.A;
-	a2 = L{2}.A;
-	a3 = L{3}.A;
+	a1 = L(1).A;
+	a2 = L(2).A;
+	a3 = L(3).A;
 
-	if ~isempty( find( [L{4}.A L{5}.A L{6}.A] ~= 0 ))
+    if ~robot.spherical,
 		error('wrist is not spherical')
 	end
 
-	d1 = L{1}.D;
-	d2 = L{2}.D;
-	d3 = L{3}.D;
-	d4 = L{4}.D;
+	d1 = L(1).D;
+	d2 = L(2).D;
+	d3 = L(3).D;
+	d4 = L(4).D;
 
 	if ~ishomog(T),
 		error('T is not a homog xform');

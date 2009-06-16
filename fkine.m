@@ -48,7 +48,7 @@ function t = fkine(robot, q)
 
 	n = robot.n;
 
-	L = robot.link;
+	L = robot.links;
 	if length(q) == n,
 		t = robot.base;
 		for i=1:n,
