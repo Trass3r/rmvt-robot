@@ -1,6 +1,6 @@
-%IKINE560 Inverse kinematics for Puma 560 
+%IKINE56S Inverse kinematics for 6-axis robot with sperhical wrist
 %
-%	Q = IKINE560(ROBOT, T, CONFIG)
+%	Q = IKINE6S(ROBOT, T, CONFIG)
 %
 % Solve the inverse kinematics of the Puma-like (spherical wristed) robot 
 % ROBOT whose end-effector pose is given by T.
@@ -32,7 +32,7 @@
 %  4/99 use new robot object
 %  4/02 tidyup, remove multiple solutions
 
-function theta = ikine560(robot, T,configuration)
+function theta = ikine6s(robot, T,configuration)
 
 	if robot.n ~= 6,
 		error('Solution only applicable for 6DOF manipulator');
@@ -55,18 +55,18 @@ function theta = ikine560(robot, T,configuration)
 		return;
 	end
 	L = robot.links;
-	a1 = L(1).A;
-	a2 = L(2).A;
-	a3 = L(3).A;
+	a1 = L(1).a;
+	a2 = L(2).a;
+	a3 = L(3).a;
 
     if ~robot.spherical,
 		error('wrist is not spherical')
 	end
 
-	d1 = L(1).D;
-	d2 = L(2).D;
-	d3 = L(3).D;
-	d4 = L(4).D;
+	d1 = L(1).d;
+	d2 = L(2).d;
+	d3 = L(3).d;
+	d4 = L(4).d;
 
 	if ~ishomog(T),
 		error('T is not a homog xform');
