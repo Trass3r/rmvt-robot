@@ -217,14 +217,14 @@ classdef robot
             if ~isempty(r.comment)
                 s = strcat(s, [' <' r.comment '>']);
             end
-            s = strcat(s, sprintf('\n\t\tgrav = [%.2f %.2f %.2f]\n', r.gravity));
+            s = strcat(s, sprintf('\n      grav = [%.2f %.2f %.2f]\n', r.gravity));
             if getfield(r, 'mdh') == 0,
                 s = strcat(s, sprintf('\t\tstandard D&H parameters\n'));
             else
                 s = strcat(s, sprintf('\t\tmodified D&H parameters\n'));
             end
 
-            s = strcat(s, sprintf('\n\n  alpha\t\t A\t\t theta\t\t D\t\tR/P\n'));
+            s = strcat(s, sprintf('\n\n      alpha           a       theta           d\n'));
             for i = 1:r.n,
                 s = strcat(s, sprintf('\n%s', char(r.links(i))));
             end
@@ -278,7 +278,7 @@ classdef robot
         end
 
         function r = set.gravity(r, v)
-            if isvector(v) & (length(v) == 3),
+            if isvec(v, 3),
                 r.gravity = v;
             else
                 error('gravity must be a 3-vector');

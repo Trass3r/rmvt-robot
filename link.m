@@ -317,26 +317,24 @@ classdef link
             disp( char(l) );
         end % display()
 
-        function s = char(l)
+        function s = char(links)
 
-            if length(l) > 1,
-                s = '';
-                for ll=l,
-                    s = strvcat(s, char(ll));
+
+            s = '';
+            for j=1:length(links),
+                l = links(j);
+                if l.mdh == 0,
+                    conv = 'std';
+                else
+                    conv = 'mod';
                 end
-                return;
+                if l.sigma == 1,
+                    js = sprintf('%11.4g %11.4g %11.4g %11s (%s)', l.alpha, l.a, l.theta, sprintf('q%d', j), conv);
+                else
+                    js = sprintf('%11.4g %11.4g %11s %11.4g (%s)', l.alpha, l.a, sprintf('q%d', j), l.d, conv);
+                end
+                s = strvcat(s, js);
             end
-            jtype = 'RP';
-
-            if l.mdh == 0,
-                conv = 'std';
-            else
-                conv = 'mod';
-            end
-
-            s = sprintf('%f\t%f\t%f\t%f\t%c\t(%s)', l.alpha, l.a, l.theta, l.d, ...
-                jtype((l.sigma==1) + 1), ...
-                conv);
         end % char()
 
         function show(l)
