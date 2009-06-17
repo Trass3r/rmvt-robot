@@ -26,8 +26,4 @@
 
 function R = tr2rot(T)
 
-	if ~ishomog(T)
-		error('input must be a homogeneous transform');
-	end
-
 	R = T(1:3,1:3);
