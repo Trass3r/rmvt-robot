@@ -1,8 +1,12 @@
-%ISHOMOG Test if argument is a homogeneous transformation
+%ISROT Test if argument is a rotation matrix
 %
-%	H = ISHOMOG(TR)
+%	H = ISROT(R)
 %
-%  Returns true (1) if the argument tr is of dimension 4x4.
+%  Returns true if the argument is of dimension 3x3.
+%
+%	H = ISROT(R, true)
+%
+%  Additional test that determinant is 1
 
 % Copyright (C) 2008, by Peter I. Corke
 %
@@ -21,9 +25,15 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function h = isrot(r)
+function h = isrot(r, dtest)
 	if ndims(r) == 2,
 		h =  all(size(r) == [3 3]);
 	else
-		h = 0;
-	end
+		h = false;
+    end
+
+    if nargin > 1,
+        if h & dtest,
+            h = abs(det(r) - 1) < eps;
+        end
+    end
