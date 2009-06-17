@@ -27,6 +27,8 @@
 
 function [theta, v] = tr2angvec(t)
 
+    t = t2r(t);
+    
 	qs = sqrt(trace(t)+1)/2.0;
 	kx = t(3,2) - t(2,3);	% Oz - Ay
 	ky = t(1,3) - t(3,1);	% Ax - Nz
