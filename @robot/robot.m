@@ -69,14 +69,16 @@
 classdef robot
 
     properties
+        name
         gravity
         base
         tool
-        lineopt
-        shadowopt
-        name
         manuf
         comment
+
+        plotopt
+        lineopt
+        shadowopt
     end
 
     properties (SetAccess = private)
@@ -85,7 +87,6 @@ classdef robot
         mdh
         handle
         q
-        plotopt
     end
 
     properties (Dependent = true, SetAccess = private)
@@ -143,7 +144,7 @@ classdef robot
                     dh_dyn = L;
                     clear L
                     for j=1:numrows(dh_dyn)
-                        L(j) = links(dh_dyn(j,:));
+                        L(j) = link(dh_dyn(j,:));
                     end
                     % get name of variable
                     r.name = inputname(1);
@@ -224,10 +225,9 @@ classdef robot
                 s = strcat(s, sprintf('\t\tmodified D&H parameters\n'));
             end
 
-            s = strcat(s, sprintf('\n\n      alpha           a       theta           d\n'));
-            for i = 1:r.n,
-                s = strcat(s, sprintf('\n%s', char(r.links(i))));
-            end
+            s = [s, sprintf('\n\n      alpha           a       theta           d\n')];
+            s = [s, char(r.links)];
+            s(end) = [];    % remove trailing newline
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

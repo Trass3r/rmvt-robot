@@ -110,7 +110,6 @@ classdef link
                 l.mdh = 0;
                 l.offset = 0;
                 
-                % it's a legacy DYN matrix
                 l.m = [];
                 l.r = [];
                 v = [];
@@ -172,12 +171,8 @@ classdef link
                 l.alpha = dh(1);
                 l.a = dh(2);
                 l.theta = dh(3);
-                l.a = dh(4);
-                if length(dh) == 4,
-                    l.sigma = 0;
-                else
-                    l.sigma = dh(5);
-                end
+                l.d = dh(4);
+                l.sigma = dh(5);
                 l.mdh = 0;	% default to standard D&H
                 l.offset = 0;
                 
@@ -329,11 +324,11 @@ classdef link
                     conv = 'mod';
                 end
                 if l.sigma == 1,
-                    js = sprintf('%11.4g %11.4g %11.4g %11s (%s)', l.alpha, l.a, l.theta, sprintf('q%d', j), conv);
+                    js = sprintf('%11.4g %11.4g %11.4g %11s (%s)\n', l.alpha, l.a, l.theta, sprintf('q%d', j), conv);
                 else
-                    js = sprintf('%11.4g %11.4g %11s %11.4g (%s)', l.alpha, l.a, sprintf('q%d', j), l.d, conv);
+                    js = sprintf('%11.4g %11.4g %11s %11.4g (%s)\n', l.alpha, l.a, sprintf('q%d', j), l.d, conv);
                 end
-                s = strvcat(s, js);
+                s = [s, js];
             end
         end % char()
 
