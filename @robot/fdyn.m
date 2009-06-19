@@ -58,7 +58,41 @@ function [t, q, qd] = fdyn(robot, t0, t1, torqfun, q0, qd0, varargin)
 		x0 = [q0(:); qd0(:)];
 	end
 		
-	[t,y] = ode45('fdyn2', [t0 t1], x0, [], robot, torqfun, varargin{:});
+	[t,y] = ode45(@fdyn2, [t0 t1], x0, [], robot, torqfun, varargin{:});
 	q = y(:,1:n);
 	qd = y(:,n+1:2*n);
 
+end
+
+
+%FDYN2  private function called by FDYN
+%
+%	XDD = FDYN2(T, X, FLAG, ROBOT, TORQUEFUN)
+%
+% Called by FDYN to evaluate the robot velocity and acceleration for
+% forward dynamics.  T is the current time, X = [Q QD] is the state vector,
+% ROBOT is the object being integrated, and TORQUEFUN is the string name of
+% the function to compute joint torques and called as
+%
+%       TAU = TORQUEFUN(T, X)
+%
+% if not given zero joint torques are assumed.
+%
+% The result is XDD = [QD QDD].
+function xd = fdyn2(t, x, flag, robot, torqfun, varargin)
+
+	n = robot.n;
+
+	q = x(1:n);
+	qd = x(n+1:2*n);
+
+	% evaluate the torque function if one is given
+	if isstr(torqfun)
+		tau = feval(torqfun, t, q, qd, varargin{:});
+	else
+		tau = zeros(n,1);
+	end
+	
+	qdd = accel(robot, x(1:n,1), x(n+1:2*n,1), tau);
+	xd = [x(n+1:2*n,1); qdd];
+end
