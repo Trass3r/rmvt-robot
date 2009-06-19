@@ -1,10 +1,15 @@
 %TRINTERP Interpolate homogeneous transformations
 %
-%	TR = TRINTERP(T0, T1, R)
+%	TR = TRINTERP(T0, T1, r)
 %
 % Returns a homogeneous transform interpolation between T0 and T1 as
-% R varies from 0 to 1.  Rotation is interpolated using quaternion
+% r varies from 0 to 1.  Rotation is interpolated using quaternion
 % spherical linear interpolation.
+%
+%	TR = TRINTERP(T, r)
+%
+% Returns a transform that varies from the identity matrix, r=0, to T
+% when r=1.
 %
 % See also: CTRAJ, QUATERNION
 
@@ -27,13 +32,25 @@
 
 function t = trinterp(T0, T1, r)
 
-	q0 = quaternion(T0);
-	q1 = quaternion(T1);
+    if nargin == 3,
+        q0 = quaternion(T0);
+        q1 = quaternion(T1);
 
-	p0 = transl(T0);
-	p1 = transl(T1);
+        p0 = transl(T0);
+        p1 = transl(T1);
 
-	qr = qinterp(q0, q1, r);
-	pr = p0*(1-r) + r*p1;
+        qr = qinterp(q0, q1, r);
+        pr = p0*(1-r) + r*p1;
+    elseif nargin == 2,
+        r = T1;
+        
+        q0 = quaternion(T0);
+        p0 = transl(T0);
 
-	t = [qr.r pr; 0 0 0 1];
+        qr = q0.scale(r);
+        pr = r*p0;
+    else
+        error('must be 2 or 3 arguments');
+    end
+    t = [qr.r pr; 0 0 0 1];
+        

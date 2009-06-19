@@ -38,7 +38,18 @@
 
 function trplot(T, name, color)
 
-            % trplot( Q.r, fmt, color);
+    if ndims(T) == 3,
+        clf
+        hold on
+        for i=1:size(T,3),
+            trplot(T(:,:,i), num2str(i));
+        end
+        hold off
+        shg
+        return
+    end
+
+    % trplot( Q.r, fmt, color);
     if size(T) == [3 3],
         T = r2t(T);
     end

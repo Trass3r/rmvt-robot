@@ -32,6 +32,7 @@
 %   q.unitize         unitize this quaternin
 %   q.plot            same options as trplot()
 %   q.interp(q2, r)   interpolation (slerp) between q and q2, 0<=r<=1
+%   q.scale(r)        interpolation (slerp) between identity and q, 0<=r<=1
 %
 % Object operators
 %
@@ -75,7 +76,7 @@ classdef quaternion
             %   Q = quaternion(q)       from another quaternion
                 q = a1;
             elseif nargin == 1
-                if all(size(a1) == [1 4]) | all(size(a1) == [4 1])
+                if all(size(a1) == [1 4]) || all(size(a1) == [4 1])
             %   Q = quaternion([s v1 v2 v3])    from 4 elements
                     a1 = a1(:);
                     q.s = a1(1);
@@ -99,13 +100,13 @@ classdef quaternion
                     error('unknown dimension of input');
                 end
             elseif nargin == 2
-                if isvector(a1) & isscalar(a2),
+                if isscalar(a1) && isvector(a2),
                 %   Q = quaternion(s, v)    from real + vector parts
                     q.s = a1;
                     q.v = a2;
-                elseif isscalar(a1) & isvector(a2)
+                elseif isvector(a1) && isscalar(a2),
                 %   Q = quaternion(v, theta)    from vector plus angle
-                    q.s = cos(a2/2);;
+                    q.s = cos(a2/2);
                     q.v = sin(a2/2)*unit(a1(:)');
                 end
             end
@@ -178,9 +179,9 @@ classdef quaternion
         end
 
 
-        %QINTERP Interpolate rotations expressed by quaternion objects
+        %INTERP Interpolate rotations expressed by quaternion objects
         %
-        %   QI = qinterp(Q1, Q2, R)
+        %   QI = interp(Q1, Q2, R)
         %
         % Return a unit-quaternion that interpolates between Q1 and Q2 as R moves
         % from 0 to 1.  This is a spherical linear interpolation (slerp) that can
@@ -195,12 +196,11 @@ classdef quaternion
             q1 = double(Q1);
             q2 = double(Q2);
 
-            if (r<0) | (r>1),
+            if (r<0) || (r>1),
                 error('R out of range');
             end
 
             theta = acos(q1*q2');
-            q = {};
             count = 1;
 
             if length(r) == 1,
@@ -216,7 +216,51 @@ classdef quaternion
                     else
                         qq = quaternion( (sin((1-R)*theta) * q1 + sin(R*theta) * q2) / sin(theta) );
                     end
-                    q{count} = qq;
+                    q(count) = qq;
+                    count = count + 1;
+                end
+            end
+        end
+        
+        
+        %SCALE Interpolate rotations expressed by quaternion objects
+        %
+        %   QI = scale(Q1, R)
+        %
+        % Return a unit-quaternion that interpolates between identiy and Q1 as R moves
+        % from 0 to 1.  This is a spherical linear interpolation (slerp) that can
+        % be interpretted as interpolation along a great circle arc on a sphere.
+        %
+        % If r is a vector, QI, is a cell array of quaternions, each element
+        % corresponding to sequential elements of R.
+        %
+        % See also: CTRAJ, quaternion.
+
+        function q = scale(Q, r)
+
+            q2 = double(Q);
+
+            if any(r<0) || (r>1),
+                error('r out of range');
+            end
+            q1 = [1 0 0 0];         % identity quaternion
+            theta = acos(q1*q2');
+
+            if length(r) == 1,
+                if theta == 0,
+                    q = Q;
+                else
+                    q = quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
+                end
+            else
+                count = 1;
+                for R=r(:)',
+                    if theta == 0,
+                        qq = Q;
+                    else
+                        qq = quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
+                    end
+                    q(count) = qq;
                     count = count + 1;
                 end
             end
