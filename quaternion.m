@@ -4,11 +4,10 @@
 %   Q = quaternion(q)            from another quaternion
 %
 %   Q = quaternion([s v1 v2 v3]) from 4 elements
-%   Q = quaternion(s, v)         from real plus vector
 %   Q = quaternion(s)            from a scalar 
 %   Q = quaternion(v)            from a vector (pure quaternion)
 %
-%   Q = quaternion(v, theta)     unit quaternion from vector plus angle
+%   Q = quaternion(th, v)        unit quaternion from vector plus angle
 %   Q = quaternion(R)            unit quaternion from a 3x3 or 4x4 matrix
 %
 % A quaternion is a compact method of representing a 3D rotation that has
@@ -100,14 +99,10 @@ classdef quaternion
                     error('unknown dimension of input');
                 end
             elseif nargin == 2
-                if isscalar(a1) && isvector(a2),
-                %   Q = quaternion(s, v)    from real + vector parts
-                    q.s = a1;
-                    q.v = a2;
-                elseif isvector(a1) && isscalar(a2),
-                %   Q = quaternion(v, theta)    from vector plus angle
-                    q.s = cos(a2/2);
-                    q.v = sin(a2/2)*unit(a1(:)');
+                if isvector(a1) && isscalar(a2),
+                %   Q = quaternion(theta, v)    from vector plus angle
+                    q.s = cos(a1/2);
+                    q.v = sin(a1/2)*unit(a2(:)');
                 end
             end
 
@@ -333,7 +328,7 @@ classdef quaternion
 
                 if length(q2) == 3,
                     qp = q1 * quaternion([0 q2(:)']) * inv(q1);
-                    qp = qp.v;
+                    qp = qp.v(:);
                 elseif length(q2) == 1,
                     qp = quaternion( double(q1)*q2);
                 else
