@@ -62,10 +62,10 @@ function trplot(T, name, color)
 	end
 
 	% create unit vectors
-	o = T*[0 0 0 0]';
-	x1 = T*[1 0 0 0]';
-	y1 = T*[0 1 0 0]';
-	z1 = T*[0 0 1 0]';
+	o = T*[0 0 0 1]';
+	x1 = T*[1 0 0 1]';
+	y1 = T*[0 1 0 1]';
+	z1 = T*[0 0 1 1]';
 
 	get(gca, 'Tag')
 	if strcmp(get(gca, 'Tag'), 'trplot') == 0,
@@ -97,9 +97,18 @@ function trplot(T, name, color)
     
     mstart = [o o o]';
     mend = [x1+o y1+o z1+o]';
+    mstart
+    mend
     
     % draw the 3 arrows
-    arrow(mstart(:,1:3), mend(:,1:3), arrow_opts{:});
+    %arrow(mstart(:,1:3), mend(:,1:3), arrow_opts{:});
+    mstart = mstart(:,1:3);
+    mend = mend(:,1:3);
+    
+    for i=1:3,
+        plot2([mstart(i,:); mend(i,:)]);
+    end
+
 
     % name             for axes
     % {nam1, nam2}     axes, framename
@@ -143,4 +152,4 @@ function trplot(T, name, color)
 	if ~ishold,
 		hold off
 	end
-	axis equal
+	axis square
