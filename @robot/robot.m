@@ -79,6 +79,9 @@ classdef robot
         plotopt
         lineopt
         shadowopt
+
+        offset
+        qlim
     end
 
     properties (SetAccess = private)
@@ -91,10 +94,8 @@ classdef robot
 
     properties (Dependent = true, SetAccess = private)
         config
-        offset
         dyn
         dh
-        qlim
         spherical
     end
 
@@ -333,6 +334,18 @@ classdef robot
                 v = true;
                 return;
             end
+        end
+        
+        function jt = jtraj(r, T1, T2, t, varargin)
+            if r.spherical && (r.n == 6)
+                q1 = r.ikine6s(T1, varargin{:});
+                q2 = r.ikine6s(T2, varargin{:});
+            else
+                q1 = r.ikine(T1, varargin{:});
+                q2 = r.ikine(T2, varargin{:});
+            end
+            
+            jt = jtraj(q1, q2, t);
         end
 
     end % methods
