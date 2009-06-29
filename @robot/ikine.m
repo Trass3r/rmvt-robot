@@ -41,7 +41,7 @@
 % rotation about the wrist axis, that is, M = [1 1 1 1 1 0].
 %
 %
-% See also: FKINE, TR2DIFF, JACOB0, IKINE560.
+% See also: FKINE, TR2DIFF, JACOB0, IKINE6S.
  
 % Copyright (C) 1993-2008, by Peter I. Corke
 %
@@ -60,19 +60,37 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function qt = ikine(robot, tr, q, m)
-	%
-	%  solution control parameters
-	%
-	ilimit = 1000;
-	stol = 1e-12;
+function qt = ikine(robot, tr, q, m, newopt)
+	%  set default parameters for solution
+	opt.ilimit = 1000;
+	opt.tol = 1e-6;
+    opt.debug = true;
+    opt.lambda = 1.0;
+    opt.useInverse = false;
 
+    % with no arguments, return the default parameters as a struct
+    if nargin == 0
+        qt = opt;
+        return
+    end
+
+    % if a parameter struct is provided, use it instead
+    if nargin == 5
+        opt = newopt;
+    end
+
+    % OK, looks like we are doing real stuff
 	n = robot.n;
 
-	if nargin == 2,
+    % check sanity of arguments
+	if nargin < 3,
 		q = zeros(n, 1);
 	else
-		q = q(:);
+        if isempty(q)
+            q = zeros(n, 1);
+        else
+            q = q(:);
+        end
 	end
 	if nargin == 4,
 		m = m(:);
@@ -84,46 +102,52 @@ function qt = ikine(robot, tr, q, m)
 		end
 	else
 		if n < 6,
-			disp('For a manipulator with fewer than 6DOF a mask matrix argument should be specified');
+			error('For a manipulator with fewer than 6DOF a mask matrix argument must be specified');
 		end
 		m = ones(6, 1);
 	end
 		
+    % make this a logical array so we can index with it
+    m = logical(m);
 
-	tcount = 0;
-	if ishomog(tr),		% single xform case
-		nm = 1;
-		count = 0;
-		while nm > stol,
-			e = tr2diff(fkine(robot, q'), tr) .* m;
-			dq = pinv( jacob0(robot, q) ) * e;
-			q = q + dq;
-			nm = norm(dq);
-			count = count+1;
-			if count > ilimit,
-				error('Solution wouldn''t converge')
-			end
-		end
-		qt = q';
-	else			% trajectory case
-		np = size(tr,3);
-		qt = [];
-		for i=1:np
-			nm = 1;
-			T = tr(:,:,i);
-			count = 0;
-			while nm > stol,
-				e = tr2diff(fkine(robot, q'), T) .* m;
-				dq = pinv( jacob0(robot, q) ) * e;
-				q = q + dq;
-				nm = norm(dq);
-				count = count+1;
-				if count > ilimit,
-					fprintf('i=%d, nm=%f\n', i, nm);
-					error('Solution wouldn''t converge')
-				end
-			end
-			qt = [qt; q'];
-			tcount = tcount + count;
-		end
-	end
+    npoints = size(tr,3);    % number of points
+    qt = zeros(npoints, n);  % preallocate space for results
+    tcount = 0;              % total iteration count
+
+    for i=1:npoints
+        T = tr(:,:,i);
+        nm = Inf;
+        count = 0;
+        while nm > opt.tol,
+            e = tr2delta(fkine(robot, q'), T);
+
+            % compute the Jacobian
+            J = jacob0(robot, q);
+
+            % error is based on the square sub-Jacobian
+            if opt.useInverse
+                dq = opt.lambda * inv( J(m,:) ) * e(m);
+            else
+                dq = opt.lambda *  J(m,:)' * e(m);
+            end
+
+            if opt.debug
+                fprintf('%d/%d: e =  ', i, count); disp(e')
+                fprintf('      dq = '); disp(dq');
+            end
+
+            % update the estimated solution
+            q = q + dq;
+            nm = norm(dq);
+            count = count+1;
+            if count > opt.ilimit,
+                fprintf('i=%d, nm=%f\n', i, nm);
+                error( sprintf('Solution wouldn''t converge, final error %.4f', nm) )
+            end
+        end
+        qt(i,:) = q';
+        tcount = tcount + count;
+    end
+end
+
+
