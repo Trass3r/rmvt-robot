@@ -156,11 +156,13 @@ function rnew = plot(robot, tg, varargin)
 	if ~isempty(robot.handle),
         %disp('has handles')
 		% handles provided, animate just that robot
-		for r=1:opt.repeat,
+        count = opt.repeat;
+        while count > 0
 		    for p=1:np,
-			animate( robot, tg(p,:));
-            pause(opt.delay)
+                animate( robot, tg(p,:));
+                pause(opt.delay)
 		    end
+            count = count - 1;
 		end
 
 		return;
@@ -192,12 +194,14 @@ function rnew = plot(robot, tg, varargin)
 
 	rh = findobj('Tag', robot.name);
 
-	for r=1:opt.repeat,
+    count = opt.repeat;
+    while count > 0
 	    for p=1:np,
-		for r=rh',
-			animate( get(r, 'UserData'), tg(p,:));
-		end
+            for r=rh',
+                animate( get(r, 'UserData'), tg(p,:));
+            end
 	    end
+        count = count - 1;
 	end
 
 	% save the last joint angles away in the graphical robot
