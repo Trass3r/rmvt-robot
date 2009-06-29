@@ -28,12 +28,22 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function delta = tr2delta(T1, T2)
-    if nargin == 1
-        dT = T1;
-    else
-        % T2 = T1. Tdelta 
-        % => inv(T1).T2 = Tdelta
-        dT = inv(T1) * T2;
-    end
+%    if nargin == 1
+%        dT = T1;
+%    else
+%        % T2 = T1. Tdelta 
+%        % => inv(T1).T2 = Tdelta
+%        dT = inv(T1) * T2;
+%        dT = T2 - T1;
+%    end
+%
+%    delta = [	dT(1:3,4); skew( t2r(inv(T1)*dT) ) ];
 
-    delta = [	dT(1:3,4); skew( t2r(dT) ) ];
+% TODO HACK understand/fix this and update Chapter 2
+    delta = [	T2(1:3,4)-T1(1:3,4);
+        0.5*(	cross(T1(1:3,1), T2(1:3,1)) + ...
+            cross(T1(1:3,2), T2(1:3,2)) + ...
+            cross(T1(1:3,3), T2(1:3,3)) ...
+        )];
+end
+
