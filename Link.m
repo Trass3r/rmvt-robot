@@ -306,9 +306,11 @@ classdef link
         end % A()
 
         function display(l)
-            disp(' ');
+            loose = strcmp( get(0, 'FormatSpacing'), 'loose');
+            if loose
+                disp(' ');
+            end
             disp([inputname(1), ' = '])
-            disp(' ');
             disp( char(l) );
         end % display()
 
@@ -324,11 +326,12 @@ classdef link
                     conv = 'mod';
                 end
                 if l.sigma == 1,
-                    js = sprintf('%11.4g %11.4g %11.4g %11s (%s)\n', l.alpha, l.a, l.theta, sprintf('q%d', j), conv);
+                    % prismatic joint
+                    js = sprintf('%11.4g %11s %11.4g %11.4g (%s)', l.theta, sprintf('q%d', j), l.a, l.alpha, conv);
                 else
-                    js = sprintf('%11.4g %11.4g %11s %11.4g (%s)\n', l.alpha, l.a, sprintf('q%d', j), l.d, conv);
+                    js = sprintf('%11s %11.4g %11.4g %11.4g (%s)', sprintf('q%d', j), l.d, l.a, l.alpha, conv);
                 end
-                s = [s, js];
+                s = strvcat(s, js);
             end
         end % char()
 

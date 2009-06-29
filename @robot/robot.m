@@ -3,10 +3,20 @@
 % Create a robot
 %   ROBOT           create a ROBOT object with no links
 %   ROBOT(robot)        create a copy of an existing ROBOT object
-%   ROBOT(robot, LINK)  replaces links for robot object
 %   ROBOT(LINK, ...)    create from a cell array of LINK objects
 %   ROBOT(DH, ...)      create from legacy DH matrix
 %   ROBOT(DYN, ...)     create from legacy DYN matrix
+%
+%   Options are name/value pairs:
+%     'name', <name>
+%     'comment', <comment field>
+%     'manufacturer', <manufacturer name>
+%     'base', <base transform>
+%     'tool', <tool transform>
+%     'gravity', <gravity vector>
+%     'plotopt', <plot options cell array>
+%     'lineopt', <line options>
+%     'shadowopt', <shadow options>
 %
 % Optional trailing arguments are:
 %   Name            robot type or name
@@ -103,86 +113,85 @@ classdef robot
     end
 
     methods
-        function r = robot(L, a1, a2, a3)
+        function r = robot(L, varargin)
+
+            r.name = 'noname';
+            r.manuf = '';
+            r.comment = '';
+            r.links = [];
+            r.n = 0;
+            r.mdh = 0;
+            r.gravity = [0; 0; 9.81];
+            r.base = eye(4,4);
+            r.tool = eye(4,4);
+            r.handle = [];  % graphics handles
+            r.q = [];   % current joint angles
+            r.plotopt = {};
+            r.lineopt = {'Color', 'black', 'Linewidth', 4};
+            r.shadowopt = {'Color', [0.7 0.7 0.7], 'Linewidth', 3};
 
             if nargin == 0
-                r.name = 'noname';
-                r.manuf = '';
-                r.comment = '';
-                r.links = [];
-                r.n = 0;
-                r.mdh = 0;
-                r.gravity = [0; 0; 9.81];
-                r.base = eye(4,4);
-                r.tool = eye(4,4);
-                r.handle = [];  % graphics handles
-                r.q = [];   % current joint angles
-                r.plotopt = {};
-                r.lineopt = {'Color', 'black', 'Linewidth', 4};
-                r.shadowopt = {'Color', 'black', 'Linewidth', 1};
-            elseif isa(L, 'robot')
-                r = L;
-                if nargin == 2,
-                    r.links = a1;
-                end
+                % zero argument constructor, sets default values
+                return;
             else
-                % assume arguments are: name, manuf, comment
-                if nargin > 1,
-                    r.name = a1;
-                else
-                    r.name = 'noname';
-                end
-                if nargin > 2,
-                    r.manuf = a2;
-                else
-                    r.manuf = '';
-                end
-                if nargin > 3,
-                    r.comment = a3;
-                else
-                    r.comment = '';
-                end
+                % at least one argument.  First argument is a robot, link array
+                %   or a DH/DYN matrix
 
-                if isa(L, 'double')
+                if isa(L, 'robot')
+                    % clone the passed robot
+                    r = L;
+                elseif isa(L, 'link')
+                    r.links = L;    % attach the links
+                elseif isa(L, 'double')
                     % legacy matrix
                     dh_dyn = L;
                     clear L
                     for j=1:numrows(dh_dyn)
                         L(j) = link(dh_dyn(j,:));
                     end
-                    % get name of variable
-                    r.name = inputname(1);
-                    r.links = L;
-                elseif isa(L, 'link')
-
                     r.links = L;
                 else
                     error('unknown type passed to robot');
                 end
                 r.n = length(L);
+            end
+            % process the rest of the arguments in key, value pairs
 
-                % set the robot object mdh status flag
-                mdh = [];
-                for j = 1:length(L)
-                    mdh = [mdh L.mdh];
+            count = 1;
+            while count <= length(varargin)
+                switch lower(varargin{count})
+                case 'name'
+                    r.name = varargin{count+1}; count = count+1;
+                case 'comment'
+                    r.comment = varargin{count+1}; count = count+1;
+                case 'manufacturer'
+                    r.manuf = varargin{count+1}; count = count+1;
+                case 'base'
+                    r.base = varargin{count+1}; count = count+1;
+                case 'tool'
+                    r.tool = varargin{count+1}; count = count+1;
+                case 'gravity'
+                    r.gravity = varargin{count+1}; count = count+1;
+                case 'plotopt'
+                    r.plotopt = varargin{count+1}; count = count+1;
+                case 'lineopt'
+                    r.lineopt = varargin{count+1}; count = count+1;
+                case 'shadowopt'
+                    r.shadowopt = varargin{count+1}; count = count+1;
+                otherwise
+                    error( sprintf('unknown option <%s>', varargin{count}));
                 end
-                if all(mdh == 0)
-                    r.mdh = mdh(1);
-                elseif all (mdh == 1)
-                    r.mdh = mdh(1);
-                else
-                    error('robot has mixed D&H links conventions');
-                end
+                count = count + 1;
+            end
 
-                % fill in default base and gravity direction
-                r.gravity = [0; 0; 9.81];
-                r.base = eye(4,4);
-                r.tool = eye(4,4);
-                r.handle = [];
-                r.q = [];
-                r.plotopt = {};
-                r.lineopt = {'Color', 'black', 'Linewidth', 4};
-                r.shadowopt = {'Color', 'black', 'Linewidth', 1};
+            % set the robot object mdh status flag
+            mdh = [r.links.mdh];
+            if all(mdh == 0)
+                r.mdh = mdh(1);
+            elseif all (mdh == 1)
+                r.mdh = mdh(1);
+            else
+                error('robot has mixed D&H links conventions');
             end
         end
 
@@ -204,34 +213,55 @@ classdef robot
         end
 
         function display(r)
-            disp(' ');
+            loose = strcmp( get(0, 'FormatSpacing'), 'loose');
+            if loose
+                disp(' ');
+            end
             disp([inputname(1), ' = '])
-            disp(' ');
+            if loose
+                disp(' ');
+            end
             disp(char(r))
-            disp(' ');
+            if loose
+                disp(' ');
+            end
         end
 
         %CHAR String representation of robot parametesrs
-        function s = char(r)
+        function s = char(robot)
 
-            s = sprintf('%s (%d axis, %s)', r.name, r.n, r.config);
+            s = '';
+            for j=1:length(robot),
+                r = robot(j);
 
-            if ~isempty(r.manuf)
-                s = strcat(s, [' [' r.manuf ']']);
-            end
-            if ~isempty(r.comment)
-                s = strcat(s, [' <' r.comment '>']);
-            end
-            s = strcat(s, sprintf('\n      grav = [%.2f %.2f %.2f]\n', r.gravity));
-            if getfield(r, 'mdh') == 0,
-                s = strcat(s, sprintf('\t\tstandard D&H parameters\n'));
-            else
-                s = strcat(s, sprintf('\t\tmodified D&H parameters\n'));
-            end
+                % informational line
+                line = sprintf('%s (%d axis, %s)', r.name, r.n, r.config);
+                if ~isempty(r.manuf)
+                    line = strcat(line, sprintf(' [%s]', r.manuf));
+                end
+                if ~isempty(r.comment)
+                    line = strcat(line, sprintf(' <%s>', r.comment));
+                end
+                s = strvcat(s, line);
 
-            s = [s, sprintf('\n\n      alpha           a       theta           d\n')];
-            s = [s, char(r.links)];
-            s(end) = [];    % remove trailing newline
+                % link parameters
+                s = strvcat(s, '      theta           d           a       alpha');
+                s = strvcat(s, char(r.links));
+
+                % gravity, base, tool
+                s_grav = horzcat(strvcat('grav = ', ' ', ' '), num2str(r.gravity));
+                s_grav = strvcat(s_grav, ' ');
+                s_base = horzcat(strvcat('  base = ',' ',' ', ' '), num2str(r.base'));
+
+                s_tool = horzcat(strvcat('   tool =  ',' ',' ', ' '), num2str(r.tool'));
+
+                line = horzcat(s_grav, s_base, s_tool);
+
+                s = strvcat(s, ' ', line);
+                if j ~= length(robot)
+                    s = strvcat(s, ' ');
+                end
+            end
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -123,7 +123,6 @@ qs = [0 0 -pi/2 0 0 0];
 qn=[0 pi/4 pi 0 pi/4  0];
 
 
-p560 = robot(L, 'Puma 560', 'Unimation', 'params of 8/95');
+p560 = robot(L, 'name', 'Puma 560', ...
+    'manufacturer', 'Unimation', 'comment', 'params of 8/95');
 clear L
-p560.name = 'Puma 560';
-p560.manuf = 'Unimation';

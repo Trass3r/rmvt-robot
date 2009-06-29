@@ -39,6 +39,5 @@ twolink_dh = [
   0     1         0     0         0     1       1       0       0       0       0       0       0       0       0        0      1
 ];
 
-tl = robot(twolink_dh);
-tl.name = 'Simple two link';
+tl = robot(twolink_dh, 'name', 'Simple two link');
 qz = [0 0];
