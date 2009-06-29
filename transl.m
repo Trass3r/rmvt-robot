@@ -1,20 +1,24 @@
 %TRANSL Create translational transform
 %
 %	TR = TRANSL(X, Y, Z)
-%	TR = TRANSL( [X Y Z] )
 %
 % Returns a homogeneous transformation representing a translation of X, Y
 % and Z.
 %
-%	[X Y Z]' = TRANSL(T)
+%	TR = TRANSL( P )
+%
+% Returns a homogeneous transformation for the point P = [X Y Z].  If P is an
+% Mx3 matrix return a 4x4xM matrix representing a sequence of homogenous transforms.
+%
+%
+%	P = TRANSL(T)
 %
 % Returns the translational part of a homogenous transform as a 3-element 
-% column vector.
+% column vector as a column vector.
 %
-%	[X Y Z] = TRANSL(TG)
-%
-% Returns a  matrix of the X, Y and Z elements extracted from a Cartesian 
-% trajectory matrix TG.
+% If T has 3 dimensions, ie. 4x4xM it is considered a homgoeneous transform
+% sequence and returns an Mx3 matrix where each row is the translational component
+% corresponding to each transform.
 %
 % See also: CTRAJ.
 
@@ -36,17 +40,26 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function r = transl(x, y, z)
-	if nargin == 1,
+	if nargin == 1
 		if ishomog(x),
+            % T -> P
 			r = x(1:3,4);
-		elseif ndims(x) == 3,
+		elseif ndims(x) == 3
+            % T -> P
 			r = squeeze(x(1:3,4,:))';
-		else
+		elseif numrows(x) == 1
+            % P -> T
 			t = x(:);
 			r =    [eye(3)			t;
 				0	0	0	1];
+        else
+            % P -> T
+            n = numrows(x);
+            r = repmat(eye(4,4), [1 1 n]);
+            r(1:3,4,:) = x';
 		end
-	elseif nargin == 3,
+	elseif nargin == 3
+        % P -> T
 		t = [x; y; z];
 		r =    [eye(3)			t;
 			0	0	0	1];
