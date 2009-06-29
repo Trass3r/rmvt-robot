@@ -32,7 +32,7 @@
 %  4/99 use new robot object
 %  4/02 tidyup, remove multiple solutions
 
-function theta = ikine6s(robot, T,configuration)
+function theta = ikine6s(robot, T, varargin)
 
 	if robot.n ~= 6,
 		error('Solution only applicable for 6DOF manipulator');
@@ -45,11 +45,8 @@ function theta = ikine6s(robot, T,configuration)
 	if ndims(T) == 3,
 		theta = [];
 		for k=1:size(T,3),
-			if nargin < 3,
-				theta = [theta; ikine560(robot, T(:,:,k))];
-			else
-				theta = [theta; ikine560(robot, T(:,:,k), configuration)];
-			end
+            th = ikine6s(robot, T(:,:,k), varargin{:});
+            theta = [theta; th];
 		end
 
 		return;
@@ -96,7 +93,7 @@ function theta = ikine6s(robot, T,configuration)
 	if nargin < 3,
 		configuration = '';
 	else
-		configuration = lower(configuration);
+		configuration = lower(varargin{1});
 	end
 
 	% default configuration
@@ -161,7 +158,9 @@ function theta = ikine6s(robot, T,configuration)
 	r=sqrt(V114^2 + Pz^2);
 	Psi = acos((a2^2-d4^2-a3^2+V114^2+Pz^2)/(2.0*a2*r));
 	if ~isreal(Psi),
-		error('point not reachable');
+		warning('point not reachable');
+        theta = [NaN NaN NaN NaN NaN NaN];
+        return
 	end
 	theta(2) = atan2(Pz,V114) + n2*Psi;
 
@@ -227,4 +226,8 @@ function theta = ikine6s(robot, T,configuration)
 	num = -V412*cos(theta(5)) - V332*sin(theta(5));
 	den = - V432;
 	theta(6) = atan2(num,den);
-	%[num den]
+
+    % remove the link offset angles
+    for i=1:6
+        theta(i) = theta(i) - L(i).offset;
+    end
