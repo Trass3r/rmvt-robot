@@ -4,7 +4,7 @@ import	java.lang.*;
 
 /**
  * A class to simplify symbolic transform expressions.
- * @author Peter I. Corke pic@cat.csiro.au
+ * @author Peter I. Corke peter.i.corke@gmail.com
  */
 
 /**
@@ -14,39 +14,70 @@ import	java.lang.*;
  *		RX, RY, RZ	pure rotations about the X, Y and Z axes respectively
  *		DH			Denavit-Hartenberg joint transformation
  *
+ *	public boolean istrans()
+ *	public boolean isrot()
+ *	public int axis()
+ *	public boolean isjoint() {
+ *	public boolean factorMatch(int dhWhich, int i, int verbose) {
+ *	public void add(Element e) {
+ *	public Element(int type, int constant) {
+ *	public Element(int type)	// new of specified type
+ *
+ *	public static String toString(Element [] e) {
+ *	public String argString() {
+ *	public String toString() {
+ *
+ * Constructors:
+ *	Element(Element e) 	// clone of argument
+ *	Element(Element e, int type, int sign) // clone of argument with new type
+ *	Element(Element e, int type) // clone of argument with new type
+ *	Element(String s)
  */
 class Element {
-	private int		type;
+    static final int    TX = 0,
+                        TY = 1,
+                        TZ = 2,
+                        RX = 3,
+                        RY = 4,
+                        RZ = 5,
+                        DH_STANDARD = 6,
+                        DH_MODIFIED = 7;
 
-	// transform parameters
-	private String	var;
-	private String	symconst;
-	private int		constant;
+    // one of TX, TY ... RZ, DH_STANDARD/MODIFIED
+	int		type;
 
-	// DH parameters
-	private String	theta,	
-			A,
-			D,
-			alpha;
+	// transform parameters, only one of these is set
+	String	var;        // eg. q1
+	String	symconst;   // eg. L1
+	int		constant;   // eg. 90
 
-	private static int[]	rules = new int[20];	// class variable
+	// DH parameters, only set if type is DH_STANDARD/MODIFIED
+	String	theta,	
+            A,
+            D,
+            alpha;
+    int     prismatic;
 
-	private static final int	TX = 0,
-								TY = 1,
-								TZ = 2,
-								RX = 3,
-								RY = 4,
-								RZ = 5;
-	public static final int		DH_STANDARD = 6,
-								DH_MODIFIED = 7;
-	private static final String[] typeName = {
+    // an array of counters for the application of each rule
+    // just for debugging.
+	static int[]	rules = new int[20];	// class variable
+
+    // mapping from type to string
+	static final String[] typeName = {
 		"Tx", "Ty", "Tz", "Rx", "Ry", "Rz", "DH", "DHm"};
 
-	private static final int dhStandard[][] = {
+    // order of elementary transform for each DH convention
+    // in each tuple, the first element is the transform type,
+    // the second is true if it can be a joint variable.
+	static final int dhStandard[][] = {
 			{RZ, 1}, {TX, 0}, {TZ, 1}, {RX, 0} };
-	private static final int dhModified[][] = {
+	static final int dhModified[][] = {
 			{RX, 0}, {TX, 0}, {RZ, 1}, {TZ, 1} };
 
+    /*
+     * Display the number of times each rule was used in the
+     * conversion.
+     */
 	public static void showRuleUsage() {
 		for (int i=0; i<20; i++)
 			if (rules[i] > 0)
@@ -54,14 +85,23 @@ class Element {
 					rules[i]);
 	}
 
+    // test if the Element is a translation, eg. TX, TY or TZ
 	public boolean istrans() {
 		return (type == TX) || (type == TY) || (type == TZ);
 	}
 
+    // test if the Element is a rotation, eg. RX, RY or RZ
 	public boolean isrot() {
 		return (type == RX) || (type == RY) || (type == RZ);
 	}
 
+    // true if this transform represents a joint coordinate, ie. not
+    // a constant
+	public boolean isjoint() {
+		return this.var != null;
+	}
+
+    // return the axis, 0 for X, 1 for Y, 2 for Z
 	public int axis() {
 		switch (type) {
 		case TX:
@@ -78,6 +118,53 @@ class Element {
 		}
 	}
 
+    // return the summation of two symbolic parameters as a string
+	private String symAdd(String s1, String s2)
+	{
+		if ( (s1 == null) && (s2 == null) )
+			return null;
+		else if ( (s1 != null) && (s2 == null) )
+			return new String(s1);
+		else if ( (s1 == null) && (s2 != null) )
+			return new String(s2);
+		else {
+			return s1 + "+" + s2;
+		}
+	}
+
+    /**
+     * Add the argument of another Element to this element.
+     * assumes that variable has not already been set
+     * used by factor() to build a DH element
+     */
+	public void add(Element e) {
+		if ((this.type != DH_STANDARD) && (this.type != DH_MODIFIED))
+			throw new IllegalArgumentException("wrong element type " + this);
+		
+		System.out.println("  adding: " + this + " += "  + e);
+		switch (e.type) {
+		case RZ:
+			this.theta = e.argString(); 
+            if (e.isjoint())
+                this.prismatic = 0;
+            break;
+		case TX:
+			this.A = e.argString(); break;
+		case TZ:
+			this.D = e.argString(); 
+            if (e.isjoint())
+                this.prismatic = 1;
+            break;
+		case RX:
+			this.alpha = e.argString(); break;
+		default:
+			throw new IllegalArgumentException("cant factorize " + e);
+		}
+	}
+
+
+    // test if this particular element could be part of a DH term
+    //  eg. Rz(q1) can be, Rx(q1) cannot.
 	public boolean factorMatch(int dhWhich, int i, int verbose) {
 		int	dhFactors[][];
 		boolean	match;
@@ -101,23 +188,6 @@ class Element {
 					" to " + typeName[dhFactors[i][0]] + "<" +
 					dhFactors[i][1] + ">" + " -> " + match);
 		return match;
-	}
-
-	public boolean isjoint() {
-		return this.var != null;
-	}
-
-	private String symAdd(String s1, String s2)
-	{
-		if ( (s1 == null) && (s2 == null) )
-			return null;
-		else if ( (s1 != null) && (s2 == null) )
-			return new String(s1);
-		else if ( (s1 == null) && (s2 != null) )
-			return new String(s2);
-		else {
-			return s1 + "+" + s2;
-		}
 	}
 
 	/**
@@ -228,9 +298,11 @@ class Element {
 	}
 			
 	/**
-	 * Substitute this transform
+	 * Substitute this transform for a triple of transforms
+     * that includes an RZ or TZ.
+     *
 	 * @return	- null if no substituion required
-	 *			- array of Elements to subsitute
+	 *			- array of Elements to substitute
 	 */
 	Element[] substituteToZ() {
 
@@ -261,6 +333,7 @@ class Element {
 			return null;
 		}
 	}
+
 	Element[] substituteToZ(Element prev) {
 
 		Element[] s = new Element[3];
@@ -290,6 +363,7 @@ class Element {
 			return null;
 		}
 	}
+
 	/**
 	 * Simple rewriting rule for adjacent transform pairs.  Attempt to
 	 * eliminate TY and RY.
@@ -303,81 +377,61 @@ class Element {
 
 		if (prev.isjoint() || this.isjoint())
 			return null;
-		/*
-		 * needed for acrobot case
-		 *	push RY, TY to the right
-		 */
+        /*
+         * rules for R R
+         */
 		if ((prev.type == RX) && (this.type == TY)) {
-				// RX.TY := TZ.RX
+				// RX.TY -> TZ.RX
 				s[0] = new Element(this, TZ);
 				s[1] = new Element(prev);
 				rules[0]++;
 				return s;
-		} else if ((prev.type == RY) && (this.type == TX)) {
-				// RY.TX(L) := TZ(-L).RY
-				s[0] = new Element(this, TZ, -1);
-				s[1] = new Element(prev);
-				rules[1]++;
-				return s;
 		} else if ((prev.type == RX) && (this.type == TZ)) {
-				// RX.TZ(L) := TY(-L).RX
+				// RX.TZ(L) -> TY(-L).RX
 				s[0] = new Element(this, TY, -1);
 				s[1] = new Element(prev);
 				rules[2]++;
 				return s;
-		} else if ((prev.type == RY) && (this.type == RX)) {
-				// RY(Q).RX := RX.RZ(-Q)
-				s[0] = new Element(this);
-				s[1] = new Element(prev, RZ, -1);
-				rules[3]++;
-				return s;
-		} else if ((prev.type == RX) && (this.type == RY)) {
-				// RX.RY := RZ.RX
-				s[0] = new Element(this, RZ);
+		} else if ((prev.type == RY) && (this.type == TX)) {
+				// RY.TX(L) -> TZ(-L).RY
+				s[0] = new Element(this, TZ, -1);
 				s[1] = new Element(prev);
-				rules[4]++;
+				rules[1]++;
+				return s;
+		} else if ((prev.type == RY) && (this.type == TZ)) {
+				// RY.TZ(L) -> TX(L).RY
+				s[0] = new Element(this, TX, this.constant);
+				s[1] = new Element(prev);
+				rules[11]++;
 				return s;
 		} else if ((prev.type == TY) && (this.type == RX)) {
-				// TY(L).RX := RX.TZ(-L)
+				// TY(L).RX -> RX.TZ(-L)
 				s[0] = new Element(this);
 				s[1] = new Element(prev, TZ, -1);
 				rules[5]++;
 				//return s;
 				return null;
+		} else if ((prev.type == RY) && (this.type == RX)) {
+				// RY(Q).RX -> RX.RZ(-Q)
+				s[0] = new Element(this);
+				s[1] = new Element(prev, RZ, -1);
+				rules[3]++;
+				return s;
+		} else if ((prev.type == RX) && (this.type == RY)) {
+				// RX.RY -> RZ.RX
+				s[0] = new Element(this, RZ);
+				s[1] = new Element(prev);
+				rules[4]++;
+				return s;
 		} else if ((prev.type == RZ) && (this.type == RX)) {
-				// RZ.RX := RX.RY
+				// RZ.RX -> RX.RY
 				s[0] = new Element(this);
 				s[1] = new Element(prev, RY);
 				//rules[10]++;
 				//return s;
 				return null;
-		} else if ((prev.type == RY) && (this.type == TZ)) {
-				// RY.TZ(L) = TX(L).RY
-				s[0] = new Element(this, TX);
-				s[1] = new Element(prev);
-				rules[11]++;
-				return s;
 		}
 		return null;
-	}
-
-	public void add(Element e) {
-		if ((this.type != DH_STANDARD) && (this.type != DH_MODIFIED))
-			throw new IllegalArgumentException("wrong element type " + this);
-		
-		System.out.println("  adding: " + this + " += "  + e);
-		switch (e.type) {
-		case RZ:
-			this.theta = e.argString(); break;
-		case TX:
-			this.A = e.argString(); break;
-		case TZ:
-			this.D = e.argString(); break;
-		case RX:
-			this.alpha = e.argString(); break;
-		default:
-			throw new IllegalArgumentException("cant factorize " + e);
-		}
 	}
 
 	/*
@@ -486,6 +540,7 @@ class Element {
 	}
 
 	// class method to convert Element vector to string
+    /*
 	public static String toString(Element [] e) {
 		String 	s = "";
 
@@ -493,7 +548,13 @@ class Element {
 			s += e + " ";
 		return s;
 	}
+    */
 
+    /*
+     * Return a string representation of the parameters (argument)
+     * of the element, which can be a number, symbolic constant,
+     * or a joint variable.
+     */
 	public String argString() {
 		String s = "";
 
@@ -530,6 +591,10 @@ class Element {
 		return s;
 	}
 
+    /*
+     * Return a string representation of the element.
+     *  eg. Rz(q1), Tx(L1), Rx(90), DH(....)
+     */
 	public String toString() {
 
 		String s = typeName[type] + "(";
@@ -537,13 +602,39 @@ class Element {
 		s += ")";
 		return s;
 	}
+
+    /*
+    public String rotation() {
+    }
+
+    public String translation() {
+    }
+    */
 }
 
 /**********************************************************************
+/* A list of Elements.  Subclass of Java's arrayList
  *
- **********************************************************************/
+ *	public int factorize(int dhWhich, int verbose) 
+ *
+ *	public int floatRight() {
+ *	public int swap(int dhWhich) {
+ *	public int substituteToZ() {
+ *	public int substituteToZ2() {
+ *	public int substituteY() {
+ *	public int merge() {
+ *	public void simplify() {
+ *	public ElementList() {	// constructor, use superclass
+ *	public String toString() {
+ */
 class ElementList extends ArrayList {
 
+    /**
+     * Attempt to group this and subsequent elements into a DH term
+     * @return: the number of factors matched, zero means no DH term found
+     *
+     * Modifies the ElementList and compresses the terms.
+     */
 	public int factorize(int dhWhich, int verbose) {
 
 		int	match, jvars;
@@ -846,18 +937,151 @@ class ElementList extends ArrayList {
 
 		return s;
 	}
+
+    /*
+    static String jstr2offset(String s) {
+        int i;
+        
+        if (s != null) {
+            i = s.indexOf("+");
+            if (i >= 0)
+                return s.substring(i);
+            i = s.indexOf("-");
+            if (i >= 0)
+                return s.substring(i);
+        }
+        return "0";
+    }
+
+    static String convertMatlab(String s)
+    {
+        if (s == null)
+            return " 0";
+        return " " + s;
+    }
+
+    public String toMatlab(String robot) {
+		String	dh = "[";
+        String  offs = "[";
+        String  base = "";
+        String  tool = "";
+        String  theta, a, d, alpha;
+        int     dhSeenYet = 0;
+        Element e;
+
+		for (int i=0; i<this.size(); i++) {
+			e = (Element) this.get(i);
+            if (e.type == Element.DH_STANDARD) {
+                dhSeenYet = 1;
+                // build up the string: theta a d alpha
+                if (e.prismatic == 1) {
+                    // prismatic joint
+                    d = "0";    // by definition
+                    offs += jstr2offset(e.D) + " ";
+                    theta = (e.theta == null) ? "0" : e.theta;
+                } else {
+                    // revolute joint
+                    theta = "0";    // by definition
+                    offs += jstr2offset(e.theta) + " ";
+                    d = (e.D == null) ? "0" : e.D;
+                }
+
+                a = (e.A == null) ? "0" : e.A;
+                alpha = (e.alpha == null) ? "0" : e.alpha;
+
+                s += theta;
+                s += ", ";
+                s += a;
+                s += ", ";
+                s += d;
+                s += ", ";
+                s += alpha;
+                s += "; ";
+            } else {
+                // found some primitive transform, these will be
+                // part of base or tool
+                String  xform = "";
+
+                switch (type) {
+                case RX:    xform += "*trotx(" + e.rotation() + ")"; break;
+                case RY:    xform += "*troty(" + e.rotation() + ")"; break;
+                case RZ:    xform += "*trotz(" + e.rotation() + ")"; break;
+                case TX:    xform += "*transl(" + e.translation + "0,0)"; break;
+                case TY:    xform += "*transl(0, " + e.translation + ",0)"; break;
+                case TZ:    xform += "*transl(0,0," + e.translation + ")"; break;
+                }
+
+                // scrape the leading * off
+                if (xform.length() > 0)
+                    xform = xform.substring(2);
+
+                // assign this string to base or tool depending on
+                // whether or not we've seen the DH terms go by
+                if (dhSeenYet == 0)
+                    base = xform;
+                else
+                    tool = xform;
+            }
+        }
+        dh += "]";
+        offs += "]";
+
+        // build the matlab string
+
+        s = "robot(" + dh + ", " + robot ;
+
+        if (base.length() > 0)
+            s += ", 'base', " + base;
+        if (tool.length() > 0)
+            s += ", 'tool', " + tool;
+        s += ");";
+
+		return s;
+	}
+    */
 }
 
 public class dh {
 
-	public static void parse(BufferedReader src) {
+	public dh(String src) {
+        System.err.println("Modified hello from dh constructor\n");
+
+        parseString(src);
+    }
+
+	public static ElementList parseFile(String filename) {
+		BufferedReader	src;
 		String			buffer;
 
+		try {
+            File file = new File(filename);
+
+            if (!file.canRead() || !file.isFile())
+                throw new IOException("dh: file access/type error");
+
+            src = new BufferedReader(new FileReader(file));
+
+            // read the file and parse it
+            src = new BufferedReader(new FileReader(file));
+            buffer = src.readLine();
+
+        return parseString(buffer);
+		}
+		catch (FileNotFoundException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+		catch (IOException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+        return null;
+    }
+
+	public static ElementList parseString(String buffer) {
 		ElementList l = new ElementList();
 
 		try {
-			// read the file and parse it
-			buffer = src.readLine();
 			System.out.println(buffer);
 			StringTokenizer tokens = new StringTokenizer(buffer, " *.");
 
@@ -872,44 +1096,26 @@ public class dh {
 			l.factorize(Element.DH_STANDARD, 0);
 			System.out.println(l);
 
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
+            return l;
 		}
 		catch (IllegalArgumentException e) {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
+        return null;
 	}
 
 	public static void main(String args[]) {
 
-		BufferedReader	src;
+        ElementList l;
 
-		try {
-			if (args.length > 0) {
-				System.out.println(args[0]);
-				File file = new File(args[0]);
-
-				if (!file.canRead() || !file.isFile())
-					throw new IOException("dh: file access/type error");
-
-				src = new BufferedReader(new FileReader(file));
-			} else
-				src = new BufferedReader(new InputStreamReader(System.in));
-
-			parse(src);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
-		Element.showRuleUsage();
-
-	}
+        if (args.length > 0) {
+            l = parseFile(args[0]);
+            System.err.println( l );
+            Element.showRuleUsage();
+        } else {
+            System.err.println("no file name specified\n");
+            System.exit(1);
+        }
+    }
 }
