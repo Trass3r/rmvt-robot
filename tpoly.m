@@ -1,4 +1,4 @@
-function [s,sd,sdd] = tg1(q0, qf, t, qd0, qdf)
+function [s,sd,sdd] = tpoly(q0, qf, t, qd0, qdf)
 
     if isscalar(t)
         t = [0:(t-1)]';
@@ -12,22 +12,27 @@ function [s,sd,sdd] = tg1(q0, qf, t, qd0, qdf)
         qdf = 0;
     end
     
-
-    tscal = max(t);
-    t = t / tscal;  % normalized t
+    tf = max(t);
     
-    A = 6*(qf - q0) - 3*(qdf+qd0)*tscal;
-    B = -15*(qf - q0) + (8*qd0 + 7*qdf)*tscal;
-    C = 10*(qf - q0) - (6*qd0 + 4*qdf)*tscal;
-    D = 0;
-    E = qd0*tscal; % as the t vector has been normalized
-    F = q0;
+    % solve for the polynomial coefficients using least squares
+    X = [
+        0           0           0         0       0   1
+        tf^5        tf^4        tf^3      tf^2    tf  1
+        0           0           0         0       1   0
+        5*tf^4      4*tf^3      3*tf^2    2*tf^2  tf  0
+        0           0           0         1       0   0
+        20*tf^3     12*tf^2     6*tf      2       0   0
+    ];
+    coeffs = (X \ [q0 qf qd0 qdf 0 0]')';
 
-    coeffs = [A B C D E F];
+    % coefficients of derivatives 
+    coeffs_d = [coeffs(1:5)] .* [5:-1:1];
+    coeffs_dd = [coeffs_d(1:4)] .* [4:-1:1];
 
+    % evaluate the polynomials
     p = polyval(coeffs, t);
-    pd = polyval([5*A 4*B 3*C 2*D E], t) / tscal;
-    pdd = polyval([20*A 12*B 6*C 2*D], t) / tscal^2;
+    pd = polyval(coeffs_d, t);
+    pdd = polyval(coeffs_dd, t);
 
     switch nargout
         case 0
