@@ -39,7 +39,7 @@ function t = trinterp(T0, T1, r)
         p0 = transl(T0);
         p1 = transl(T1);
 
-        qr = qinterp(q0, q1, r);
+        qr = q0.interp(q1, r);
         pr = p0*(1-r) + r*p1;
     elseif nargin == 2,
         r = T1;
