@@ -80,8 +80,6 @@ classdef robot
         lineopt
         shadowopt
 
-        offset
-        qlim
     end
 
     properties (SetAccess = private)
@@ -97,6 +95,11 @@ classdef robot
         dyn
         dh
         spherical
+    end
+
+    properties (Dependent = true)
+        offset
+        qlim
     end
 
     methods
@@ -258,6 +261,7 @@ classdef robot
             for i=1:r.n,
                 L(i).offset = v(i);
             end
+            r.links = L;
         end
 
         function v = get.offset(r)
@@ -272,6 +276,7 @@ classdef robot
             for i=1:r.n,
                 L(i).qlim = v(i,:);
             end
+            r.links = L;
         end
 
         function v = get.qlim(r)
