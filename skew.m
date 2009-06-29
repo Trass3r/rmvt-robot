@@ -32,7 +32,8 @@ function S = skew(v)
         S = [  0   -v(3)  v(2)
               v(3)  0    -v(1)
              -v(2) v(1)   0];
-	else
-		d = [	t1(1:3,4);
-			0.5*[t1(3,2)-t1(2,3); t1(1,3)-t1(3,1); t1(2,1)-t1(1,2)]];
+    elseif isrot(v)
+        S = 0.5*[v(3,2)-v(2,3); v(1,3)-v(3,1); v(2,1)-v(1,2)];
+    else
+        error('argument must be 3-vector or 3x3 matrix');
 	end
