@@ -29,6 +29,16 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function r = trnorm(t)
+
+    if ndims(t) == 3
+        nd = size(t, 3);
+        r = zeros(4,4,nd);
+        for i=1:nd,
+            r(:,:,i) = trnorm(t(:,:,i));
+        end
+        return
+    end
+
 	n = cross(t(1:3,2), t(1:3,3));	% N = O x A
     o = cross(t(1:3,3), n);         % O = A x N
 	r = [unit(n) unit(t(1:3,2)) unit(t(1:3,3)) t(1:3,4); 0 0 0 1];
