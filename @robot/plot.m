@@ -309,10 +309,10 @@ function o = plot_options(robot, optin)
 		%
 		% simple heuristic to figure the maximum reach of the robot
 		%
-		L = robot.link;
+		L = robot.links;
 		reach = 0;
 		for i=1:robot.n,
-			reach = reach + abs(L{i}.A) + abs(L{i}.D);
+			reach = reach + abs(L(i).a) + abs(L(i).d);
 		end
 		o.dims = [-reach reach -reach reach -reach reach];
 		o.mag = reach/10;
@@ -406,13 +406,13 @@ function h = create_new_robot(robot, opt)
 	% each joint, as well as axis centerline.
 	%
 	if opt.joints,
-		L = robot.link;
+		L = robot.links;
 		for i=1:robot.n,
             
             if ~isempty(opt.cylinder),
 
                 % cylinder or box to represent the joint
-                if L{i}.sigma == 0,
+                if L(i).sigma == 0,
                     N = 16;
                 else
                     N = 4;
@@ -463,7 +463,7 @@ function animate(robot, q)
 
 	n = robot.n;
 	h = robot.handle;
-	L = robot.link;
+	L = robot.links;
 
 	mag = h.mag;
 
@@ -483,7 +483,7 @@ function animate(robot, q)
 	for j=1:n,
 		Tn(:,:,j) = t;
 
-		t = t * L{j}(q(j));
+		t = t * L(j).A(q(j));
 
 		x = [x; t(1,4)];
 		y = [y; t(2,4)];
