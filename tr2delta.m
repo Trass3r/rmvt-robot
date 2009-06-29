@@ -27,16 +27,13 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function S = skew(v)
-    if isvector(v),
-        S = [  0   -v(3)  v(2)
-              v(3)  0    -v(1)
-             -v(2) v(1)   0];
+function delta = tr2delta(T1, T2)
+    if nargin == 1
+        dT = T1;
     else
-        if ishomog(v)
-            d = [	v(1:3,4);
-                0.5*[v(3,2)-v(2,3); v(1,3)-v(3,1); v(2,1)-v(1,2)]];
-        else
-            S = 0.5*[v(3,2)-v(2,3); v(1,3)-v(3,1); v(2,1)-v(1,2)];
-        end
-	end
+        % T2 = T1. Tdelta 
+        % => inv(T1).T2 = Tdelta
+        dT = inv(T1) * T2;
+    end
+
+    delta = [	dT(1:3,4); skew( t2r(dT) ) ];
