@@ -8,9 +8,9 @@
 % The output is a trajectory MxN matrix, with one row per time step, and
 % one column per axis.
 %
-%   segments is a matrix of via points, 1 row per via point, one column per axis
-%   qdmax is a vector of axis velocity limits
-%   q is a vector of initial axis coordinates
+%   segments is a NxM matrix of via points, 1 row per via point, one column per axis
+%   qdmax is a row N-vector of axis velocity limits, or a column M-vector of segment times
+%   q is a N-vector of initial axis coordinates
 %   dt is the time step
 %   tacc is the acceleration time.
 %
@@ -37,7 +37,7 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function [TG, taxis]  = mstraj(segments, qdmax, q, dt, tacc, qd0, qdf)
+function [TG, taxis]  = mstraj(segments, qdmax, q, dt, Tacc, qd0, qdf)
 
     ns = numrows(segments);
     nj = numcols(segments);
@@ -67,6 +67,13 @@ function [TG, taxis]  = mstraj(segments, qdmax, q, dt, tacc, qd0, qdf)
         end
 
         % set the blend time, just half an interval for the first segment
+
+        if length(Tacc) > 1
+            tacc = Tacc(seg);
+        else
+            tacc = Tacc;
+        end
+
         tacc = ceil(tacc/dt)*dt;
         tacc2 = ceil(tacc/2/dt) * dt;
         if seg == 1
@@ -87,22 +94,30 @@ function [TG, taxis]  = mstraj(segments, qdmax, q, dt, tacc, qd0, qdf)
         %   qb = f(tb, max acceleration)
         %   dq = q_next - q_prev - qb
         %   tl = abs(dq) ./ qdmax;
-        qb = taccx * qdmax / 2;        % distance moved during blend
-        tb = taccx;
 
-        % convert to time
-        tl = abs(dq) ./ qdmax;
-        %tl = abs(dq - qb) ./ qdmax;
-        tl = ceil(tl/dt) * dt;
+        if size(qdmax, 1) == 1
+            % qdmax is specified, compute slowest axis
 
-        % find the total time and slowest axis
-        tt = tb + tl;
-        [tseg,slowest] = max(tt);
-        taxis(seg,:) = tt;
+            qb = taccx * qdmax / 2;        % distance moved during blend
+            tb = taccx;
 
-        % best if there is some linear motion component
-        if tseg <= 2*tacc
-            tseg = 2 * tacc;
+            % convert to time
+            tl = abs(dq) ./ qdmax;
+            %tl = abs(dq - qb) ./ qdmax;
+            tl = ceil(tl/dt) * dt;
+
+            % find the total time and slowest axis
+            tt = tb + tl;
+            [tseg,slowest] = max(tt);
+            taxis(seg,:) = tt;
+
+            % best if there is some linear motion component
+            if tseg <= 2*tacc
+                tseg = 2 * tacc;
+            end
+        else
+            % segment time specified, use that
+            tseg = qdmax(seg);
         end
 
         % log the planned arrival time
