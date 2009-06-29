@@ -52,6 +52,10 @@
 %   q.t               4x4 homogeneous transform matrix
 %   q.dot             derivative of quaternion
 
+% TODO
+%  constructor handles R, T trajectory and returns vector
+%  .r, .t on a quaternion vector??
+
 classdef quaternion
 
     properties (Dependent = true)
@@ -410,6 +414,7 @@ classdef quaternion
             end
 
             trplot( Q.r, varargin{:});
+            drawnow
         end
 
         function r = get.r(q)
