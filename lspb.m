@@ -43,8 +43,7 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
         % return the time to complete, not the path
         return
     end
-	tb = (q0 - q1 + V*tf)./V
-	tb
+	tb = (q0 - q1 + V*tf)./V;
 	a = V./tb;
 
     p = zeros(length(t), 1);
