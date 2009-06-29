@@ -64,8 +64,10 @@ function qt = ikine(robot, tr, q, m, newopt)
 	%  set default parameters for solution
 	opt.ilimit = 1000;
 	opt.tol = 1e-6;
-    opt.debug = true;
-    opt.lambda = 1.0;
+    opt.debug = false;
+    opt.lambda = 10;
+    % 0.4 for Puma
+    % 10 for leg
     opt.useInverse = false;
 
     % with no arguments, return the default parameters as a struct
@@ -126,7 +128,7 @@ function qt = ikine(robot, tr, q, m, newopt)
 
             % error is based on the square sub-Jacobian
             if opt.useInverse
-                dq = opt.lambda * inv( J(m,:) ) * e(m);
+                dq = opt.lambda * pinv( J(m,:) ) * e(m);
             else
                 dq = opt.lambda *  J(m,:)' * e(m);
             end
@@ -142,7 +144,7 @@ function qt = ikine(robot, tr, q, m, newopt)
             count = count+1;
             if count > opt.ilimit,
                 fprintf('i=%d, nm=%f\n', i, nm);
-                error( sprintf('Solution wouldn''t converge, final error %.4f', nm) )
+                error( sprintf('Solution wouldn''t converge, final error %.4g', nm) )
             end
         end
         qt(i,:) = q';
