@@ -32,6 +32,7 @@
 %
 % options is a list of any of the following:
 % 'workspace', [xmin, xmax ymin ymax zmin zmax]
+% 'delay', delay		delay betwen frames for animation (s)
 % 'perspective' 'ortho' controls camera view mode
 % 'raise' 'noraise'		controls autoraise of current figure on plot
 % 'render' 'norender'   controls shaded rendering after drawing
@@ -41,11 +42,10 @@
 % 'name', 'noname'		display the robot's name 
 % 'shadow' 'noshadow'		controls display of shadow
 % 'xyz' 'noa'			wrist axis label
-% 'joints' 'nojoints'		controls display of joints
+% 'jaxes', 'nojaxes'    control display of joint axes
+% 'joints' 'nojoints'	controls display of joints
 % 'cylinder', [r g b]   color for joint cylinders
-% 'nocylinder'          don't draw joint cylinders
 % 'mag' scale			annotation scale factor
-% 'raise', 'noraise'    automatically raise the figure after plot
 %
 % The options come from 3 sources and are processed in the order:
 % 1. Cell array of options returned by the function PLOTBOTOPT
@@ -198,7 +198,8 @@ function rnew = plot(robot, tg, varargin)
     while count > 0
 	    for p=1:np,
             for r=rh',
-                animate( get(r, 'UserData'), tg(p,:));
+                animate( get(r, 'UserData'), tg(p,:), opt);
+                pause(opt.delay)
             end
 	    end
         count = count - 1;
@@ -230,8 +231,9 @@ function o = plot_options(robot, optin)
 	o.repeat = 1;
 	o.shadow = true;
 	o.wrist = true;
+    o.jaxes = true;
 	o.dims = [];
-	o.base = 0;
+	o.base = false;
 	o.wristlabel = 'xyz';
 	o.projection = 'perspective';
 	o.magscale = 1;
@@ -265,17 +267,17 @@ function o = plot_options(robot, optin)
 			o.projection = 'orthographic';
         case 'raise'
 			o.raise = true;
+        case 'noraise'
+			o.raise = false;
 		case 'norender'
 			o.raise = false;
         case 'cylinder'
             o.cylinder = options{i+1};
             i = i+1;
-        case 'nocylinder',
-            o.cylinder = [];
 		case 'base'
-			o.base = 1;
+			o.base = true;
 		case 'nobase'
-			o.base = 0;
+			o.base = false;
 		case 'loop'
 			o.repeat = Inf;
 		case 'noloop'
@@ -285,13 +287,17 @@ function o = plot_options(robot, optin)
 		case 'noname',
 			o.name = 0;
 		case 'wrist'
-			o.wrist = 1;
+			o.wrist = true;
 		case 'nowrist'
-			o.wrist = 0;
+			o.wrist = false;
+        case 'jaxes'
+            o.jaxes = true;
+        case 'nojaxes'
+            o.jaxes = false;
 		case 'shadow'
-			o.shadow = 1;
+			o.shadow = true;
 		case 'noshadow'
-			o.shadow = 0;
+			o.shadow = false;
 		case 'xyz'
 			o.wristlabel = 'XYZ';
 		case 'noa'
@@ -409,51 +415,51 @@ function h = create_new_robot(robot, opt)
 	% display cylinders (revolute) or boxes (pristmatic) at
 	% each joint, as well as axis centerline.
 	%
-	if opt.joints,
-		L = robot.links;
-		for i=1:robot.n,
-            
-            if ~isempty(opt.cylinder),
+    L = robot.links;
+    for i=1:robot.n,
+        
+        if opt.joints
 
-                % cylinder or box to represent the joint
-                if L(i).sigma == 0,
-                    N = 16;
-                else
-                    N = 4;
-                end
-                % define the vertices of the cylinder
-                [xc,yc,zc] = cylinder(opt.mag/4, N);
-                zc(zc==0) = -opt.mag/2;
-                zc(zc==1) = opt.mag/2;
-
-                % create vertex color data
-                cdata = zeros(size(xc));
-                for j=1:3,
-                    cdata(:,:,j) = opt.cylinder(j);
-                end
-                % render the surface
-                h.joint(i) = surface(xc,yc,zc,cdata);
-                
-                % set the surfaces to be smoothed and translucent
-                set(h.joint(i), 'FaceColor', 'interp');
-                set(h.joint(i), 'EdgeColor', 'none');
-                set(h.joint(i), 'FaceAlpha', 0.7);
-
-                % build a matrix of coordinates so we
-                % can transform the cylinder in animate()
-                % and hang it off the cylinder
-                xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
-                set(h.joint(i), 'UserData', xyz);
+            % cylinder or box to represent the joint
+            if L(i).sigma == 0,
+                N = 16;
+            else
+                N = 4;
             end
+            % define the vertices of the cylinder
+            [xc,yc,zc] = cylinder(opt.mag/4, N);
+            zc(zc==0) = -opt.mag/2;
+            zc(zc==1) = opt.mag/2;
+
+            % create vertex color data
+            cdata = zeros(size(xc));
+            for j=1:3,
+                cdata(:,:,j) = opt.cylinder(j);
+            end
+            % render the surface
+            h.joint(i) = surface(xc,yc,zc,cdata);
             
-			% add a dashed line along the axis
-			h.jointaxis(i) = line('xdata', [0;0], ...
-				'ydata', [0;0], ...
-				'zdata', [0;0], ...
-				'color', 'blue', ...
-				'linestyle', ':');
+            % set the surfaces to be smoothed and translucent
+            set(h.joint(i), 'FaceColor', 'interp');
+            set(h.joint(i), 'EdgeColor', 'none');
+            set(h.joint(i), 'FaceAlpha', 0.7);
+
+            % build a matrix of coordinates so we
+            % can transform the cylinder in animate()
+            % and hang it off the cylinder
+            xyz = [xc(:)'; yc(:)'; zc(:)'; ones(1,2*N+2)]; 
+            set(h.joint(i), 'UserData', xyz);
+        end
+
+        if opt.jaxes
+            % add a dashed line along the axis
+            h.jointaxis(i) = line('xdata', [0;0], ...
+                'ydata', [0;0], ...
+                'zdata', [0;0], ...
+                'color', 'blue', ...
+                'linestyle', ':');
             h.jointlabel(i) = text(0, 0, 0, num2str(i), 'HorizontalAlignment', 'Center');
-		end
+        end
 	end
 
 %ANIMATE   move an existing graphical robot
@@ -463,7 +469,7 @@ function h = create_new_robot(robot, opt)
 % Move the graphical robot to the pose specified by the joint coordinates q.
 % Graphics are defined by the handle structure robot.handle.
 
-function animate(robot, q)
+function animate(robot, q, opt)
 
 	n = robot.n;
 	h = robot.handle;
@@ -526,10 +532,12 @@ function animate(robot, q)
 				'Zdata', zc);
 
 			xyzl = Tn(:,:,j) * xyz_line;
-			set(h.jointaxis(j), 'Xdata', xyzl(1,:), ...
-				'Ydata', xyzl(2,:), ...
-				'Zdata', xyzl(3,:));
-            set(h.jointlabel(j), 'Position', xyzl(1:3,1));
+            if isfield(h, 'jointaxis')
+                set(h.jointaxis(j), 'Xdata', xyzl(1,:), ...
+                    'Ydata', xyzl(2,:), ...
+                    'Zdata', xyzl(3,:));
+                set(h.jointlabel(j), 'Position', xyzl(1:3,1));
+            end
 		end
 	end
 
@@ -558,5 +566,3 @@ function animate(robot, q)
 		set(h.yt, 'Position', yv(1:3));
 		set(h.zt, 'Position', zv(1:3));
 	end
-	
-	drawnow
