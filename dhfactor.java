@@ -47,16 +47,17 @@ class Element {
 	int		type;
 
 	// transform parameters, only one of these is set
-	String	var;        // eg. q1
-	String	symconst;   // eg. L1
-	int		constant;   // eg. 90
+	String	var;        // eg. q1, for joint var types
+	String	symconst;   // eg. L1, for lengths
+	int		constant;   // eg. 90, for angles
 
 	// DH parameters, only set if type is DH_STANDARD/MODIFIED
-	String	theta,	
-            A,
-            D,
+	int 	theta,	
             alpha;
+    String  A,
+            D;
     int     prismatic;
+    int     offset;
 
     // an array of counters for the application of each rule
     // just for debugging.
@@ -144,6 +145,38 @@ class Element {
 		System.out.println("  adding: " + this + " += "  + e);
 		switch (e.type) {
 		case RZ:
+            if (e.isjoint()) {
+                this.prismatic = 0;
+                this.var = e.var;
+                this.offset = e.constant;
+                this.theta = 0;
+            } else
+                this.theta = e.constant;
+            break;
+		case TX:
+			this.A = e.symconst; break;
+		case TZ:
+            if (e.isjoint()) {
+                this.prismatic = 1;
+                this.var = e.var;
+                this.D = null;
+            } else
+                this.D = e.symconst;
+            break;
+		case RX:
+			this.alpha = e.constant; break;
+		default:
+			throw new IllegalArgumentException("cant factorize " + e);
+		}
+	}
+    /*
+	public void add(Element e) {
+		if ((this.type != DH_STANDARD) && (this.type != DH_MODIFIED))
+			throw new IllegalArgumentException("wrong element type " + this);
+		
+		System.out.println("  adding: " + this + " += "  + e);
+		switch (e.type) {
+		case RZ:
 			this.theta = e.argString(); 
             if (e.isjoint())
                 this.prismatic = 0;
@@ -161,6 +194,7 @@ class Element {
 			throw new IllegalArgumentException("cant factorize " + e);
 		}
 	}
+    */
 
 
     // test if this particular element could be part of a DH term
@@ -215,6 +249,8 @@ class Element {
 		sum.var = symAdd(this.var, e.var);
 		sum.symconst = symAdd(this.symconst, e.symconst);
 		sum.constant = this.constant + e.constant;
+        if (Math.abs(sum.constant) > 90)
+			throw new IllegalArgumentException("rotation angle > 90");
 
 		/*
 		 * remove a null transform which can result from
@@ -377,37 +413,36 @@ class Element {
 
 		if (prev.isjoint() || this.isjoint())
 			return null;
-        /*
-         * rules for R R
-         */
+
+        /* note that if rotation is -90 we must make the displacement -ve */
 		if ((prev.type == RX) && (this.type == TY)) {
 				// RX.TY -> TZ.RX
-				s[0] = new Element(this, TZ);
+				s[0] = new Element(this, TZ, prev.constant);
 				s[1] = new Element(prev);
 				rules[0]++;
 				return s;
 		} else if ((prev.type == RX) && (this.type == TZ)) {
-				// RX.TZ(L) -> TY(-L).RX
-				s[0] = new Element(this, TY, -1);
+				// RX.TZ -> TY.RX
+				s[0] = new Element(this, TY, -prev.constant);
 				s[1] = new Element(prev);
 				rules[2]++;
 				return s;
 		} else if ((prev.type == RY) && (this.type == TX)) {
-				// RY.TX(L) -> TZ(-L).RY
-				s[0] = new Element(this, TZ, -1);
+				// RY.TX-> TZ.RY
+				s[0] = new Element(this, TZ, -prev.constant);
 				s[1] = new Element(prev);
 				rules[1]++;
 				return s;
 		} else if ((prev.type == RY) && (this.type == TZ)) {
-				// RY.TZ(L) -> TX(L).RY
-				s[0] = new Element(this, TX, this.constant);
+				// RY.TZ-> TX.RY
+				s[0] = new Element(this, TX, prev.constant);
 				s[1] = new Element(prev);
 				rules[11]++;
 				return s;
 		} else if ((prev.type == TY) && (this.type == RX)) {
-				// TY(L).RX -> RX.TZ(-L)
+				// TY.RX -> RX.TZ
 				s[0] = new Element(this);
-				s[1] = new Element(prev, TZ, -1);
+				s[1] = new Element(prev, TZ, -this.constant);
 				rules[5]++;
 				//return s;
 				return null;
@@ -468,35 +503,51 @@ class Element {
 		this.type = type;
 		if (e.var != null)
 			this.var = new String(e.var);
+        this.constant = e.constant;
 		if (e.symconst != null)
-			if (sign >= 0)
-				this.symconst = new String(e.symconst);
-			else {
-				StringBuffer s = new StringBuffer(e.symconst);
-				if ((s.charAt(0) != '+') &&
-					(s.charAt(0) != '-')
-				)
-					s.insert(0, '+');
-				for (int i=0; i<s.length(); i++)
-					switch (s.charAt(i)) {
-					case '+':
-						s.setCharAt(i, '-');
-						break;
-					case '-':
-						s.setCharAt(i, '+');
-						break;
-					default:
-						break;
-					}
-					
-				this.symconst = new String(s);
-			}
-		this.constant = sign*e.constant;
+            this.symconst = new String(e.symconst);
+
+        if (sign < 0)
+            this.negate();
 	}
 
 	public Element(Element e, int type) {	// clone of argument with new type
 		this(e, type, 1);
 	}
+
+    // negate the arguments of the element
+    public void negate() {
+        //System.out.println("negate: " + this.constant + " " + this.symconst);
+
+        // flip the numeric part, easy
+		this.constant = -this.constant;
+
+
+        if (this.symconst != null) {
+            StringBuffer s = new StringBuffer(this.symconst);
+            // if no leading sign character insert one (so we can flip it)
+            if ((s.charAt(0) != '+') &&
+                (s.charAt(0) != '-')
+            )
+                s.insert(0, '+');
+
+            // go through the string and flip all sign chars
+            for (int i=0; i<s.length(); i++)
+                switch (s.charAt(i)) {
+                case '+':
+                    s.setCharAt(i, '-');
+                    break;
+                case '-':
+                    s.setCharAt(i, '+');
+                    break;
+                default:
+                    break;
+                }
+                
+            this.symconst = new String(s);
+       }
+       //System.out.println("negate: " + this.constant + " " + this.symconst);
+    }
 
 	/**
 	 * Parsing constructor.
@@ -577,13 +628,32 @@ class Element {
 			break;
 		case DH_STANDARD:
 		case DH_MODIFIED:
-			s += (theta == null) ? "0" : theta;
+            // theta, d, a, alpha
+
+            // theta
+            if (prismatic == 0) {
+                s += var;
+                if (offset > 0)
+                    s += "+" + offset;
+                 else if (offset < 0)
+                    s += offset;
+            } else
+                s += theta;
 			s += ", ";
+
+            // d
+            if (prismatic > 0)
+                s += var;
+            else
+                s += (D == null) ? "0" : D;
+			s += ", ";
+
+            // a
 			s += (A == null) ? "0" : A;
 			s += ", ";
-			s += (D == null) ? "0" : D;
-			s += ", ";
-			s += (alpha == null) ? "0" : alpha;
+
+            // alpha
+            s += alpha;
 			break;
 		default:
 			throw new IllegalArgumentException("bad Element type");
@@ -1000,17 +1070,6 @@ class ElementList extends ArrayList {
             } else {
                 // found some primitive transform, these will be
                 // part of base or tool
-                String  xform = "";
-
-                switch (type) {
-                case RX:    xform += "*trotx(" + e.rotation() + ")"; break;
-                case RY:    xform += "*troty(" + e.rotation() + ")"; break;
-                case RZ:    xform += "*trotz(" + e.rotation() + ")"; break;
-                case TX:    xform += "*transl(" + e.translation + "0,0)"; break;
-                case TY:    xform += "*transl(0, " + e.translation + ",0)"; break;
-                case TZ:    xform += "*transl(0,0," + e.translation + ")"; break;
-                }
-
                 // scrape the leading * off
                 if (xform.length() > 0)
                     xform = xform.substring(2);
@@ -1041,12 +1100,144 @@ class ElementList extends ArrayList {
     */
 }
 
-public class dh {
+public class dhfactor {
 
-	public dh(String src) {
+    ElementList  results;
+
+    // Matlab callable constructor
+	public dhfactor(String src) {
         System.err.println("Modified hello from dh constructor\n");
 
-        parseString(src);
+        results = parseString(src);
+    }
+
+    private String angle(Element e) {
+        return angle(e.constant);
+    }
+
+
+    private String angle(int a)
+    {
+        if (a == 0)
+            return "0";
+        else if (a == 90)
+            return "pi/2";
+        else if (a == -90)
+            return "-pi/2";
+        else
+			throw new IllegalArgumentException("bad transform angle");
+    }
+
+    private String el2matlab(int from, int to)
+    {
+        String  xform = "";
+        int     i;
+
+        for (i=from; i<to; i++) {
+            Element e = (Element) results.get(i);
+
+            if (xform.length() > 0)
+                xform += "*";
+
+            switch (e.type) {
+            case Element.RX:    xform += "trotx(" + angle(e) + ")"; break;
+            case Element.RY:    xform += "troty(" + angle(e) + ")"; break;
+            case Element.RZ:    xform += "trotz(" + angle(e) + ")"; break;
+            case Element.TX:    xform += "transl(" + e.symconst + ",0,0)"; break;
+            case Element.TY:    xform += "transl(0, " + e.symconst + ",0)"; break;
+            case Element.TZ:    xform += "transl(0,0," + e.symconst + ")"; break;
+            }
+        }
+        if (xform.length() == 0)
+            xform = "eye(4,4)";
+        return xform;
+    }
+
+    public String dh() {
+		String	s = "[";
+        String  theta, d;
+        Element e;
+
+        // theta, alpha are ints
+        // D, A are Strings
+
+		for (int i=0; i<results.size(); i++) {
+			e = (Element) results.get(i);
+            if (e.type == Element.DH_STANDARD) {
+                // build up the string: theta a d alpha  (old Toolbox order)
+                if (e.prismatic == 1) {
+                    // prismatic joint
+                    d = "0";    // by definition
+                    theta = angle(e.theta);
+                } else {
+                    // revolute joint
+                    theta = "0";    // by definition
+                    d = (e.D == null) ? "0" : e.D;
+                }
+
+                s += theta;
+                s += ", ";
+                s += (e.A == null) ? "0" : e.A;
+                s += ", ";
+                s += d;
+                s += ", ";
+                s += angle(e.alpha);
+                s += "; ";
+            };
+        }
+        s += "]";
+		return s;
+	}
+
+    public String offset() {
+		String	s = "[";
+        Element e;
+
+		for (int i=0; i<results.size(); i++) {
+			e = (Element) results.get(i);
+            if (e.type == Element.DH_STANDARD) {
+                    s += angle(e.offset)  + " ";
+            };
+        }
+        s += "]";
+		return s;
+	}
+
+    // return base transform string in Matlab Toolbox form
+    public String base() {
+        int i;
+
+        for (i=0; i<results.size(); i++) {
+            Element e = (Element)results.get(i);
+
+            if ( (e.type == Element.DH_STANDARD) || (e.type == Element.DH_MODIFIED) )
+                return el2matlab(0, i);
+        }
+
+        return "eye(4,4)";
+    }
+
+    // return base transform string in Matlab Toolbox form
+    public String tool() {
+        int i;
+
+        for (i=results.size()-1; i>=0; i--) {
+            Element e = (Element)results.get(i);
+
+            if ( (e.type == Element.DH_STANDARD) || (e.type == Element.DH_MODIFIED) )
+                return el2matlab(i, results.size());
+        }
+
+        return "eye(4,4)";
+    }
+
+
+    // return Matlab Toolbox robot creation command
+    public String command(String name) {
+        return "robot(" + this.dh() + ", 'name', '" + name +
+            "', 'base', " + this.base() +
+            ", 'tool', " + this.tool() +
+            ", 'offset', " + this.offset() + ")";
     }
 
 	public static ElementList parseFile(String filename) {
@@ -1105,16 +1296,19 @@ public class dh {
         return null;
 	}
 
+    // command line instantiation
+    //   dhfactor file
+    //   dhfactor < stdin
 	public static void main(String args[]) {
 
-        ElementList l;
-
         if (args.length > 0) {
-            l = parseFile(args[0]);
+
+            ElementList l  = parseFile(args[0]);
             System.err.println( l );
-            Element.showRuleUsage();
+            
         } else {
             System.err.println("no file name specified\n");
+            Element.showRuleUsage();
             System.exit(1);
         }
     }
