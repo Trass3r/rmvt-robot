@@ -131,11 +131,18 @@ classdef quaternion
 
         function display(q)
 
-            disp(' ');
+            loose = strcmp( get(0, 'FormatSpacing'), 'loose');
+            if loose
+                disp(' ');
+            end
             disp([inputname(1), ' = '])
-            disp(' ');
+            if loose
+                disp(' ');
+            end
             disp(char(q))
-            disp(' ');
+            if loose
+                disp(' ');
+            end
         end
 
         %DOUBLE Convert a quaternion object to a 4-element vector
