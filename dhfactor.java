@@ -1153,13 +1153,16 @@ public class dhfactor {
         return xform;
     }
 
+    /*
+     * Create a Toolbox legacy DH matrix. The column order is:
+     *
+     *      alpha A theta D
+     *
+     */
     public String dh() {
 		String	s = "[";
         String  theta, d;
         Element e;
-
-        // theta, alpha are ints
-        // D, A are Strings
 
 		for (int i=0; i<results.size(); i++) {
 			e = (Element) results.get(i);
@@ -1175,13 +1178,13 @@ public class dhfactor {
                     d = (e.D == null) ? "0" : e.D;
                 }
 
-                s += theta;
+                s += angle(e.alpha);
                 s += ", ";
                 s += (e.A == null) ? "0" : e.A;
                 s += ", ";
-                s += d;
+                s += theta;
                 s += ", ";
-                s += angle(e.alpha);
+                s += d;
                 s += "; ";
             };
         }
