@@ -139,7 +139,7 @@ classdef robot
 
                 if isa(L, 'robot')
                     % clone the passed robot
-                    r = L;
+                    r.links = L.links;
                 elseif isa(L, 'link')
                     r.links = L;    % attach the links
                 elseif isa(L, 'double')
@@ -153,7 +153,7 @@ classdef robot
                 else
                     error('unknown type passed to robot');
                 end
-                r.n = length(L);
+                r.n = length(r.links);
             end
             % process the rest of the arguments in key, value pairs
 
@@ -170,6 +170,10 @@ classdef robot
                     r.base = varargin{count+1}; count = count+1;
                 case 'tool'
                     r.tool = varargin{count+1}; count = count+1;
+                case 'offset'
+                    r.offset = varargin{count+1}; count = count+1;
+                case 'qlim'
+                    r.qlim = varargin{count+1}; count = count+1;
                 case 'gravity'
                     r.gravity = varargin{count+1}; count = count+1;
                 case 'plotopt'
