@@ -127,6 +127,11 @@
 
 function rnew = plot(robot, tg, varargin)
 
+    if (nargin == 2) && iscell(tg)
+        rnew = plot_options(robot, tg);
+        return;
+    end
+        
 	%
 	% q = PLOT(robot)
 	% return joint coordinates from a graphical robot of given name
@@ -141,7 +146,11 @@ function rnew = plot(robot, tg, varargin)
     end
     
     % process options
-	opt = plot_options(robot, varargin);
+    if (nargin > 2) && isstruct(varargin{1})
+        opt = varargin{1};
+    else
+        opt = plot_options(robot, varargin);
+    end
 
 	%
 	% robot2 = ROBOT(robot, q, varargin)
@@ -164,16 +173,17 @@ function rnew = plot(robot, tg, varargin)
 		    end
             count = count - 1;
 		end
-
 		return;
     end
 
-	% Do the right thing with figure windows.
-    ax = newplot();
-    
-    % if this figure has no robot in it, create one
-    if isempty( findobj(ax, 'Tag', robot.name) ),
+    % get handle of any existing robot of same name
+	rh = findobj('Tag', robot.name);
 
+    if isempty(rh) || isempty( get(gcf, 'Children'))
+        % no robot of this name exists
+
+        % create one
+        ax = newplot();
 		h = create_new_robot(robot, opt);
 
 		% save the handles in the passed robot object, and
@@ -181,18 +191,25 @@ function rnew = plot(robot, tg, varargin)
 		robot.handle = h;
 		set(h.robot, 'Tag', robot.name);
 		set(h.robot, 'UserData', robot);
+
+        rh = h.robot;
     end
 
-    % get handle of any existing robot of same name
-	rh = findobj('Tag', robot.name);
+    if ishold && isempty( findobj(gca, 'Tag', robot.name))
+        % if hold is on and no robot of this name in current axes
+		h = create_new_robot(robot, opt);
+		% save the handles in the passed robot object, and
+		% attach it to the robot as user data.
+		robot.handle = h;
+		set(h.robot, 'Tag', robot.name);
+		set(h.robot, 'UserData', robot);
+
+        rh = h.robot;
+    end
     
     if opt.raise,
         figure(gcf);
     end
-
-	% now animate all robots tagged with this name
-
-	rh = findobj('Tag', robot.name);
 
     count = opt.repeat;
     while count > 0
