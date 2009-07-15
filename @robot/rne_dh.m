@@ -51,7 +51,7 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-function tau = rne_dh(robot, a1, a2, a3, a4, a5)
+function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 
 	z0 = [0;0;1];
 	grav = robot.gravity;	% default gravity from the object
@@ -112,15 +112,15 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 	% init some variables, compute the link rotation matrices
 	%
 		for j=1:n,
-			link = robot.link{j};
-			Tj = link(q(j));
+			link = robot.links(j);
+			Tj = link.A(q(j));
 			if link.RP == 'R',
-				D = link.D;
+				d = link.d;
 			else
-				D = q(j);
+				d = q(j);
 			end
 			alpha = link.alpha;
-			pstar = [link.A; D*sin(alpha); D*cos(alpha)];
+			pstar = [link.a; d*sin(alpha); d*cos(alpha)];
 			if j == 1,
 				pstar = t2r(robot.base) * pstar;
 				Tj = robot.base * Tj;
@@ -137,7 +137,7 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 	%  the forward recursion
 	%
 		for j=1:n,
-			link = robot.link{j};
+			link = robot.links(j);
 
 			Rt = Rm{j}';	% transpose!!
 			pstar = pstarm(:,j);
@@ -165,8 +165,8 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 					cross(w, cross(w,pstar));
 			end
 
-			vhat = cross(wd,r) + ...
-				cross(w,cross(w,r)) + vd;
+			vhat = cross(wd,r') + ...
+				cross(w,cross(w,r')) + vd;
 			F = link.m*vhat;
 			N = link.I*wd + cross(w,link.I*w);
 			Fm = [Fm F];
@@ -190,7 +190,7 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 		nn = fext(4:6);
 
 		for j=n:-1:1,
-			link = robot.link{j};
+			link = robot.links(j);
 			pstar = pstarm(:,j);
 			
 			%
@@ -204,7 +204,7 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 			end
 			r = link.r;
 			nn = R*(nn + cross(R'*pstar,f)) + ...
-				cross(pstar+r,Fm(:,j)) + ...
+				cross(pstar+r',Fm(:,j)) + ...
 				Nm(:,j);
 			f = R*f + Fm(:,j);
 			if debug,
@@ -226,4 +226,10 @@ function tau = rne_dh(robot, a1, a2, a3, a4, a5)
 					link.G * friction(link, qd(j));
 			end
 		end
+        R = Rm{1};
+        nn = R*(nn);
+        f = R*f;
+        f
+        nn
+        wbase = [f; nn];
 	end

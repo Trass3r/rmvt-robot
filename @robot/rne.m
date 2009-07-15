@@ -53,9 +53,9 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 
-function tau = rne(robot, varargin)
+function [tau,f] = rne(robot, varargin)
 	if robot.mdh == 0,
-		tau = rne_dh(robot, varargin{:});
+		[tau,f] = rne_dh(robot, varargin{:});
 	else
 		tau = rne_mdh(robot, varargin{:});
 	end
