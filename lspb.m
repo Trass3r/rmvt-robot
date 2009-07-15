@@ -96,11 +96,11 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
             s = p;
         case 2
             s = p;
-            sd = [0; diff(s)];
+            sd = pd;
         case 3
             s = p;
-            sd = [0; diff(s)];
-            sdd = [0; diff(sd)];
+            sd = pd;
+            sdd = pdd;
     end
     
 	if nargout == 0,
