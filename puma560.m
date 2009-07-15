@@ -105,6 +105,9 @@ L(4).B =   71.2e-6;
 L(5).B =   82.6e-6;
 L(6).B =   36.7e-6;
 
+p560 = robot(L, 'name', 'Puma 560', ...
+    'manufacturer', 'Unimation', 'comment', 'viscous friction; params of 8/95');
+
 % Coulomb friction (motor referenced)
 L(1).Tc = [ .395	-.435];
 L(2).Tc = [ .126	-.071];
@@ -123,6 +126,6 @@ qs = [0 0 -pi/2 0 0 0];
 qn=[0 pi/4 pi 0 pi/4  0];
 
 
-p560 = robot(L, 'name', 'Puma 560', ...
-    'manufacturer', 'Unimation', 'comment', 'params of 8/95');
+p560_f = robot(L, 'name', 'Puma 560', ...
+    'manufacturer', 'Unimation', 'comment', 'nonlin friction; params of 8/95');
 clear L
