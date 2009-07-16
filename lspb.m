@@ -16,9 +16,6 @@
 %   Return path over the time vector t, but setting the velocity of the
 %   linear segment.
 %
-% t = lspb(q0, q1, [], V)
-%
-%   Return the time to complete the segment at specified velocity. 
 
 function [s,sd,sdd] = lspb(q0, q1, t, V)
 
@@ -39,10 +36,13 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
 		end
     end
 
-    if isempty(t)
-        % return the time to complete, not the path
+    if q0 == q1
+        s = ones(size(t)) * q0;
+        sd = zeros(size(t));
+        sdd = zeros(size(t));
         return
     end
+
 	tb = (q0 - q1 + V*tf)./V;
 	a = V./tb;
 
