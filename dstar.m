@@ -4,31 +4,25 @@
 % X is an index into the array of states.
 % This is the PROCESS_STATE() function
 
-classdef dstar < handle
+classdef dstar < Navigation
 
     properties
-        occgrid
-
-        costmap   % world cost map
+        costmap   % world cost map: obstacle = Inf
+        G         % index of goal point
 
         % info kept per cell (state)
         b       % backpointer (0 means not set)
+        t       % tag: NEW OPEN CLOSED
         h       % pathcost
 
-        % info for the open list
-        openlist    % list of open states
-            % 3xN matrix: state index;  k
+        % list of open states: 2xN matrix
+        %   each open point is a column, row 1 = index of cell, row 2 = k
+        openlist
+
         k_old
         k_min
-        %k
-        G       % goal
-        t       % tag: NEW OPEN CLOSED
 
-        openlist_maxlen
-        niter
-        navhook
-
-        verbose
+        openlist_maxlen     % keep track of maximum length
 
         % tag state values
         NEW = 0;
@@ -39,22 +33,31 @@ classdef dstar < handle
     methods
 
         % constructor
-        function ds = dstar(costmap, goal)
-            ds.costmap = costmap;
-            ds.b = zeros(size(costmap), 'uint32');
-            ds.t = zeros(size(costmap), 'uint8');
-            ds.h = Inf*ones(size(costmap));
-            ds.openlist = zeros(2,0);
-            ds.verbose = false;
-            ds.navhook = [];
+        function ds = dstar(world, goal)
+
+            % invoke the superclass constructor
+            ds = ds@Navigation(world);
+            ds.occgrid2costmap(ds.occgrid);
+
+            % init the D* state variables
+            ds.reset();
+
+            if nargin > 1
+                ds.goal_set(goal);
+            end
+
+        end
+
+        function reset(ds)
+            % build the matrices required to hold the state of each cell for D*
+            ds.b = zeros(size(ds.costmap), 'uint32');  % backpointers
+            ds.t = zeros(size(ds.costmap), 'uint8');   % tags
+            ds.h = Inf*ones(size(ds.costmap));         % path cost estimate
+            ds.openlist = zeros(2,0);               % the open list, one column per point
 
             ds.openlist_maxlen = -Inf;
-            ds.niter = 0;
-
-            if nargin >= 2
-                ds.setgoal(goal);
-            end
         end
+
 
         function costmap_set(ds, costmap)
             ds.costmap = costmap;
@@ -64,29 +67,26 @@ classdef dstar < handle
             c = ds.costmap;
         end
 
-        function occgrid_set(ds, og, cost)
+        function occgrid2costmap(ds, og, cost)
             if nargin < 3
                 cost = 1;
             end
-            costmap = og;
-            costmap(costmap==0) = cost;     % unoccupied cells have driving cost
-            costmap(costmap==1) = Inf;      % occupied cells have Inf driving cost
-        end
-
-        function verbosity(ds, v)
-            ds.verbose = v;
-        end
-            
-        function s = display(ds)
-            s = char(ds);
+            ds.costmap = og;
+            ds.costmap(ds.costmap==1) = Inf;      % occupied cells have Inf driving cost
+            ds.costmap(ds.costmap==0) = cost;     % unoccupied cells have driving cost
         end
 
         function s = char(ds)
-            s = sprintf('D*: open list %d\n', numcols(ds.openlist));
+            s = '';
+            s = strvcat(s, sprintf('D*: costmap %dx%d, open list %d\n', size(ds.costmap), numcols(ds.openlist)));
         end
 
-        function setgoal(ds, goal)
-            ds.G = sub2ind(size(ds.costmap), goal(2), goal(1));
+        function goal_set(ds, goal)
+
+            goal_set@Navigation(ds, goal);
+
+            % keep goal in index rather than row,col format
+            ds.G = sub2ind(size(ds.occgrid), goal(2), goal(1));
             if ds.costmap(ds.G) == Inf
                 error('cant set goal inside obstacle');
             end
@@ -94,29 +94,20 @@ classdef dstar < handle
             ds.h(ds.G) = 0;
         end
 
-        function navhook_set(ds, navhook)
-            ds.navhook = navhook
+
+        function navigate_init(ds)
+            idisp2(ds.h)
+            set(gca, 'Ydir', 'normal');
+            hold on
         end
-            
-        function p = navigate(ds, robot, varargin)
-            p = robot;
-            navhook = if ds.navhook
-            while true
-                plot(robot(1), robot(2), 'g.');
-                drawnow 
-                robot = ds.next(robot);
-                if isempty(robot)
-                    break
-                end
-                p = [p; robot];
-                if isa('function_handle', ds.navhook)
-                    ds.navhook(ds, robot(1), robot(2));
-                end
-            end
+
+        function navigate(ds, varargin)
+            navigate@Navigation(ds, varargin{:});
+            hold off
         end
 
         function n = next(ds, current)
-            X = sub2ind(size(ds.costmap), state(2), state(1));
+            X = sub2ind(size(ds.costmap), current(2), current(1));
             X = ds.b(X);
             if X == 0
                 n = [];
@@ -124,10 +115,6 @@ classdef dstar < handle
                 [r,c] = ind2sub(size(ds.costmap), X);
                 n = [c,r];
             end
-        end
-
-        function reset(ds)
-            ds.t = zeros(size(costmap), 'uint8');
         end
 
         function plan(ds)
