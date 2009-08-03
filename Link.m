@@ -178,7 +178,7 @@ classdef link
                 
                 % it's a legacy DYN matrix
                 l.m = dh(6);
-                l.r = dh(7:9)';		% a column vector
+                l.r = dh(7:9);		% a column vector
                 v = dh(10:15);
                 l.I = [	v(1) v(4) v(6)
                     v(4) v(2) v(5)
@@ -230,7 +230,7 @@ classdef link
 
             l2 = link(l);
 
-            if (nargin == 2) & strcmpi(only(1:3), 'all'),
+            if (nargin == 2) && strcmpi(only(1:3), 'all')
                 l2.B = 0;
             end
             l2.Tc = [0 0];
