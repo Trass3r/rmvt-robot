@@ -68,14 +68,6 @@ classdef Navigation < handle
         end
 
         function navigate_init(nav)
-            image(nav.occgrid+1)
-            colormap([1 1 1; 1 0 0;])  
-            set(gca, 'Ydir', 'normal');
-            xlabel('x');
-            ylabel('y');
-            grid
-
-            hold on
         end
 
         % initialize navigation for this starting point
@@ -85,7 +77,7 @@ classdef Navigation < handle
         function path = navigate(nav, robot, varargin)
 
             % render the world
-            nav.navigate_init();
+            nav.visualize();
 
             % find the starting location for the robot
             if (nargin < 2) || isempty(robot)
