@@ -1,23 +1,35 @@
+%PRM Class for probabilistic roadmap navigation
+%
+% A concrete class that implements the PRM navigation algorithm.
+% This class subclasses the Navigation class.
+%
+% Usage for subclass:
+%
+%   prm = PRM(occgrid, options)  create an instance object
+%
+%   prm                     show summary statistics about the object
+%   prm.visualize()         display the occupancy grid
+%
+%   prm.plan(goal)          plan a path to coordinate goal
+%   prm.path(start)         display a path from start to goal
+%   p = prm.path(start)     return a path from start to goal
+%
+
+% Peter Corke 8/2009.
+
 classdef PRM < Navigation
 
     properties
-        npoints
+        npoints         % number of points to find
         distthresh
 
-        vertices
-        edgelist
-        edgelen         % length of this edge    
+        graph           % graph Object representing random nodes
 
-        curLabel        % current label
-        ncomponents     % number of components
-        labels          % label of each vertex
-        labelset        % set of labels
-
-        cost            % distance from goal vertex
-        seed            % current random seed
-
+        vgoal
+        vstart
         localGoal
         localPath
+        gpath            % path through the graph
     end
 
     methods
@@ -27,73 +39,82 @@ classdef PRM < Navigation
 
             % invoke the superclass constructor
             prm = prm@Navigation(varargin{:});
-            prm.labelset = zeros(1, 0);
-            prm.labels = zeros(1, 0);
-            prm.edgelist = zeros(2, 0);
-            prm.edgelen = zeros(1, 0);
-            prm.vertices = zeros(2, 0);
 
+            prm.graph = PGraph(2);  % planar graph
+
+            % TODO: need a means to set these
+            %  {'npoints', [], 'distthresh', []}
             prm.npoints = 100;
-            prm.distthresh = 0.4*max(size(prm.occgrid));
-
-            % save current random seed so we can repeat the expt
-            defaultStream = RandStream.getDefaultStream;
-            prm.seed = defaultStream.State;
-
-            prm.ncomponents = 0;
-            prm.curLabel = 0;
-
+            prm.distthresh = 0.3*max(size(prm.occgrid));
         end
 
-        function s = char(prm)
-            s = '';
-            s = strvcat(s, sprintf('PRM: %dx%d', size(prm.occgrid)));
-            s = strvcat(s, sprintf('  %d vertices', numcols(prm.vertices)));
-            s = strvcat(s, sprintf('  %d edges', numcols(prm.edgelist)));
-            s = strvcat(s, sprintf('  %d components', prm.ncomponents));
+        function plan(prm, goal)
+
+            prm.goal_set(goal(:));
+
+            % build a graph over the free space
+            prm.message('create the graph');
+            create_graph(prm);
+
+            prm.vgoal = prm.graph.closest(prm.goal);
+
+            % find a path through the graph
+            prm.message('planning path through graph');
+            prm.graph.goal(prm.vgoal);   % set the goal
+
         end
 
         function navigate_init2(prm, p)
+            % find node closest to the start and goal points
+            prm.vstart = prm.graph.closest(p);
+
+            if prm.graph.component(prm.vstart) ~= prm.graph.component(prm.vgoal)
+                error('Navigation: start and goal not connected');
+            end
+
+            % create a path through the graph
+            prm.gpath = prm.graph.path(prm.vstart);
+            prm.gpath = prm.gpath(2:end);
+
             % start the navigation engine with a path to the nearest vertex
-            prm.localGoal = prm.closest(p);
-            prm.localGoal
-            prm.goal
-            prm.showVertex(prm.localGoal);
-            prm.localPath = bresenham(p, prm.vertices(:,prm.localGoal));
+            prm.graph.showVertex(prm.vstart);
+
+            prm.localPath = bresenham(p, prm.graph.coord(prm.vstart));
             prm.localPath = prm.localPath(2:end,:);
         end
 
         function n = next(prm, p)
 
-            n = prm.localPath(1,:);     % take the first point
-            prm.localPath = prm.localPath(2:end,:); % and remove from the path
-
-            if all(n == prm.goal)
+            if all(p(:) == prm.goal)
                 n = [];     % we've arrived
                 return;
             end
 
             if numrows(prm.localPath) == 0
                 % local path is consumed, move to next vertex
-                vnd = prm.neighbours(prm.localGoal);
-                [mn,k] = min(prm.cost(vnd(1,:)));
-                if mn == 0
-                    % we have arrived at the goal
-                    prm.localPath = bresenham(prm.vertices(:,k), prm.goal);
+                if length(prm.gpath) == 0
+                    % we have arrived at the goal vertex
+                    % make the path from this vertex to the goal coordinate
+                    prm.localPath = bresenham(p, prm.goal);
                     prm.localPath = prm.localPath(2:end,:);
                     prm.localGoal = [];
                 else
-                    prm.localGoal = vnd(1,k);
-                    prm.localPath = bresenham(p, prm.vertices(:,prm.localGoal));
+                    % set local goal to next vertex in gpath and remove it
+                    % from the list
+                    prm.localGoal = prm.gpath(1);
+                    prm.gpath = prm.gpath(2:end);
+
+                    % compute local path to the next vertex
+                    prm.localPath = bresenham(p, prm.graph.coord(prm.localGoal));
                     prm.localPath = prm.localPath(2:end,:);
-                    prm.showVertex(prm.localGoal);
+                    prm.graph.showVertex(prm.localGoal);
                 end
             end
-        end
 
-        function plan(prm)
-            create_graph(prm);
-            plan_on_graph(prm);
+            n = prm.localPath(1,:)';     % take the first point
+            prm.localPath = prm.localPath(2:end,:); % and remove from the path
+
+
         end
 
         function create_graph(prm)
@@ -109,54 +130,23 @@ classdef PRM < Navigation
                 end
                 new = [x; y];
 
-                [d,v] = distances(prm, new);
+                vnew = prm.graph.add_node(new);
+
+                [d,v] = prm.graph.distances(new);
                 % test neighbours in order of increasing distance
-                label = 0;
                 for i=1:length(d)
-                    if d(i) > prm.distthresh
-                        break;
-                    end
-                    if ~prm.clearpath(new, prm.vertices(:,v(i)))
+                    if v(i) == vnew
                         continue;
                     end
-                    if label == 0
-                        label = prm.labels(v(i));
-                        prm.appendedge(v(i), d(i));
-                    elseif label ~= prm.labels(v(i))
-                        prm.merge(prm.labels(v(i)), label);
-                        prm.appendedge(v(i), d(i));
+                    if d(i) > prm.distthresh
+                        continue;
                     end
+                    if ~prm.clearpath(new, prm.graph.coord(v(i)))
+                        continue;
+                    end
+                    prm.graph.add_edge(vnew, v(i));
                 end
-                prm.vertices = [prm.vertices new];
-                if label == 0
-                    label = prm.newlabel();
-                end
-                prm.labels = [prm.labels label];
             end
-        end
-
-        function appendedge(prm, v, d)
-            prm.edgelist = [prm.edgelist [v; numcols(prm.vertices)+1]];
-            prm.edgelen = [prm.edgelen d];
-        end
-
-        function showComponent(prm, c)
-            k = prm.labels == c;
-            showVertices(prm, k);
-        end
-
-        function l = newlabel(prm)
-            prm.curLabel = prm.curLabel + 1;
-            l = prm.curLabel;
-            prm.ncomponents = prm.ncomponents + 1;
-            prm.labelset = union(prm.labelset, l);
-        end
-
-        % merge label1 and label2, label2 dominates
-        function merge(prm, l1, l2)
-            prm.labels(prm.labels==l1) = l2;
-            prm.ncomponents = prm.ncomponents - 1;
-            prm.labelset = setdiff(prm.labelset, l1);
         end
 
         function c = clearpath(prm, p1, p2)
@@ -171,94 +161,19 @@ classdef PRM < Navigation
             c = true;
         end
 
+        function s = char(prm)
+            s = '';
+            s = strvcat(s, sprintf('PRM: %dx%d', size(prm.occgrid)));
+            s = strvcat(s, sprintf('  graph size: %d', prm.npoints));
+            s = strvcat(s, sprintf('  dist thresh: %f', prm.distthresh));
+            s = strvcat(s, char(prm.graph) );
+        end
+
+
         function visualize(prm)
             visualize@Navigation(prm);
 
-            % show vertices
-            plot(prm.vertices(1,:), prm.vertices(2,:), ...
-                'LineStyle', 'None', ...
-                'Marker', 'o', ...
-                'MarkerFaceColor', 'b', ...
-                'MarkerEdgeColor', 'b');
-            % show edges
-            for e=prm.edgelist
-                v1 = prm.vertices(:,e(1));
-                v2 = prm.vertices(:,e(2));
-                plot([v1(1) v2(1)], [v1(2) v2(2)], 'k--');
-            end
-        end
-
-        function showVertices(prm, v)
-            for vv=v
-                showVertex(prm, vv);
-            end
-        end
-
-        function showVertex(prm, v)
-            plot(prm.vertices(1,v), prm.vertices(2,v), ...
-                'LineStyle', 'None', ...
-                'Marker', 'o', ...
-                'MarkerSize', 12, ...
-                'MarkerFaceColor', 'y', ...
-                'MarkerEdgeColor', 'y');
-        end
-
-            
-        % which edges contain v
-        function e = edges(prm, v)
-            e = [find(prm.edgelist(1,:) == v) find(prm.edgelist(2,:) == v)];
-        end
-
-        % return neighbours of v
-        function vnd = neighbours(prm, v)
-            e = prm.edges(v);
-            d = prm.edgelen(e);
-            vn = prm.edgelist(:,e);
-            vn = vn(:)';
-            vn(vn==v) = [];   % remove references to self
-
-            vnd = [vn; d];
-        end
-
-        function plan_on_graph(prm)
-            % cost is total distance from goal
-            prm.cost = zeros(1, numcols(prm.vertices));
-
-            vg = prm.closest(prm.goal);
-
-            prm.descend(vg);
-        end
-
-        function descend(prm, vg)
-
-            % get neighbours and their distance
-            for vnd = prm.neighbours(vg);
-                vn = vnd(1); d = vnd(2);
-                if prm.cost(vn) > 0
-                    continue;
-                end
-                prm.cost(vn) = prm.cost(vg) + d;
-                descend(prm, vn);
-            end
-        end
-
-        function d = distance(prm, v1, v2)
-            d = norm2( prm.vertices(v1) - prm.vertices(v2));
-        end
-
-        function [d,k] = distances(prm, p)
-            dx = prm.vertices(1,:) - p(1);
-            dy = prm.vertices(2,:) - p(2);
-            d = norm2(dx, dy);
-            [d,k] = sort(d, 'ascend');
-        end
-
-        % return the closest vertext to coordinate p
-        function c = closest(prm, p)
-            dx = prm.vertices(1,:) - p(1);
-            dy = prm.vertices(2,:) - p(2);
-            d = norm2(dx, dy);
-            [mn,c] = min(d);
+            plot(prm.graph);
         end
 
     end % method
