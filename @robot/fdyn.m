@@ -44,8 +44,8 @@ function [t, q, qd] = fdyn(robot, t0, t1, torqfun, q0, qd0, varargin)
 
 	% check the Matlab version, since ode45 syntax has changed
 	v = ver;
-	if str2num(v(1).Version)<6,
-		%error('fdyn now requires Matlab version >= 6');
+	if str2num(v(1).Version)<7,
+		error('fdyn now requires Matlab version >= 7');
 	end
 
 	n = robot.n;
@@ -79,16 +79,16 @@ end
 % if not given zero joint torques are assumed.
 %
 % The result is XDD = [QD QDD].
-function xd = fdyn2(t, x, flag, robot, torqfun, varargin)
+function xd = fdyn2(t, x, robot, torqfun, varargin)
 
 	n = robot.n;
 
-	q = x(1:n);
-	qd = x(n+1:2*n);
+	q = x(1:n)';
+	qd = x(n+1:2*n)';
 
 	% evaluate the torque function if one is given
-	if isstr(torqfun)
-		tau = feval(torqfun, t, q, qd, varargin{:});
+	if isa(torqfun, 'function_handle')
+		tau = torqfun(robot, t, q, qd, varargin{:});
 	else
 		tau = zeros(n,1);
 	end

@@ -33,18 +33,13 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function c = coriolis(robot, q, qd)
+function C = coriolis(robot, q, qd)
 
 	if nargin == 3,
-		c = rne(robot, q, qd, zeros(size(q)), [0;0;0]);
+		C = rne(robot, q, qd, zeros(size(q)), [0;0;0]);
 	else
 		n = length(q);
-		c = [];
-		qd = zeros(1,n);
-		for i=1:n,
-			qd(i) = 1;
-			C = coriolis(robot, q, qd);
-			qd(i) = 0;
-			c(:,i) = C';
-		end
+        q = q(:)';  % row vector
+        C = rne(robot.nofriction, ...
+            ones(n,1)*q, eye(n), zeros(n), [0 0 0]');
 	end

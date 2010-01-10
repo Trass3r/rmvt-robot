@@ -38,8 +38,8 @@ function  r2 = nofriction(r, varargin)
 	r2 = robot(r);
 
 	for i=1:r2.n,
-		l2{i} = nofriction(r.link{i}, varargin{:});
+		l2(i) = r.links(i).nofriction(varargin{:});
 	end
 
-	r2.link = l2;
+	r2.links = l2;
 	r2.name = ['NF/' r.name];

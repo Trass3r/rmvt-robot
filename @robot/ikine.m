@@ -65,7 +65,7 @@ function qt = ikine(robot, tr, q, m, newopt)
 	opt.ilimit = 1000;
 	opt.tol = 1e-6;
     opt.debug = false;
-    opt.lambda = 10;
+    opt.lambda = 0.4;
     % 0.4 for Puma
     % 10 for leg
     opt.useInverse = false;

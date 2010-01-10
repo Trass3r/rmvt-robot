@@ -226,10 +226,9 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 					link.G * friction(link, qd(j));
 			end
 		end
+        % this last bit needs work/testing
         R = Rm{1};
         nn = R*(nn);
         f = R*f;
-        f
-        nn
         wbase = [f; nn];
 	end

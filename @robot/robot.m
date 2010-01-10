@@ -140,7 +140,7 @@ classdef robot
                 if isa(L, 'robot')
                     % clone the passed robot
                     r.links = L.links;
-                elseif isa(L, 'link')
+                elseif isa(L, 'Link')
                     r.links = L;    % attach the links
                 elseif isa(L, 'double')
                     % legacy matrix
