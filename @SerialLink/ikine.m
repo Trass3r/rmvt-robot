@@ -144,7 +144,8 @@ function qt = ikine(robot, tr, q, m, newopt)
             count = count+1;
             if count > opt.ilimit,
                 fprintf('i=%d, nm=%f\n', i, nm);
-                error( sprintf('Solution wouldn''t converge, final error %.4g', nm) )
+                warning( sprintf('Solution wouldn''t converge, final error %.4g', nm) )
+                break
             end
         end
         qt(i,:) = q';
