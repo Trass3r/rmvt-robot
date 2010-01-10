@@ -1,25 +1,25 @@
-%SerialLink.itorque Inertia torque
+%ITORQUE Compute the manipulator inertia torque
 %
-% TAUI = R.itorque(Q, QDD) is the inertia force/torque vector (1xN) at the
-% specified joint configuration Q (1xN) and acceleration QDD (1xN), and N
-% is the number of robot joints. TAUI = INERTIA(Q)*QDD.
+%	TAUI = ITORQUE(ROBOT, Q, QDD)
 %
-% If Q and QDD are matrices (KxN), each row is interpretted as a joint state 
-% vector, and the result is a matrix (KxN) where each row is the corresponding
-% joint torques.
+% Returns the n-element inertia torque vector at the specified pose and 
+% acceleration, that is,
+% 	TAUI = INERTIA(Q)*QDD
+%
+% ROBOT describes the manipulator dynamics and kinematics.
+% If Q and QDD are row vectors, the result is a row vector of joint torques.
+% If Q and QDD are matrices, each row is interpretted as a joint state 
+% vector, and the result is a matrix each row being the corresponding joint 
+% torques.
 % 
-% Note::
-% - If the robot model contains non-zero motor inertia then this will 
-%   included in the result.
+% If ROBOT contains non-zero motor inertia then this will included in the
+% result.
 %
-% See also SerialLink.inertia, SerialLink.rne.
+% See also: RNE, CORIOLIS, INERTIA, GRAVLOAD.
 
-
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -33,8 +33,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function it = itorque(robot, q, qdd)
 	it = rne(robot, q, zeros(size(q)), qdd, [0;0;0]);

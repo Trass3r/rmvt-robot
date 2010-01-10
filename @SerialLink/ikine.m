@@ -1,86 +1,51 @@
-%SerialLink.ikine Numerical inverse kinematics
+%IKINE Inverse manipulator kinematics
 %
-% Q = R.ikine(T) are the joint coordinates (1xN) corresponding to the robot 
-% end-effector pose T (4x4) which is a homogenenous transform.
+%	Q = IKINE(ROBOT, T)
+%	Q = IKINE(ROBOT, T, Q)
+%	Q = IKINE(ROBOT, T, Q, M)
 %
-% Q = R.ikine(T, Q0, OPTIONS) specifies the initial estimate of the joint 
-% coordinates.
+% Returns the joint coordinates corresponding to the end-effector transform T.
+% Note that the inverse kinematic solution is generally not unique, and 
+% depends on the initial guess Q (which defaults to 0).
 %
-% This method can be used for robots with 6 or more degrees of freedom.
+%	QT = IKINE(ROBOT, TG)
+%	QT = IKINE(ROBOT, TG, Q)
+%	QT = IKINE(ROBOT, TG, Q, M)
 %
-% Underactuated robots::
+% Returns the joint coordinates corresponding to each of the transforms in 
+% the 4x4xN trajectory TG.
+% Returns one row of QT for each input transform.  The initial estimate 
+% of QT for each time step is taken as the solution from the previous 
+% time step.
 %
-% For the case where the manipulator has fewer than 6 DOF the solution 
-% space has more dimensions than can be spanned by the manipulator joint 
-% coordinates.
+% If the manipulator has fewer than 6 DOF then this method of solution
+% will fail, since the solution space has more dimensions than can
+% be spanned by the manipulator joint coordinates.  In such a case
+% it is necessary to provide a mask matrix, M, which specifies the 
+% Cartesian DOF (in the wrist coordinate frame) that will be ignored
+% in reaching a solution.  The mask matrix has six elements that
+% correspond to translation in X, Y and Z, and rotation about X, Y and
+% Z respectively.  The value should be 0 (for ignore) or 1.  The number
+% of non-zero elements should equal the number of manipulator DOF.
 %
-% Q = R.ikine(T, Q0, M, OPTIONS) similar to above but where M is a mask 
-% vector (1x6) which specifies the Cartesian DOF (in the wrist coordinate 
-% frame) that will be ignored in reaching a solution.  The mask vector 
-% has six elements that correspond to translation in X, Y and Z, and rotation 
-% about X, Y and Z respectively.  The value should be 0 (for ignore) or 1.
-% The number of non-zero elements should equal the number of manipulator DOF.
+% Solution is computed iteratively using the pseudo-inverse of the
+% manipulator Jacobian.
 %
-% For example when using a 3 DOF manipulator rotation orientation might be 
-% unimportant in which case  M = [1 1 1 0 0 0].
+% Such a solution is completely general, though much less efficient 
+% than specific inverse kinematic solutions derived symbolically.
+% 
+% This approach allows a solution to obtained at a singularity, but 
+% the joint angles within the null space are arbitrarily assigned.
 %
-% For robots with 4 or 5 DOF this method is very difficult to use since
-% orientation is specified by T in world coordinates and the achievable
-% orientations are a function of the tool position.
+% For instance with a typical 5 DOF manipulator one would ignore
+% rotation about the wrist axis, that is, M = [1 1 1 1 1 0].
 %
-% Trajectory operation::
 %
-% In all cases if T is 4x4xM it is taken as a homogeneous transform sequence 
-% and R.ikine() returns the joint coordinates corresponding to each of the 
-% transforms in the sequence.  Q is MxN where N is the number of robot joints.
-% The initial estimate of Q for each time step is taken as the solution 
-% from the previous time step.
-%
-% Options::
-% 'pinv'         use pseudo-inverse instead of Jacobian transpose (default)
-% 'ilimit',L     set the maximum iteration count (default 1000)
-% 'tol',T        set the tolerance on error norm (default 1e-6)
-% 'alpha',A      set step size gain (default 1)
-% 'varstep'      enable variable step size if pinv is false
-% 'verbose'      show number of iterations for each point
-% 'verbose=2'    show state at each iteration
-% 'plot'         plot iteration state versus time
-%
-% References::
-% - Robotics, Vision & Control, Section 8.4,
-%   P. Corke, Springer 2011.
-%
-% Notes::
-% - Solution is computed iteratively.
-% - Solution is sensitive to choice of initial gain.  The variable
-%   step size logic (enabled by default) does its best to find a balance
-%   between speed of convergence and divergence.
-% - Some experimentation might be required to find the right values of 
-%   tol, ilimit and alpha.
-% - The pinv option leads to much faster convergence (default)
-% - The tolerance is computed on the norm of the error between current
-%   and desired tool pose.  This norm is computed from distances
-%   and angles without any kind of weighting.
-% - The inverse kinematic solution is generally not unique, and 
-%   depends on the initial guess Q0 (defaults to 0).
-% - The default value of Q0 is zero which is a poor choice for most
-%   manipulators (eg. puma560, twolink) since it corresponds to a kinematic
-%   singularity.
-% - Such a solution is completely general, though much less efficient 
-%   than specific inverse kinematic solutions derived symbolically, like
-%   ikine6s or ikine3.
-% - This approach allows a solution to be obtained at a singularity, but 
-%   the joint angles within the null space are arbitrarily assigned.
-% - Joint offsets, if defined, are added to the inverse kinematics to 
-%   generate Q.
-% - Joint limits are not considered in this solution.
-%
-% See also SerialLink.ikcon, SerialLink.ikunc, SerialLink.fkine, SerialLink.ikine6s.
+% See also: FKINE, TR2DIFF, JACOB0, IKINE6S.
  
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2008, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -94,51 +59,56 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
-function [qt,histout] = ikine(robot, tr, varargin)
+function qt = ikine(robot, tr, q, m, newopt)
+	%  set default parameters for solution
+	opt.ilimit = 1000;
+	opt.tol = 1e-6;
+    opt.debug = false;
+    opt.lambda = 0.4;
+    % 0.4 for Puma
+    % 10 for leg
+    opt.useInverse = false;
 
-    %  set default parameters for solution
-    opt.ilimit = 1000;
-    opt.tol = 1e-6;
-    opt.alpha = 0.9;
-    opt.plot = false;
-    opt.pinv = true;
-    opt.varstep = false;
+    % with no arguments, return the default parameters as a struct
+    if nargin == 0
+        qt = opt;
+        return
+    end
 
-    [opt,args] = tb_optparse(opt, varargin);
+    % if a parameter struct is provided, use it instead
+    if nargin == 5
+        opt = newopt;
+    end
 
-    n = robot.n;
+    % OK, looks like we are doing real stuff
+	n = robot.n;
 
-    % robot.ikine(tr, q)
-    if ~isempty(args)
-        q = args{1};
+    % check sanity of arguments
+	if nargin < 3,
+		q = zeros(n, 1);
+	else
         if isempty(q)
-            q = zeros(1, n);
+            q = zeros(n, 1);
         else
-            q = q(:)';
+            q = q(:);
         end
-    else
-        q = zeros(1, n);
-    end
-
-    % robot.ikine(tr, q, m)
-    if length(args) > 1
-        m = args{2};
-        m = m(:);
-        if numel(m) ~= 6
-            error('RTB:ikine:badarg', 'Mask matrix should have 6 elements');
-        end
-        if numel(find(m)) > robot.n 
-            error('RTB:ikine:badarg', 'Number of robot DOF must be >= the same number of 1s in the mask matrix')
-        end
-    else
-        if n < 6
-            error('RTB:ikine:badarg', 'For a manipulator with fewer than 6DOF a mask matrix argument must be specified');
-        end
-        m = ones(6, 1);
-    end
+	end
+	if nargin == 4,
+		m = m(:);
+		if length(m) ~= 6,
+			error('Mask matrix should have 6 elements');
+		end
+		if length(find(m)) ~= robot.n 
+			error('Mask matrix must have same number of 1s as robot DOF')
+		end
+	else
+		if n < 6,
+			error('For a manipulator with fewer than 6DOF a mask matrix argument must be specified');
+		end
+		m = ones(6, 1);
+	end
+		
     % make this a logical array so we can index with it
     m = logical(m);
 
@@ -146,168 +116,40 @@ function [qt,histout] = ikine(robot, tr, varargin)
     qt = zeros(npoints, n);  % preallocate space for results
     tcount = 0;              % total iteration count
 
-    if ~ishomog(tr)
-        error('RTB:ikine:badarg', 'T is not a homog xform');
-    end
-
-    J0 = jacob0(robot, q);
-    J0 = J0(m, :);
-    if cond(J0) > 100
-        warning('RTB:ikine:singular', 'Initial joint configuration results in a (near-)singular configuration, this may slow convergence');
-    end
-
-    history = [];
-    failed = false;
-    e = zeros(6,1);
-    revolutes = [robot.links.sigma] == 0;
-
-    
     for i=1:npoints
         T = tr(:,:,i);
-
         nm = Inf;
-        % initialize state for the ikine loop
-        eprev = [Inf Inf Inf Inf Inf Inf];
-        save.e = [Inf Inf Inf Inf Inf Inf];
-        save.q = [];
         count = 0;
-
-        while true
-            % update the count and test against iteration limit
-            count = count + 1;
-            if count > opt.ilimit
-                warning('ikine: iteration limit %d exceeded (row %d), final err %f', ...
-                    opt.ilimit, i, nm);
-                failed = true;
-                %q = NaN*ones(1,n);
-                break
-            end
-
-            % compute the error
-            Tq = robot.fkine(q');
-            
-            e(1:3) = transl(T - Tq);
-            Rq = t2r(Tq);
-            [th,n] = tr2angvec(Rq'*t2r(T));
-            e(4:6) = th*n;
-            
-            % optionally adjust the step size
-            if opt.varstep
-                % test against last best error, only consider the DOF of
-                % interest
-                if norm(e(m)) < norm(save.e(m))
-                    % error reduced,
-                    % let's save current state of solution and rack up the step size
-                    save.q = q;
-                    save.e = e;
-                    opt.alpha = opt.alpha * (2.0^(1.0/8));
-                    if opt.verbose > 1
-                        fprintf('step %d: raise alpha to %f\n', count, opt.alpha);
-                    end
-                else
-                    % rats!  error got worse,
-                    % restore to last good solution and reduce step size
-                    q = save.q;
-                    e = save.e;
-                    opt.alpha = opt.alpha * 0.5;
-                    if opt.verbose > 1
-                        fprintf('step %d: drop alpha to %f\n', count, opt.alpha);
-                    end
-                end
-            end
+        while nm > opt.tol,
+            e = tr2delta(fkine(robot, q'), T);
 
             % compute the Jacobian
             J = jacob0(robot, q);
 
-            % compute change in joint angles to reduce the error, 
-            % based on the square sub-Jacobian
-            if opt.pinv
-                %pinv( J(m,:) )
-                dq = opt.alpha * pinv( J(m,:) ) * e(m);
+            % error is based on the square sub-Jacobian
+            if opt.useInverse
+                dq = opt.lambda * pinv( J(m,:) ) * e(m);
             else
-                dq = J(m,:)' * e(m);
-                dq = opt.alpha * dq;
+                dq = opt.lambda *  J(m,:)' * e(m);
             end
 
-            % diagnostic stuff
-            if opt.verbose > 1
-                fprintf('%d/%d: |e| = %f\n', i, count, nm);
-                fprintf('       e  = '); disp(e');
-                fprintf('       dq = '); disp(dq');
-            end
-            if opt.plot
-                h.q = q';
-                h.dq = dq;
-                h.e = e;
-                h.ne = nm;
-                h.alpha = opt.alpha;
-                history = [history; h]; %#ok<*AGROW>
+            if opt.debug
+                fprintf('%d/%d: e =  ', i, count); disp(e')
+                fprintf('      dq = '); disp(dq');
             end
 
             % update the estimated solution
-            q = q + dq';
-            
-            % wrap angles for revolute joints
-            k = (q > pi) & revolutes;
-            q(k) = q(k) - 2*pi;
-            
-            k = (q < -pi) & revolutes;
-            q(k) = q(k) + 2*pi;
-            
-            nm = norm(e(m));
-
-            if norm(e(m)) > 2*norm(eprev(m))
-                warning('RTB:ikine:diverged', 'solution diverging at step %d, try reducing alpha', count);
+            q = q + dq;
+            nm = norm(dq);
+            count = count+1;
+            if count > opt.ilimit,
+                fprintf('i=%d, nm=%f\n', i, nm);
+                error( sprintf('Solution wouldn''t converge, final error %.4g', nm) )
             end
-            eprev = e;
-
-            if nm <= opt.tol
-                break
-            end
-
-        end  % end ikine solution for tr(:,:,i)
+        end
         qt(i,:) = q';
         tcount = tcount + count;
-        if opt.verbose
-            fprintf('%d iterations\n', count);
-        end
-    end
-    
-    if opt.verbose && npoints > 1
-        fprintf('TOTAL %d iterations\n', tcount);
-    end
-
-    % plot evolution of variables
-    if opt.plot
-        figure(1);
-        subplot(511)
-        plot([history.q]');
-        ylabel('q');
-        grid
-
-        subplot(512)
-        plot([history.dq]');
-        ylabel('dq');
-        grid
-
-        subplot(513)
-        plot([history.e]');
-        ylabel('e');
-        grid
-
-        subplot(514)
-        semilogy([history.ne]);
-        ylabel('|e|');
-        grid
-
-        subplot(515)
-        plot([history.alpha]);
-        xlabel('iteration');
-        ylabel('\alpha');
-        grid
-
-        if nargout > 1
-            histout = history;
-        end
     end
 end
+
+

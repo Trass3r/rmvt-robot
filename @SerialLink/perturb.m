@@ -1,18 +1,20 @@
-%SerialLink.perturb Perturb robot parameters
+%PERTURB Return robot object with perturbed dynamic parameters
 %
-% RP = R.perturb(P) is a new robot object in which the dynamic parameters (link
-% mass and inertia) have been perturbed.  The perturbation is multiplicative so 
-% that values are multiplied by random numbers in the interval (1-P) to (1+P).
-% The name string of the perturbed robot is prefixed by 'P/'.
+%	ROBOT = PERTURB(ROBOT, P)
+%
+% Return a new robot object in which the dynamic parameters (link mass and
+% inertia) have been perturbed.  The perturbation is multiplicative so that
+% values are multiplied by random numbers in the interval (1-P) to (1+P).
 %
 % Useful for investigating the robustness of various model-based control 
-% schemes. For example to vary parameters in the range +/- 10 percent is:
-%    r2 = p560.perturb(0.1);
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% schemes.
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% The name string of the perturbed robot is prefixed by 'P/'.
+%
+
+% Copyright (C) 1999-2008, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -26,24 +28,21 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function  r2 = perturb(r, p)
 
-	if nargin == 1
+	if nargin == 1,
 		p = 0.1;	% 10 percent disturb by default
 	end
 
-    r2 = SerialLink(r);
 
-    links = r2.links;
-	for i=1:r.n
+	for i=1:r.n,
+		l2{i} = r.link{i};
 		s = (2*rand-1)*p + 1;
-		links(i).m = links(i).m * s;
-
+		l2{i}.m = l2{i}.m * s;
 		s = (2*rand-1)*p + 1;
-		links(i).I = links(i).I * s;
+		l2{i}.I = l2{i}.I * s;
 	end
 
+	r2 = robot(r, l2);		% clone the robot
 	r2.name = ['P/' r.name];

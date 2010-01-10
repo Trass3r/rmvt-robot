@@ -1,26 +1,24 @@
-%SerialLink.nofriction Remove friction 
+%NOFRICTION Return robot object with zero link friction 
 %
-% RNF = R.nofriction() is a robot object with the same parameters as R but 
-% with non-linear (Coulomb) friction coefficients set to zero.  
+%	ROBOT = NOFRICTION(ROBOT)
 %
-% RNF = R.nofriction('all') as above but viscous and Coulomb friction coefficients set to zero.
+% Return the robot object but with non-linear friction coefficients set to
+% zero.  
 %
-% RNF = R.nofriction('viscous') as above but viscous friction coefficients 
-% are set to zero.
+% 	ROBOT = NOFRICTION(ROBOT, 'all')
 %
-% Notes::
-% - Non-linear (Coulomb) friction can cause numerical problems when integrating
-%   the equations of motion (R.fdyn).
-% - The resulting robot object has its name string prefixed with 'NF/'.
+% Return the robot object but with all friction coefficients set to zero.  
 %
-% See also SerialLink.fdyn, Link.nofriction.
+% Non-linear (Coulomb) friction can cause numerical problems when integrating
+% the equations of motion (FDYN).
+%
+% The resulting robot object has its name string modified by prepending 'NF/'.
+%
+% See also: LINK/NOFRICTION
 
-
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1999-2008, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -34,15 +32,14 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function  r2 = nofriction(r, varargin)
 
-	r2 = SerialLink(r); % make a copy
+	r2 = robot(r);
 
-	for j=1:r2.n
-		r2.links(j) = r.links(j).nofriction(varargin{:});
+	for i=1:r2.n,
+		l2(i) = r.links(i).nofriction(varargin{:});
 	end
 
+	r2.links = l2;
 	r2.name = ['NF/' r.name];
