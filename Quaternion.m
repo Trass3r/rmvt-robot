@@ -50,7 +50,7 @@
 %   q.v               vector part
 %   q.r               3x3 rotation matrix
 %   q.t               4x4 homogeneous transform matrix
-%   q.dot             derivative of quaternion
+%   q.dot(w)          derivative of quaternion with angular velocity w
 
 % TODO
 %  constructor handles R, T trajectory and returns vector
