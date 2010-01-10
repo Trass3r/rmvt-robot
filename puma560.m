@@ -55,12 +55,13 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 clear L
-L(1) = link([ pi/2 0	0	0	0], 'standard');
-L(2) = link([ 0 	.4318	0	0	0], 'standard');
-L(3) = link([-pi/2 .0203	0	.15005	0], 'standard');
-L(4) = link([pi/2 0	0	.4318	0], 'standard');
-L(5) = link([-pi/2 0	0	0	0], 'standard');
-L(6) = link([0 	0	0	0	0], 'standard');
+%             th    d       a         alpha
+L(1) = Link([ 0     0       0         pi/2    0], 'standard');
+L(2) = Link([ 0 	0       0.4318	  0       0], 'standard');
+L(3) = Link([ 0     0.15005	0.0203    -pi/2   0], 'standard');
+L(4) = Link([ 0     0.4318	0         pi/2    0], 'standard');
+L(5) = Link([ 0     0       0         -pi/2   0], 'standard');
+L(6) = Link([ 0     0 	    0          0      0], 'standard');
 
 L(1).m = 0;
 L(2).m = 17.4;
@@ -105,7 +106,7 @@ L(4).B =   71.2e-6;
 L(5).B =   82.6e-6;
 L(6).B =   36.7e-6;
 
-p560 = robot(L, 'name', 'Puma 560', ...
+p560 = SerialLink(L, 'name', 'Puma 560', ...
     'manufacturer', 'Unimation', 'comment', 'viscous friction; params of 8/95');
 
 % Coulomb friction (motor referenced)
@@ -126,6 +127,6 @@ qs = [0 0 -pi/2 0 0 0];
 qn=[0 pi/4 pi 0 pi/4  0];
 
 
-p560_f = robot(L, 'name', 'Puma 560', ...
+p560_f = SerialLink(L, 'name', 'Puma 560', ...
     'manufacturer', 'Unimation', 'comment', 'nonlin friction; params of 8/95');
 clear L

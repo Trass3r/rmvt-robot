@@ -66,7 +66,7 @@
 %	L = LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
 %
 
-classdef Link
+classdef Link < handle
     properties
         % kinematic parameters
         theta
@@ -128,12 +128,13 @@ classdef Link
                 % link([alpha A theta D sigma])
 
                 if length(dh) < 4,
-                        error('must provide <alpha A theta D> params');
+                        error('must provide params (theta d a alpha)');
                 end
-                l.alpha = dh(1);
-                l.a = dh(2);
-                l.theta = dh(3);
-                l.d = dh(4);
+                l.theta = dh(1);
+                l.d = dh(2);
+                l.a = dh(3);
+                l.alpha = dh(4);
+
                 l.sigma = 0;
                 if length(dh) >= 5,
                     l.sigma = dh(5);
@@ -314,22 +315,40 @@ classdef Link
             disp( char(l) );
         end % display()
 
-        function s = char(links)
+        function s = char(links, from_robot)
 
+            % display in the order theta d a alpha
+            if nargin < 2
+                from_robot = false;
+            end
 
             s = '';
             for j=1:length(links),
                 l = links(j);
-                if l.mdh == 0,
-                    conv = 'std';
+                if from_robot
+                    if l.sigma == 1,
+                        % prismatic joint
+                        js = sprintf('|%3d|%11.4g|%11s|%11.4g|%11.4g|', ...
+                            j, l.theta, sprintf('q%d', j), l.a, l.alpha);
+                    else
+                        js = sprintf('|%3d|%11s|%11.4g|%11.4g|%11.4g|', ...
+                            j, sprintf('q%d', j), l.d, l.a, l.alpha);
+                    end
                 else
-                    conv = 'mod';
-                end
-                if l.sigma == 1,
-                    % prismatic joint
-                    js = sprintf('%11.4g %11s %11.4g %11.4g (%s)', l.theta, sprintf('q%d', j), l.a, l.alpha, conv);
-                else
-                    js = sprintf('%11s %11.4g %11.4g %11.4g (%s)', sprintf('q%d', j), l.d, l.a, l.alpha, conv);
+                    conv = l.RP;
+                    if l.mdh == 0,
+                        conv = [conv ',stdDH'];
+                    else
+                        conv = [conv ',modDH'];
+                    end
+                    if l.sigma == 1,
+                        % prismatic joint
+                        js = sprintf(' theta=%.4g, d=%s, a=%.4g, alpha=%.4g (%s)', ...
+                            l.theta, sprintf('q%d', j), l.a, l.alpha, conv);
+                    else
+                        js = sprintf(' theta=%s, d=%.4g, a=%.4g, alpha=%.4g (%s)', ...
+                            sprintf('q%d', j), l.d, l.a, l.alpha, conv);
+                    end
                 end
                 s = strvcat(s, js);
             end

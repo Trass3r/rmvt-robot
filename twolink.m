@@ -34,10 +34,10 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 twolink_dh = [
-% alpha A	theta	D	sigma	m	rx	ry	rz	Ixx	Iyy	Izz	Ixy	Iyz	Ixz	Jm	G
-  0     1         0     0         0     1       1       0       0       0       0       0       0       0       0        0      1
-  0     1         0     0         0     1       1       0       0       0       0       0       0       0       0        0      1
+% theta d a alpha a	sigma	m	rx	ry	rz	Ixx	Iyy	Izz	Ixy	Iyz	Ixz	Jm	G
+  0     0         1     0         0     1       1       0       0       0       0       0       0       0       0        0      1
+  0     0         1     0         0     1       1       0       0       0       0       0       0       0       0        0      1
 ];
 
-tl = robot(twolink_dh, 'name', 'Simple two link');
+two_link = SerialLink(twolink_dh, 'name', 'Simple two link');
 qz = [0 0];
