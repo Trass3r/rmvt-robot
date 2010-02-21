@@ -1,14 +1,9 @@
-%SKEW Convert to/from skew symmetric form
+%SKEW Create skew-symmetric matrix
 %
 %   S = skew(v)
 %
 % Create 3x3 skew-symmetric matrix from 3x1 vector v
 %
-%   v = skew(S);
-%
-% Assuming that S is skew-symmetric, extract the 3 unique values from it.  We
-% actually take the mean of the two elements that correspond to each unique
-% element, ie. vx = 0.5*(S(3,2)-S(2,3))
 
 % Copyright (C) 1993-2008, by Peter I. Corke
 %
@@ -28,12 +23,10 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function S = skew(v)
-    if isvector(v),
+    if isvec(v,3),
         S = [  0   -v(3)  v(2)
               v(3)  0    -v(1)
              -v(2) v(1)   0];
-    elseif isrot(v)
-        S = 0.5*[v(3,2)-v(2,3); v(1,3)-v(3,1); v(2,1)-v(1,2)];
     else
-        error('argument must be 3-vector or 3x3 matrix');
+        error('argument must be a 3-vector');
 	end
