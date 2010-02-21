@@ -16,8 +16,6 @@
 % substituted  
 %  eg.  trplot(trotx(.2), {'$%c_{cam}$','$\{X_{cam}\}$'})
 %
-% Note that if you want the frame name to be '{frame}' you need to escape
-% the braces, eg. '\{frame\}.
 
 % Copyright (C) 2008, by Peter I. Corke
 %
@@ -36,120 +34,168 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function trplot(T, name, color)
+function hout = trplot(T, varargin)
 
-    if ndims(T) == 3,
-        clf
-        hold on
-        for i=1:size(T,3),
-            trplot(T(:,:,i), num2str(i));
+    opt.color = 'b';
+    opt.axes = true;
+    opt.name = [];
+    opt.axis = [];
+    opt.framename = [];
+    opt.axlabel = [];
+    opt.text_opts = {};
+    opt.view = [];
+    opt.width = 1;
+    opt.arrow = true;
+    argc = 1;
+    while argc <= length(varargin)
+        switch lower(varargin{argc})
+        case 'color'
+            opt.color = varargin{argc+1}; argc = argc+1;
+        case 'frame'
+            opt.framename = varargin{argc+1}; argc = argc+1;
+        case 'label'
+            opt.axlabel = varargin{argc+1}; argc = argc+1;
+        case 'noaxes'
+            opt.axes = false;
+        case 'noarrow'
+            opt.arrow = false;
+        case 'unit'
+            opt.axis = [-1 1 -1 1 -1 1]*1.2';
+        case 'axis'
+            opt.axis = varargin{argc+1}; argc = argc+1;
+        case 'textopts'
+            opt.text_opts = varargin{argc+1}; argc = argc+1;
+        case 'width'
+            opt.width = varargin{argc+1}; argc = argc+1;
+        case 'view'
+            opt.view = varargin{argc+1}; argc = argc+1;
+        otherwise
+            error( sprintf('unknown option <%s>', varargin{argc}));
         end
-        hold off
-        shg
-        return
+        argc = argc + 1;
     end
+
+    if isempty(opt.axis)
+        if all(size(T) == [3 3]) || norm(transl(T)) < eps
+            opt.axis = [-1 1 -1 1 -1 1]*1.2';
+        end
+            
+    end
+    
+    % TODO: should do the 2D case as well
+    
+    ih = ishold;
+    if ~ih
+        % if hold is not on, then clear the axes and set scaling
+		cla
+        if ~isempty(opt.axis)
+            axis(opt.axis);
+        end
+        daspect([1 1 1]);
+        
+        if opt.axes
+            xlabel( 'X');
+            ylabel( 'Y');
+            zlabel( 'Z');
+            rotate3d on
+        end
+        new_plot = true;
+    else
+        set(gca, 'XLimMode', 'auto');
+        set(gca, 'YLimMode', 'auto');
+        set(gca, 'ZLimMode', 'auto');
+	end
+
+    opt.text_opts = {opt.text_opts{:}, 'Color', opt.color};
+
+	hold on
 
     % trplot( Q.r, fmt, color);
     if size(T) == [3 3],
         T = r2t(T);
     end
 
-	if nargin < 2,
-		name = '';
-	end
-	if nargin < 3,
-		color = 'b';
-	end
 
 	% create unit vectors
-	o = T*[0 0 0 1]';
-	x1 = T*[1 0 0 1]';
-	y1 = T*[0 1 0 1]';
-	z1 = T*[0 0 1 1]';
+	o =  transformp(T, [0 0 0]');
+	x1 = transformp(T, [1 0 0]');
+	y1 = transformp(T, [0 1 0]');
+	z1 = transformp(T, [0 0 1]');
 
-	get(gca, 'Tag')
-	if strcmp(get(gca, 'Tag'), 'trplot') == 0,
-		fprintf('No tag\n');
-		clf
-		axes
-		set(gca, 'Tag', 'trplot')
-		fprintf('set tag\n');
-		xlabel( 'X');
-		ylabel( 'Y');
-		zlabel( 'Z');
-	end
-	ih = ishold;
-	hold on
-% 	plot3([0;x1(1)]+off(1), [0; x1(2)]+off(2), [0; x1(3)]+off(3), color);
-% 	h = text(off(1)+x1(1), off(2)+x1(2), off(3)+x1(3), sprintf(fmt, 'X'));
-% 	set(h, 'Color', color);
-% 
-% 	plot3([0;y1(1)]+off(1), [0; y1(2)]+off(2), [0; y1(3)]+off(3), color);
-% 	h = text(off(1)+y1(1), off(2)+y1(2), off(3)+y1(3), sprintf(fmt, 'Y'));
-% 	set(h, 'Color', color);
-% 
-% 	plot3([0;z1(1)]+off(1), [0; z1(2)]+off(2), [0; z1(3)]+off(3), color);
-% 	h = text(off(1)+z1(1), off(2)+z1(2), off(3)+z1(3), sprintf(fmt, 'Z'));
-% 	set(h, 'Color', color);
-
-    arrow_opts = {'EdgeColor', color, 'FaceColor', color, 'Width', 2};
-    text_opts = {'Color', color};
+    
+    % draw the axes
     
     mstart = [o o o]';
-    mend = [x1+o y1+o z1+o]';
-    mstart
-    mend
+    mend = [x1 y1 z1]';
     
-    % draw the 3 arrows
-    %arrow(mstart(:,1:3), mend(:,1:3), arrow_opts{:});
-    mstart = mstart(:,1:3);
-    mend = mend(:,1:3);
-    
-    for i=1:3,
-        plot2([mstart(i,:); mend(i,:)]);
-    end
-
-
-    % name             for axes
-    % {nam1, nam2}     axes, framename
-    if isstr(name)
-        axname = name;
-        framename = '';
-    end
-    if iscell(name),
-        axname = name{1};
-        framename = name{2};
-    end
-
-    if strcmp(axname, ''),
-            fmt = '%c';
+    if opt.arrow
+        hg = hgtransform;
+        % draw the 3 arrows
+        S = [opt.color num2str(opt.width)];
+        ha = arrow3(mstart(:,1:3), mend(:,1:3), S);
+        for h=ha'
+            set(h, 'Parent', hg);
+        end
     else
-            if axname(1) == '$',
-                fmt = axname;
-                text_opts = {text_opts{:}, 'Interpreter', 'latex'};
-            else,
-                fmt = sprintf('%%c%s', axname);
-            end
+        for i=1:3,
+            plot2([mstart(i,1:3); mend(i,1:3)]);
+        end
     end
+
+    % label the axes
+    if isempty(opt.framename),
+        fmt = '%c';
+    else
+%             if opt.axlabel(1) == '$',
+%                 fmt = axlabel;
+%                 opt.text_opts = {opt.text_opts{:}, 'Interpreter', 'latex'};
+%             else,
+%                 fmt = sprintf('%%c%s', axlabel);
+%             end
+        fmt = sprintf('%%c_{%s}', opt.framename);
+    end
+    
     % add the labels to each axis
-	h = text(o(1)+x1(1), o(2)+x1(2), o(3)+x1(3), sprintf(fmt, 'X'));
-	set(h, text_opts{:});
+	h = text(x1(1), x1(2), x1(3), sprintf(fmt, 'X'));
+	set(h, opt.text_opts{:});
+    if opt.arrow
+        set(h, 'Parent', hg);
+    end
 
-	h = text(o(1)+y1(1), o(2)+y1(2), o(3)+y1(3), sprintf(fmt, 'Y'));
-	set(h, text_opts{:});
+	h = text(y1(1), y1(2), y1(3), sprintf(fmt, 'Y'));
+	set(h, opt.text_opts{:});
+    if opt.arrow
+        set(h, 'Parent', hg);
+    end
 
-	h = text(o(1)+z1(1), o(2)+z1(2), o(3)+z1(3), sprintf(fmt, 'Z'));
-	set(h, text_opts{:});
-    
-    if ~strcmp(framename, ''),
-        h = text(o(1)-0.02*x1(1), o(2)-0.02*y1(2), o(3)-0.02*z1(3), framename);
-        set(h, 'VerticalAlignment', 'middle', ...
-            'Interpreter', 'latex', ...
-            'HorizontalAlignment', 'center', text_opts{:});
+	h = text(z1(1), z1(2), z1(3), sprintf(fmt, 'Z'));
+	set(h, opt.text_opts{:});
+    if opt.arrow
+        set(h, 'Parent', hg);
     end
     
+    % label the frame
+    if ~isempty(opt.framename),
+        h = text(o(1)-0.04*x1(1), o(2)-0.04*y1(2), o(3)-0.04*z1(3), ...
+            ['\{' opt.framename '\}']);
+        set(h, 'VerticalAlignment', 'middle', ...
+            'HorizontalAlignment', 'center', opt.text_opts{:});
+    end
+    
+    if ~opt.axes
+        set(gca, 'visible', 'off');
+    end
+    if isstr(opt.view) && strcmp(opt.view, 'auto')
+        cam = x1+y1+z1;
+        view(cam(1:3));
+    elseif ~isempty(opt.view)
+        view(opt.view);
+    end
 	grid on
-	if ~ishold,
+	if ~ih
 		hold off
-	end
-	axis square
+    end
+    
+    if nargout > 0
+        hout = hg;
+    end
