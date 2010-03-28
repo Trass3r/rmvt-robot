@@ -297,7 +297,7 @@ classdef Link < handle
 
         function T = A(L, q)
 
-            if L.mdh == 0,
+            if L.mdh == 0
                 T = linktran([L.alpha L.a L.theta L.d L.sigma], ...
                     q+L.offset);
             else
@@ -341,13 +341,19 @@ classdef Link < handle
                     else
                         conv = [conv ',modDH'];
                     end
+                    if length(links) == 1
+                        qname = 'q';
+                    else
+                        qname = sprintf('q%d', j);
+                    end
+
                     if l.sigma == 1,
                         % prismatic joint
                         js = sprintf(' theta=%.4g, d=%s, a=%.4g, alpha=%.4g (%s)', ...
-                            l.theta, sprintf('q%d', j), l.a, l.alpha, conv);
+                            l.theta, qname, l.a, l.alpha, conv);
                     else
                         js = sprintf(' theta=%s, d=%.4g, a=%.4g, alpha=%.4g (%s)', ...
-                            sprintf('q%d', j), l.d, l.a, l.alpha, conv);
+                            qname, l.d, l.a, l.alpha, conv);
                     end
                 end
                 s = strvcat(s, js);
