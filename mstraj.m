@@ -12,7 +12,7 @@
 %   qdmax is a row N-vector of axis velocity limits, or a column M-vector of segment times
 %   q is a N-vector of initial axis coordinates
 %   dt is the time step
-%   tacc is the acceleration time.
+%   tacc is the acceleration time. CAN BE A VECTOR
 %
 %   traj = mstraj(segments, qdmax, q, dt, tacc, qd0, qdf)
 %
@@ -37,17 +37,25 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function [TG, taxis]  = mstraj(segments, qdmax, q, dt, Tacc, qd0, qdf)
+function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, qd0, qdf)
 
     ns = numrows(segments);
     nj = numcols(segments);
 
-    debug = false;
+    if ~isempty(qdmax) && ~isempty(tsegment)
+        error('Can only specify one of qdmax or tsegment');
+    end
+    if isempty(qdmax) && isempty(tsegment)
+        error('Must specify one of qdmax or tsegment');
+    end
 
-    if nargin < 6,
+    debug = false;
+    debug = true;
+
+    if nargin < 7,
         qd0 = zeros(1, nj);
     end
-    if nargin < 7,
+    if nargin < 8,
         qdf = zeros(1, nj);
     end
 
@@ -95,7 +103,7 @@ function [TG, taxis]  = mstraj(segments, qdmax, q, dt, Tacc, qd0, qdf)
         %   dq = q_next - q_prev - qb
         %   tl = abs(dq) ./ qdmax;
 
-        if size(qdmax, 1) == 1
+        if ~isempty(qdmax)
             % qdmax is specified, compute slowest axis
 
             qb = taccx * qdmax / 2;        % distance moved during blend
@@ -115,9 +123,10 @@ function [TG, taxis]  = mstraj(segments, qdmax, q, dt, Tacc, qd0, qdf)
             if tseg <= 2*tacc
                 tseg = 2 * tacc;
             end
-        else
+        elseif ~isempty(tsegment)
             % segment time specified, use that
-            tseg = qdmax(seg);
+            tseg = tsegment(seg);
+            slowest = NaN;
         end
 
         % log the planned arrival time
@@ -160,12 +169,14 @@ function [TG, taxis]  = mstraj(segments, qdmax, q, dt, Tacc, qd0, qdf)
     % plot a graph if no output argument
     if nargout == 0
         t = [0:numrows(tg)-1]'*dt;
+        clf
         plot(t, tg, '-o');
         hold on
         plot(arrive, segments, 'bo', 'MarkerFaceColor', 'k');
         hold off
         grid
         xlabel('time');
+        xaxis(t(1), t(end))
     else 
         TG = tg;
     end
