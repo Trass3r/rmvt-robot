@@ -1106,8 +1106,6 @@ public class dhfactor {
 
     // Matlab callable constructor
 	public dhfactor(String src) {
-        System.err.println("Modified hello from dh constructor\n");
-
         results = parseString(src);
     }
 
@@ -1115,6 +1113,14 @@ public class dhfactor {
         return angle(e.constant);
     }
 
+
+    public String toString() {
+        return results.toString();
+    }
+
+    public String display() {
+        return results.toString();
+    }
 
     private String angle(int a)
     {
@@ -1156,8 +1162,7 @@ public class dhfactor {
     /*
      * Create a Toolbox legacy DH matrix. The column order is:
      *
-     *      alpha A theta D
-     *
+     *      theta d a alpha
      */
     public String dh() {
 		String	s = "[";
@@ -1178,14 +1183,10 @@ public class dhfactor {
                     d = (e.D == null) ? "0" : e.D;
                 }
 
-                s += angle(e.alpha);
-                s += ", ";
-                s += (e.A == null) ? "0" : e.A;
-                s += ", ";
-                s += theta;
-                s += ", ";
-                s += d;
-                s += "; ";
+                s += theta; s += ", ";
+                s += d; s += ", ";
+                s += (e.A == null) ? "0" : e.A; s += ", ";
+                s += angle(e.alpha); s += "; ";
             };
         }
         s += "]";
@@ -1237,7 +1238,7 @@ public class dhfactor {
 
     // return Matlab Toolbox robot creation command
     public String command(String name) {
-        return "robot(" + this.dh() + ", 'name', '" + name +
+        return "SerialLink(" + this.dh() + ", 'name', '" + name +
             "', 'base', " + this.base() +
             ", 'tool', " + this.tool() +
             ", 'offset', " + this.offset() + ")";
