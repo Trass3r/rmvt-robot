@@ -25,4 +25,6 @@
 
 function T = r2t(R)
 
-	T = [R(1:3,1:3) [0;0;0]; 0 0 0 1];
+    n = numrows(R);
+
+	T = [R zeros(n,1); zeros(1,n) 1];

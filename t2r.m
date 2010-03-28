@@ -26,4 +26,4 @@
 
 function R = tr2rot(T)
 
-	R = T(1:3,1:3);
+	R = T(1:end-1,1:end-1);
