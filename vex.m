@@ -23,9 +23,9 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function S = skew(v)
-    if isrot(v)
-        S = 0.5*[v(3,2)-v(2,3); v(1,3)-v(3,1); v(2,1)-v(1,2)];
+function v = vex(S)
+    if isrot(S) || ishomog(S)
+        v = 0.5*[S(3,2)-S(2,3); S(1,3)-S(3,1); S(2,1)-S(1,2)];
     else
         error('argument must be a 3x3 matrix');
 	end
