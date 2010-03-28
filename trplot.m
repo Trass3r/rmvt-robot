@@ -45,7 +45,7 @@ function hout = trplot(T, varargin)
     opt.text_opts = {};
     opt.view = [];
     opt.width = 1;
-    opt.arrow = true;
+    opt.arrow = false;
     argc = 1;
     while argc <= length(varargin)
         switch lower(varargin{argc})
@@ -57,8 +57,8 @@ function hout = trplot(T, varargin)
             opt.axlabel = varargin{argc+1}; argc = argc+1;
         case 'noaxes'
             opt.axes = false;
-        case 'noarrow'
-            opt.arrow = false;
+        case 'arrow'
+            opt.arrow = true;
         case 'unit'
             opt.axis = [-1 1 -1 1 -1 1]*1.2';
         case 'axis'
@@ -128,8 +128,9 @@ function hout = trplot(T, varargin)
     mstart = [o o o]';
     mend = [x1 y1 z1]';
     
+    hg = hgtransform;
+
     if opt.arrow
-        hg = hgtransform;
         % draw the 3 arrows
         S = [opt.color num2str(opt.width)];
         ha = arrow3(mstart(:,1:3), mend(:,1:3), S);
@@ -138,7 +139,9 @@ function hout = trplot(T, varargin)
         end
     else
         for i=1:3,
-            plot2([mstart(i,1:3); mend(i,1:3)]);
+            h = plot2([mstart(i,1:3); mend(i,1:3)]);
+            set(h, 'Parent', hg);
+
         end
     end
 
@@ -158,21 +161,17 @@ function hout = trplot(T, varargin)
     % add the labels to each axis
 	h = text(x1(1), x1(2), x1(3), sprintf(fmt, 'X'));
 	set(h, opt.text_opts{:});
-    if opt.arrow
-        set(h, 'Parent', hg);
-    end
+    set(h, 'Parent', hg);
+   
 
 	h = text(y1(1), y1(2), y1(3), sprintf(fmt, 'Y'));
 	set(h, opt.text_opts{:});
-    if opt.arrow
         set(h, 'Parent', hg);
-    end
+    
 
 	h = text(z1(1), z1(2), z1(3), sprintf(fmt, 'Z'));
 	set(h, opt.text_opts{:});
-    if opt.arrow
         set(h, 'Parent', hg);
-    end
     
     % label the frame
     if ~isempty(opt.framename),
