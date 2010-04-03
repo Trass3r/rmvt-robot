@@ -35,11 +35,37 @@
 
 function C = coriolis(robot, q, qd)
 
-	if nargin == 3,
-		C = rne(robot, q, qd, zeros(size(q)), [0;0;0]);
-	else
-		n = length(q);
-        q = q(:)';  % row vector
-        C = rne(robot.nofriction, ...
-            ones(n,1)*q, eye(n), zeros(n), [0 0 0]');
-	end
+    % we need to create a clone robot with no friciton, since friction
+    % is also proportional to joint velocity
+    robot2 = robot.nofriction('all');
+
+    N = robot2.n;
+    C = zeros(N,N);
+    Csq = zeros(N,N);
+
+    % find the torques that depend on a single finite joint speed,
+    % these are due to the squared (centripetal) terms
+    %
+    %  set QD = [1 0 0 ...] then resulting torque is due to qd_1^2
+    for j=1:N
+        QD = zeros(1,N);
+        QD(j) = 1;
+        tau = robot2.rne(q, QD, zeros(size(q)), [0 0 0]');
+        Csq(:,j) = Csq(:,j) + tau';
+    end
+
+    % find the torques that depend on a pair of finite joint speeds,
+    % these are due to the product (Coridolis) terms
+    %  set QD = [1 1 0 ...] then resulting torque is due to 
+    %    qd_1 qd_2 + qd_1^2 + qd_2^2
+    for j=1:N
+        for k=j+1:N
+            % find a product term  qd_j * qd_k
+            QD = zeros(1,N);
+            QD(j) = 1;
+            QD(k) = 1;
+            tau = robot2.rne(q, QD, zeros(size(q)), [0 0 0]');
+            C(:,k) = C(:,k) + (tau' - Csq(:,k) - Csq(:,j)) * qd(j);
+        end
+    end
+    C = C + Csq * diag(qd);
