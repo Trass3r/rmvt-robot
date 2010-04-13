@@ -193,7 +193,7 @@ classdef quaternion
         % from 0 to 1.  This is a spherical linear interpolation (slerp) that can
         % be interpretted as interpolation along a great circle arc on a sphere.
         %
-        % If r is a vector, QI, is a cell array of quaternions, each element
+        % If r is a vector, QI, is a vector of quaternions, each element
         % corresponding to sequential elements of R.
         %
         % See also: CTRAJ, quaternion.
@@ -202,7 +202,7 @@ classdef quaternion
             q1 = double(Q1);
             q2 = double(Q2);
 
-            if (r<0) || (r>1),
+            if any(r<0) || any(r>1),
                 error('R out of range');
             end
 
@@ -425,11 +425,26 @@ classdef quaternion
         end
 
         function r = get.r(q)
-            r = t2r( q2tr(q) );
+            if length(q) > 1
+                r = [];
+                for Q=q
+                    rr = t2r( q2tr(Q) );
+                    r = cat(3, r, rr);
+                end
+            else
+                r = t2r( q2tr(q) );
+            end
         end
 
         function t = get.t(q)
-            t = q2tr(q);
+            if length(q) > 1
+                t = [];
+                for Q=q
+                    t = cat(3, t, q2tr(Q));
+                end
+            else
+                t = q2tr(q);
+            end
         end
 
         function qd = dot(q, omega)

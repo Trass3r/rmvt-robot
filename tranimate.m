@@ -7,7 +7,11 @@
 function tranimate(T2, varargin)
     if size(T2,3) > 1
         % tranimate(Ts)
-        Ttraj = T2;
+        if isa(T2, 'quaternion')
+            Ttraj = T2.t;   % convert quaternion to transform
+        else
+            Ttraj = T2;
+        end
     else
         if isrot(T2)
             T2 = r2t(T2);
@@ -28,7 +32,7 @@ function tranimate(T2, varargin)
         Ttraj = ctraj(T1, T2, 100);
     end
 
-    hg = trplot(T1, varargin{:});
+    hg = trplot(Ttraj(:,:,1), varargin{:});
 
     for i=1:size(Ttraj,3)
         T = Ttraj(:,:,i);
