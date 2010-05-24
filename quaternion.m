@@ -1,14 +1,14 @@
-%quaternion Constructor for quaternion objects
+%Quaternion Constructor for Quaternion objects
 % 
-%   Q = quaternion               identitity quaternion 1<0,0,0>
-%   Q = quaternion(q)            from another quaternion
+%   Q = Quaternion               identitity quaternion 1<0,0,0>
+%   Q = Quaternion(q)            from another quaternion
 %
-%   Q = quaternion([s v1 v2 v3]) from 4 elements
-%   Q = quaternion(s)            from a scalar 
-%   Q = quaternion(v)            from a vector (pure quaternion)
+%   Q = Quaternion([s v1 v2 v3]) from 4 elements
+%   Q = Quaternion(s)            from a scalar 
+%   Q = Quaternion(v)            from a vector (pure quaternion)
 %
-%   Q = quaternion(th, v)        unit quaternion from vector plus angle
-%   Q = quaternion(R)            unit quaternion from a 3x3 or 4x4 matrix
+%   Q = Quaternion(th, v)        unit quaternion from vector plus angle
+%   Q = Quaternion(R)            unit quaternion from a 3x3 or 4x4 matrix
 %
 % A quaternion is a compact method of representing a 3D rotation that has
 % computational advantages including speed and numerical robustness.
@@ -56,7 +56,7 @@
 %  constructor handles R, T trajectory and returns vector
 %  .r, .t on a quaternion vector??
 
-classdef quaternion
+classdef Quaternion
 
     properties (Dependent = true)
         r   % rotation matrix
@@ -70,33 +70,33 @@ classdef quaternion
 
     methods
 
-        function q = quaternion(a1, a2)
+        function q = Quaternion(a1, a2)
 
             if nargin == 0,
                 q.v = [0,0,0];
                 q.s = 1;
-            elseif isa(a1, 'quaternion')
-            %   Q = quaternion(q)       from another quaternion
+            elseif isa(a1, 'Quaternion')
+            %   Q = Quaternion(q)       from another quaternion
                 q = a1;
             elseif nargin == 1
                 if all(size(a1) == [1 4]) || all(size(a1) == [4 1])
-            %   Q = quaternion([s v1 v2 v3])    from 4 elements
+            %   Q = Quaternion([s v1 v2 v3])    from 4 elements
                     a1 = a1(:);
                     q.s = a1(1);
                     q.v = a1(2:4)';
                 elseif all(size(a1) == [3 3])
-            %   Q = quaternion(R)       from a 3x3 or 4x4 matrix
-                    q = quaternion( tr2q(a1) );
+            %   Q = Quaternion(R)       from a 3x3 or 4x4 matrix
+                    q = Quaternion( tr2q(a1) );
                 elseif all(size(a1) == [4 4])
-                    q = quaternion( tr2q(a1(1:3,1:3)) );
+                    q = Quaternion( tr2q(a1(1:3,1:3)) );
 
                 elseif length(a1) == 3,
-            %   Q = quaternion(v)       from a vector
+            %   Q = Quaternion(v)       from a vector
 
                     q.s = 0;
                     q.v = a1(:)';
                 elseif length(a1) == 1,
-            %   Q = quaternion(s)       from a scalar
+            %   Q = Quaternion(s)       from a scalar
                     q.s = a1(1);
                     q.v = [0 0 0];
                 else
@@ -104,7 +104,7 @@ classdef quaternion
                 end
             elseif nargin == 2
                 if isvector(a1) && isscalar(a2),
-                %   Q = quaternion(theta, v)    from vector plus angle
+                %   Q = Quaternion(theta, v)    from vector plus angle
                     q.s = cos(a1/2);
                     q.v = sin(a1/2)*unit(a2(:)');
                 end
@@ -161,7 +161,7 @@ classdef quaternion
 
         function qi = inv(q)
 
-            qi = quaternion([q.s -q.v]);
+            qi = Quaternion([q.s -q.v]);
         end
 
         %UNIT Unitize a quaternion
@@ -213,14 +213,14 @@ classdef quaternion
                 if theta == 0,
                     q = Q1;
                 else
-                    q = quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) );
+                    q = Quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) );
                 end
             else
                 for R=r(:)',
                     if theta == 0,
                         qq = Q1;
                     else
-                        qq = quaternion( (sin((1-R)*theta) * q1 + sin(R*theta) * q2) / sin(theta) );
+                        qq = Quaternion( (sin((1-R)*theta) * q1 + sin(R*theta) * q2) / sin(theta) );
                     end
                     q(count) = qq;
                     count = count + 1;
@@ -256,7 +256,7 @@ classdef quaternion
                 if theta == 0,
                     q = Q;
                 else
-                    q = quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
+                    q = Quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
                 end
             else
                 count = 1;
@@ -264,7 +264,7 @@ classdef quaternion
                     if theta == 0,
                         qq = Q;
                     else
-                        qq = quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
+                        qq = Quaternion( (sin((1-r)*theta) * q1 + sin(r*theta) * q2) / sin(theta) ).unit;
                     end
                     q(count) = qq;
                     count = count + 1;
@@ -280,9 +280,9 @@ classdef quaternion
         % q1+q2 standard quaternion addition
         function qp = plus(q1, q2)
 
-            if isa(q1, 'quaternion') & isa(q2, 'quaternion')
+            if isa(q1, 'Quaternion') & isa(q2, 'Quaternion')
 
-                qp = quaternion(double(q1) + double(q2));
+                qp = Quaternion(double(q1) + double(q2));
             end
         end
 
@@ -294,9 +294,9 @@ classdef quaternion
         % q1-q2 standard quaternion subtraction
         function qp = minus(q1, q2)
 
-            if isa(q1, 'quaternion') & isa(q2, 'quaternion')
+            if isa(q1, 'Quaternion') & isa(q2, 'Quaternion')
 
-                qp = quaternion(double(q1) - double(q2));
+                qp = Quaternion(double(q1) - double(q2));
             end
         end
 
@@ -309,7 +309,7 @@ classdef quaternion
         % q1*s  multiply vector v by scalar
         function qp = mtimes(q1, q2)
 
-            if isa(q1, 'quaternion') & isa(q2, 'quaternion')
+            if isa(q1, 'Quaternion') & isa(q2, 'Quaternion')
             %QQMUL  Multiply unit-quaternion by unit-quaternion
             %
             %   QQ = qqmul(Q1, Q2)
@@ -325,9 +325,9 @@ classdef quaternion
                 s2 = q2.s;  v2 = q2.v;
 
                 % form the product
-                qp = quaternion([s1*s2-v1*v2' s1*v2+s2*v1+cross(v1,v2)]);
+                qp = Quaternion([s1*s2-v1*v2' s1*v2+s2*v1+cross(v1,v2)]);
 
-            elseif isa(q1, 'quaternion') & isa(q2, 'double'),
+            elseif isa(q1, 'Quaternion') & isa(q2, 'double'),
 
             %QVMUL  Multiply vector by unit-quaternion
             %
@@ -338,20 +338,20 @@ classdef quaternion
             %   See also: QQMUL, QINV
 
                 if length(q2) == 3,
-                    qp = q1 * quaternion([0 q2(:)']) * inv(q1);
+                    qp = q1 * Quaternion([0 q2(:)']) * inv(q1);
                     qp = qp.v(:);
                 elseif length(q2) == 1,
-                    qp = quaternion( double(q1)*q2);
+                    qp = Quaternion( double(q1)*q2);
                 else
                     error('quaternion-vector product: must be a 3-vector or scalar');
                 end
 
-            elseif isa(q2, 'quaternion') & isa(q1, 'double'),
+            elseif isa(q2, 'Quaternion') & isa(q1, 'double'),
                 if length(q1) == 3,
-                    qp = q2 * quaternion([0 q1(:)']) * inv(q2);
+                    qp = q2 * Quaternion([0 q1(:)']) * inv(q2);
                     qp = qp.v;
                 elseif length(q1) == 1,
-                    qp = quaternion( double(q2)*q1);
+                    qp = Quaternion( double(q2)*q1);
                 else
                     error('quaternion-vector product: must be a 3-vector or scalar');
                 end
@@ -389,13 +389,13 @@ classdef quaternion
         % q1/s      result is non-unit quaternion, all elements divided by s
         function qq = mrdivide(q1, q2)
 
-            if isa(q2, 'quaternion'),
+            if isa(q2, 'Quaternion'),
                 % qq = q1 / q2
                 %    = q1 * qinv(q2)
 
                 qq = q1 * inv(q2);
             elseif isa(q2, 'double'),
-                qq = quaternion( double(q1) / q2 );
+                qq = Quaternion( double(q1) / q2 );
             end
         end
 
@@ -450,7 +450,7 @@ classdef quaternion
         function qd = dot(q, omega)
             E = q.s*eye(3,3) - skew(q.v);
             omega = omega(:);
-            qd = quaternion(-0.5*q.v*omega, 0.5*E*omega);
+            qd = Quaternion(-0.5*q.v*omega, 0.5*E*omega);
         end
     end % methods
 end % classdef
@@ -499,12 +499,12 @@ function q = tr2q(t)
     end
     nm = norm([kx ky kz]);
     if nm == 0,
-        q = quaternion([1 0 0 0]);
+        q = Quaternion([1 0 0 0]);
     else
         s = sqrt(1 - qs^2) / nm;
         qv = s*[kx ky kz];
 
-        q = quaternion([qs qv]);
+        q = Quaternion([qs qv]);
 
     end
 end
