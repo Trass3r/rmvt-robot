@@ -2,9 +2,13 @@
 %
 % All the state is kept in the structure called d
 % X is an index into the array of states.
-% This is the PROCESS_STATE() function
+% state pointers are kept as matlab array index rather than row,col format
 
-classdef dstar < Navigation
+%TODO use pgraph class
+
+% pic 7/09
+
+classdef Dstar < Navigation
 
     properties
         costmap   % world cost map: obstacle = Inf
@@ -21,6 +25,8 @@ classdef dstar < Navigation
 
         k_old
         k_min
+
+        niter
 
         openlist_maxlen     % keep track of maximum length
 
@@ -90,10 +96,9 @@ classdef dstar < Navigation
             if ds.costmap(ds.G) == Inf
                 error('cant set goal inside obstacle');
             end
-            ds.INSERT(ds.G, 0);
+            ds.INSERT(ds.G, 0, 'goalset');
             ds.h(ds.G) = 0;
         end
-
 
         function navigate_init(ds)
             idisp2(ds.h)
@@ -101,9 +106,26 @@ classdef dstar < Navigation
             hold on
         end
 
-        function navigate(ds, varargin)
-            navigate@Navigation(ds, varargin{:});
-            hold off
+        function visualize(ds, varargin)
+            v = ds.h(isfinite(ds.h));
+            cmap = gray(max(v));
+            cmap = [1 0 0; cmap];
+            colormap(cmap)
+            % display obstacles, where ds.h == Inf, as red
+            img = ds.h + 1;
+            img(isinf(img)) = 0;
+
+            image(img+1, 'CDataMapping', 'direct');
+            set(gca, 'Ydir', 'normal');
+            xlabel('x');
+            ylabel('y');
+            colorbar
+            hold on
+            plot(ds.goal(1), ds.goal(2), 'go', 'MarkerFaceColor', 'g');
+
+            if nargin == 2
+                plot(p(:,1), p(:,2), 'g.');
+            end
         end
 
         function n = next(ds, current)
@@ -117,33 +139,44 @@ classdef dstar < Navigation
             end
         end
 
-        function plan(ds)
+        function plan(ds, goal)
+            if nargin > 1
+                ds.goal = goal;
+            end
             ds.niter = 0;
+            spinner = '-\|/';
+            spincount = 0;
             while true
+                if mod(ds.niter, 10) == 0
+                    spincount = spincount + 1;
+                    fprintf('\r%c', spinner( mod(spincount, length(spinner))+1 ) );
+                end
                 ds.niter = ds.niter + 1;
 
                 if ds.PROCESS_STATE() < 0
                     break;
                 end
-                pause
                 if ds.verbose
                     disp(' ')
                 end
             end
+            fprintf('\r');
         end
 
         function modify_cost(ds, point, newcost)
             X = sub2ind(size(ds.costmap), point(2), point(1));
             ds.costmap(X) = newcost;
             if ds.t(X) == ds.CLOSED
-                ds.INSERT(X, ds.h(X));
+                ds.INSERT(X, ds.h(X), 'modifycost');
             end
-
         end
 
         % The main D* function as per the Stentz paper, comments Ln are the original
         % line numbers.
         function r = PROCESS_STATE(d)
+
+            %% states with the lowest k value are removed from the
+            %% open list
             X = d.MIN_STATE();                          % L1
 
             if isempty(X)                               % L2
@@ -154,7 +187,7 @@ classdef dstar < Navigation
             k_old = d.GET_KMIN(); d.DELETE(X);          % L3
 
             if k_old < d.h(X)                           % L4
-                if ds.verbose
+                if d.verbose
                     fprintf('k_old < h(X):  %f %f\n', k_old, d.h(X));
                 end
                 for Y=d.neighbours(X)                   % L5
@@ -165,6 +198,7 @@ classdef dstar < Navigation
                 end
             end
 
+            %% can we lower the path cost of any neighbours?
             if k_old == d.h(X)                          % L8
                 if d.verbose
                     fprintf('k_old == h(X): %f\n', k_old);
@@ -173,7 +207,7 @@ classdef dstar < Navigation
                     if (d.t(Y) == d.NEW) || ...                         % L10-12
                             ( (d.b(Y) == X) && (d.h(Y) ~= (d.h(X) + d.c(X,Y))) ) || ...
                             ( (d.b(Y) ~= X) && (d.h(Y) > (d.h(X) + d.c(X,Y))) )
-                        d.b(Y) = X; d.INSERT(Y, d.h(X)+d.c(X,Y));       % L13
+                        d.b(Y) = X; d.INSERT(Y, d.h(X)+d.c(X,Y), 'L13');   % L13
                     end
                  end
             else                                        % L14
@@ -182,14 +216,14 @@ classdef dstar < Navigation
                 end
                 for Y=d.neighbours(X)                   % L15
                     if (d.t(Y) == d.NEW) || ( (d.b(Y) == X) && (d.h(Y) ~= (d.h(X) + d.c(X,Y))) )
-                        d.b(Y) = X; d.INSERT(Y, d.h(X)+d.c(X,Y));   % L18
+                        d.b(Y) = X; d.INSERT(Y, d.h(X)+d.c(X,Y), 'L18');   % L18
                     else
                         if ( (d.b(Y) ~= X) && (d.h(Y) > (d.h(X) + d.c(X,Y))) )
-                            d.INSERT(X, d.h(X));                    % L21
+                            d.INSERT(X, d.h(X), 'L21');                    % L21
                         else
                             if (d.b(Y) ~= X) && (d.h(X) > (d.h(Y) + d.c(Y,X))) && ...
                                     (d.t(Y) == d.CLOSED) && d.h(Y) > k_old
-                                d.INSERT(Y, d.h(Y));                % L25
+                                d.INSERT(Y, d.h(Y), 'L25');                % L25
                             end
                         end
                     end
@@ -200,14 +234,14 @@ classdef dstar < Navigation
             return;
         end % process_state(0
 
-        function kk = k(X)
+        function kk = k(ds, X)
             i = find(ds.openlist(1,:) == X);
             kk = ds.openlist(2,i);
         end
 
-        function INSERT(ds, X, h_new)
+        function INSERT(ds, X, h_new, where)
             if ds.verbose
-                fprintf('insert %d = %f\n', X, h_new);
+                fprintf('insert (%s) %d = %f\n', where, X, h_new);
             end
 
             i = find(ds.openlist(1,:) == X);
@@ -247,12 +281,15 @@ classdef dstar < Navigation
             ds.t(X) = ds.CLOSED;
         end
 
+        % return the index of the open state with the smallest k value
         function ms = MIN_STATE(ds)
             if length(ds.openlist) == 0
                 ms = [];
             end
+            % find the minimum k value on the openlist
             [kmin,i] = min(ds.openlist(2,:));
-            %[kmin,i] = min(ds.k(ds.openlist(1,:)));
+
+            % return its index
             ms = ds.openlist(1,i);
         end
 
@@ -260,6 +297,7 @@ classdef dstar < Navigation
             kmin = min(ds.openlist(2,:));
         end
 
+        % return the cost of moving from state X to state Y
         function cost = c(ds, X, Y)
             [r,c] = ind2sub(size(ds.costmap), [X; Y]);
             dist = sqrt(sum(diff([r c]).^2));
@@ -274,10 +312,9 @@ classdef dstar < Navigation
             [r,c] = ind2sub(dims, X);
 
             % list of 8-way neighbours
-            Y = [r-1 r-1 r-1 0 0  r+1 r+1 r+1; c-1 c c+1 c-1 c+1 c-1 c c+1];
+            Y = [r-1 r-1 r-1 r r  r+1 r+1 r+1; c-1 c c+1 c-1 c+1 c-1 c c+1];
             k = (min(Y)>0) & (Y(1,:)<=dims(1)) & (Y(2,:)<=dims(2));
             Y = Y(:,k);
-
             Y = sub2ind(dims, Y(1,:)', Y(2,:)')';
         end
 
