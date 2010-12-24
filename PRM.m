@@ -50,41 +50,62 @@ classdef PRM < Navigation
 
         function plan(prm, goal)
 
-            prm.goal_set(goal(:));
 
             % build a graph over the free space
             prm.message('create the graph');
+            prm.graph.clear();
             create_graph(prm);
+        end
+        
+        function path(prm, start, goal)
+            
+            
+            if nargin < 3
+                error('must specify start and goal');
+            end
+            
+            % set the goal coordinate
+            prm.goal = goal;
 
-            prm.vgoal = prm.graph.closest(prm.goal);
 
-            % find a path through the graph
-            prm.message('planning path through graph');
-            prm.graph.goal(prm.vgoal);   % set the goal
+            
+            % invoke the superclass path function, which iterates on our
+            % next method
+            path@Navigation(prm, start);
 
+            
         end
 
-        function navigate_init2(prm, p)
-            % find node closest to the start and goal points
-            prm.vstart = prm.graph.closest(p);
+        function navigate_init(prm, start)
+            % find the vertex closest to the goal
+            prm.vgoal = prm.graph.closest(prm.goal);
+            
+            % find the vertex closest to the start
+            prm.vstart = prm.graph.closest(start);
 
+            % are the vertices connected?
             if prm.graph.component(prm.vstart) ~= prm.graph.component(prm.vgoal)
                 error('Navigation: start and goal not connected');
             end
-
-            % create a path through the graph
+            
+            % find a path through the graph
+            prm.message('planning path through graph');
+            prm.graph.goal(prm.vgoal);   % set the goal 
             prm.gpath = prm.graph.path(prm.vstart);
+            % the path is a list of nodes from vstart to vgoal
+            % discard the first vertex, since we plan a local path to it
             prm.gpath = prm.gpath(2:end);
 
             % start the navigation engine with a path to the nearest vertex
             prm.graph.showVertex(prm.vstart);
 
-            prm.localPath = bresenham(p, prm.graph.coord(prm.vstart));
+            prm.localPath = bresenham(start, prm.graph.coord(prm.vstart));
             prm.localPath = prm.localPath(2:end,:);
         end
 
         function n = next(prm, p)
 
+            %disp('next')
             if all(p(:) == prm.goal)
                 n = [];     % we've arrived
                 return;
@@ -111,10 +132,8 @@ classdef PRM < Navigation
                 end
             end
 
-            n = prm.localPath(1,:)';     % take the first point
+            n = prm.localPath(1,:);     % take the first point
             prm.localPath = prm.localPath(2:end,:); % and remove from the path
-
-
         end
 
         function create_graph(prm)
@@ -168,13 +187,24 @@ classdef PRM < Navigation
             s = strvcat(s, sprintf('  dist thresh: %f', prm.distthresh));
             s = strvcat(s, char(prm.graph) );
         end
-
-
-        function visualize(prm)
+        
+        
+        function visualize(prm, varargin)
+            
+            opt.backgroundony = false;
+            [opt,varargin] = tb_optparse(opt, varargin);
+            
+            % display the occgrid
             visualize@Navigation(prm);
-
-            plot(prm.graph);
+            
+            if ~opt.backgroundony
+                hold on
+                prm.graph.plot()%varargin{:});
+                hold off
+                
+            end
         end
+
 
     end % method
 end % classdef

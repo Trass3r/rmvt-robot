@@ -39,7 +39,7 @@ classdef Dstar < Navigation
     methods
 
         % constructor
-        function ds = dstar(world, goal)
+        function ds = Dstar(world, goal)
 
             % invoke the superclass constructor
             ds = ds@Navigation(world);
@@ -88,7 +88,7 @@ classdef Dstar < Navigation
         end
 
         function goal_set(ds, goal)
-
+            disp('in goal_set');
             goal_set@Navigation(ds, goal);
 
             % keep goal in index rather than row,col format
@@ -100,32 +100,9 @@ classdef Dstar < Navigation
             ds.h(ds.G) = 0;
         end
 
-        function navigate_init(ds)
-            idisp2(ds.h)
-            set(gca, 'Ydir', 'normal');
-            hold on
-        end
-
         function visualize(ds, varargin)
-            v = ds.h(isfinite(ds.h));
-            cmap = gray(max(v));
-            cmap = [1 0 0; cmap];
-            colormap(cmap)
-            % display obstacles, where ds.h == Inf, as red
-            img = ds.h + 1;
-            img(isinf(img)) = 0;
+            visualize@Navigation(ds, 'distance', ds.h);
 
-            image(img+1, 'CDataMapping', 'direct');
-            set(gca, 'Ydir', 'normal');
-            xlabel('x');
-            ylabel('y');
-            colorbar
-            hold on
-            plot(ds.goal(1), ds.goal(2), 'go', 'MarkerFaceColor', 'g');
-
-            if nargin == 2
-                plot(p(:,1), p(:,2), 'g.');
-            end
         end
 
         function n = next(ds, current)
@@ -143,6 +120,11 @@ classdef Dstar < Navigation
             if nargin > 1
                 ds.goal = goal;
             end
+            % for replanning no goal is needed, 
+            if isempty(ds.goal)
+                error('must specify a goal point');
+            end
+            
             ds.niter = 0;
             spinner = '-\|/';
             spincount = 0;
