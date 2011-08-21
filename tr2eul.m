@@ -1,14 +1,26 @@
-%TR2EUL Convert a homogeneous transform matrix to Euler angle form
+%TR2EUL Convert homogeneous transform to Euler angles
 %
-%	[PHI THETA PSI] = TR2EUL(M)
+% EUL = TR2EUL(T, OPTIONS) are the ZYZ Euler angles expressed as a row vector
+% corresponding to the rotational part of a homogeneous transform T.
+% The 3 angles EUL=[PHI,THETA,PSI] correspond to sequential rotations about 
+% the Z, Y and Z axes respectively.
 %
-% Returns a vector of roll/pitch/yaw angles corresponding to M, either a rotation
-% matrix or the rotation part of a homogeneous transform.
-% The 3 angles correspond to rotations about the Z, Y and Z axes respectively.
+% EUL = TR2EUL(R, OPTIONS) are the ZYZ Euler angles expressed as a row vector
+% corresponding to the orthonormal rotation matrix R.
 %
-% See also:  EUL2TR, TR2RPY
+% Notes::
+% - There is a singularity for the case where THETA=0 in which case PHI is arbitrarily
+%   set to zero and PSI is the sum (PHI+PSI).
+% - If R or T represents a trajectory (has 3 dimensions), then each row of EUL
+%   corresponds to a step of the trajectory.
+%
+% Options:
+%  'deg'      Compute angles in degrees (radians default)
+%
+% See also  EUL2TR, TR2RPY.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -25,12 +37,15 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function euler = tr2eul(m)
-	
+function euler = tr2eul(m, varargin)
+
+    opt.deg = false;
+    opt = tb_optparse(opt, varargin);
+
 	s = size(m);
-	if length(s) > 2,
+	if length(s) > 2
 		euler = [];
-		for i=1:s(3),
+		for i=1:s(3)
 			euler = [euler; tr2eul(m(:,:,i))];
 		end
 		return
@@ -41,7 +56,7 @@ function euler = tr2eul(m)
 	% Method as per Paul, p 69.
 	% phi = atan2(ay, ax)
 	% Only positive phi is returned.
-	if abs(m(1,3)) < eps & abs(m(2,3)) < eps,
+	if abs(m(1,3)) < eps & abs(m(2,3)) < eps
 		% singularity
 		euler(1) = 0;
 		sp = 0;
@@ -55,3 +70,6 @@ function euler = tr2eul(m)
 		euler(2) = atan2(cp*m(1,3) + sp*m(2,3), m(3,3));
 		euler(3) = atan2(-sp * m(1,1) + cp * m(2,1), -sp*m(1,2) + cp*m(2,2));
 	end
+    if opt.deg
+        euler = euler * 180/pi;
+    end
