@@ -1,13 +1,14 @@
-%FTRANS Transform force/moment
+%WTRANS Transform a wrench between coordinate frames
 %
-%	FT = FTRANS(T, F)
+% WT = WTRANS(T, W) is a wrench in the frame T corresponding to the world
+% frame wrench W.  
 %
-% Transforms a force/moment F in the base frame to FT in the frame T.
-% F and FT are 6-vectors of the form [Fx Fy Fz Mx My Mz]
+% The wrenches W and WT are 6-vectors of the form [Fx Fy Fz Mx My Mz].
 %
-% SEE ALSO: DIFF2TR
+% See also TR2DELTA.
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -24,12 +25,12 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function Ft = ftrans(T, F)
+function Wt = wtrans(T, W)
 
-	f = F(1:3); m = F(4:6);
-	k = cross(f, transl(T) ) + m;
+    f = W(1:3); m = W(4:6);
+    k = cross(f, transl(T) ) + m;
 
-	mt = rot(T)' * k;
-	ft = rot(T)' * F(1:3);
+    mt = rot(T)' * k;
+    ft = rot(T)' * F(1:3);
 
-	Ft = [ft; mt];
+    Wt = [ft; mt];

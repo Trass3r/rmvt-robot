@@ -1,37 +1,60 @@
 %LSPB  Linear segment with parabolic blend
 %
-% Compute a function, q(t), that varies smoothly from q0 to q1, using
-% a constant velocity segment and parabolic blends (trapezoidal path).
+% [S,SD,SDD] = LSPB(S0, SF, N) is a scalar trajectory that varies 
+% smoothly from S0 to SF in N steps using a constant velocity segment and 
+% parabolic blends (a trapezoidal path).  Velocity and acceleration can be
+% optionally returned as SD and SDD.  The trajectory S, SD and SDD 
+% are N-vectors.
 %
-% q = lspb(q0, q1, N)
+% [S,SD,SDD] = LSPB(S0, SF, T) as above but specifies the trajectory in 
+% terms of the length of the time vector T.
 %
-%   Return path for N steps.
+% [S,SD,SDD] = LSPB(S0, SF, N, V) as above but specifies the velocity of 
+% the linear segment which is normally computed automatically.
 %
-% q = lspb(q0, q1, t)
+% [S,SD,SDD] = LSPB(S0, SF, T, V) as above but specifies the velocity of 
+% the linear segment which is normally computed automatically and a time
+% vector.
 %
-%   Return path over the time vector t.
+% Notes::
+% - in all cases if no output arguments are specified S, SD, and SDD are plotted 
+%   against time.
+% - for some values of V no solution is possible and an error is flagged.
 %
-% q = lspb(q0, q1, t, V)
+% See also TPOLY, JTRAJ.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-%   Return path over the time vector t, but setting the velocity of the
-%   linear segment.
-%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function [s,sd,sdd] = lspb(q0, q1, t, V)
 
-	if size(t) == [1 1],
+	if size(t) == [1 1]
 		t = [0:t-1]';
 	end
 
 	tf = max(t(:));
 
-	if nargin < 4,
+	if nargin < 4
         % if velocity not specified, compute it
 		V = (q1-q0)/tf * 1.5;
 	else
-		if V < (q1-q0)/tf,
+		if V < (q1-q0)/tf
 			error('V too small\n');
-		elseif V > 2*(q1-q0)/tf,
+		elseif V > 2*(q1-q0)/tf
 			error('V too big\n');
 		end
     end
@@ -50,15 +73,15 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
     pd = p;
     pdd = p;
     
-	for i = 1:length(t),
+	for i = 1:length(t)
 		tt = t(i);
 
-		if tt <= tb,
+		if tt <= tb
             % initial blend
 			p(i) = q0 + a/2*tt^2;
             pd(i) = a*tt;
             pdd(i) = a;
-		elseif tt <= (tf-tb),
+		elseif tt <= (tf-tb)
             % linear motion
 			p(i) = (q1+q0-V*tf)/2 + V*tt;
             pd(i) = V;
@@ -103,7 +126,7 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
             sdd = pdd;
     end
     
-	if nargout == 0,
+	if nargout == 0
 	else
 		tg = p;
 	end

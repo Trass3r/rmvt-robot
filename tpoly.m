@@ -1,3 +1,42 @@
+%TPOLY Generate scalar polynomial trajectory
+%
+% [S,SD,SDD] = TPOLY(S0, SF, N) is a trajectory of a scalar that varies 
+% smoothly from S0 to SF in N steps using a quintic (5th order) polynomial.
+% Velocity and acceleration can be optionally returned as SD and SDD.  The 
+% trajectory S, SD and SDD are N-vectors.
+%
+% [S,SD,SDD] = TPOLY(S0, SF, T) as above but specifies the trajectory in 
+% terms of the length of the time vector T.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+
+% [S,SD,SDD] = TPOLY(S0, SF, N, SD0, SDF) as above but specifies initial 
+% and final joint velocity for the trajectory.
+%
+% [S,SD,SDD] = TPOLY(S0, SF, T, SD0, SDF) as above but specifies initial 
+% and final joint velocity for the trajectory and time vector T.
+%
+% Notes::
+% - In all cases if no output arguments are specified S, SD, and SDD are plotted 
+%   against time.
+%
+% See also LSPB, JTRAJ.
+
 function [s,sd,sdd] = tpoly(q0, qf, t, qd0, qdf)
 
     if isscalar(t)
@@ -19,8 +58,8 @@ function [s,sd,sdd] = tpoly(q0, qf, t, qd0, qdf)
         0           0           0         0       0   1
         tf^5        tf^4        tf^3      tf^2    tf  1
         0           0           0         0       1   0
-        5*tf^4      4*tf^3      3*tf^2    2*tf^2  tf  0
-        0           0           0         1       0   0
+        5*tf^4      4*tf^3      3*tf^2    2*tf    1   0
+        0           0           0         2       0   0
         20*tf^3     12*tf^2     6*tf      2       0   0
     ];
     coeffs = (X \ [q0 qf qd0 qdf 0 0]')';

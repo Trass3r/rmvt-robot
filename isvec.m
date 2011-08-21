@@ -1,10 +1,14 @@
-%ISVEC Test if argument is a homogeneous transformation
+%ISVEC Test if argument is a vector
 %
-%	H = ISVEC(V, l)
+% ISVEC(V) is true (1) if the argument V is a 3-vector, else false (0).
 %
-%  Returns true (1) if the argument tr is of dimension 4x4.
+% ISVEC(V, L) is true (1) if the argument V is a vector of length L,
+% either a row- or column-vector.  Otherwise false (0).
+%
+% See also ISHOMOG, ISROT.
 
-% Copyright (C) 2002-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -22,11 +26,11 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function h = isvec(v, l)
-    if nargin == 1,
+    if nargin == 1
             l = 3;
     end
-	if min(size(v)) == 1,
-		h =  length(v) == l;
-	else
-		h = 0;
-	end
+    if min(size(v)) == 1
+        h =  length(v) == l;
+    else
+        h = 0;
+    end

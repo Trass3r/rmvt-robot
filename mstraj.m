@@ -1,26 +1,34 @@
-%MSTRAJ  Multisegment trajectory
+%MSTRAJ  Multi-segment multi-axis trajectory
 %
-%   traj = mstraj(segments, qdmax, q, dt, tacc)
+% TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC) is a multi-segment trajectory 
+% based on via points SEGMENTS and velocity limits QDMAX.  The path comprises 
+% linear segments with polynomial blends.  The output trajectory is an MxN 
+% matrix, with one row per time step, and one column per axis.
 %
-% Create a multisegment trajectory based on via points and velocity/acceleration
-% limits.  The path is linear segments with polynomial blends.
+% - SEGMENTS is an NxM matrix of via points, 1 row per via point, one column 
+%   per axis.  The last via point is the destination.
+% - QDMAX is a row N-vector of axis velocity limits, or a column M-vector of 
+%   segment times
+% - Q0 is an N-vector of initial axis coordinates
+% - DT is the time step
+% - TACC is the acceleration time. If scalar this acceleration time is applied
+%   to all segment transitions, if an N-vector it specifies the acceleration 
+%   time for each segment.  TACC(i) is the acceleration time for the transition
+%   from segment i to segment i+1.  TACC(1) is also the acceleration time at
+%   the start of segment 1.
 %
-% The output is a trajectory MxN matrix, with one row per time step, and
-% one column per axis.
+% TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC, QD0, QDF) as above but 
+% additionally specifies the initial and final axis velocities as N-vectors.
 %
-%   segments is a NxM matrix of via points, 1 row per via point, one column per axis
-%   qdmax is a row N-vector of axis velocity limits, or a column M-vector of segment times
-%   q is a N-vector of initial axis coordinates
-%   dt is the time step
-%   tacc is the acceleration time. CAN BE A VECTOR
+% Notes::
+% - can be used to create joint space trajectories
+% - can be used to create Cartesian trajectories with the "axes" assigned
+%   to translation and orientation in RPY or Euler angle form.:w
 %
-%   traj = mstraj(segments, qdmax, q, dt, tacc, qd0, qdf)
-%
-% Optionally specify initial and final velocity.
-%
-% See also: CTRAJ.
+% See also MSTRAJ, LSPB, CTRAJ.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -52,10 +60,10 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, qd0, qdf)
     debug = false;
     debug = true;
 
-    if nargin < 7,
+    if nargin < 7
         qd0 = zeros(1, nj);
     end
-    if nargin < 8,
+    if nargin < 8
         qdf = zeros(1, nj);
     end
 

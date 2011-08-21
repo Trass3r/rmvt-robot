@@ -1,64 +1,119 @@
-%PRM Class for probabilistic roadmap navigation
+%PRM Probabilistic roadmap navigation class
 %
-% A concrete class that implements the PRM navigation algorithm.
-% This class subclasses the Navigation class.
+% A concrete subclass of Navigation that implements the probabilistic
+% roadmap navigation algorithm.  This performs goal independent planning of
+% roadmaps, and at the query stage finds paths between specific start and
+% goal points.
 %
-% Usage for subclass:
+% Methods::
 %
-%   prm = PRM(occgrid, options)  create an instance object
+% plan         Compute the roadmap
+% path         Compute a path to the goal
+% visualize    Display the obstacle map
+% display      Print the parameters in human readable form
+% char         Convert the parameters to a human readable string
 %
-%   prm                     show summary statistics about the object
-%   prm.visualize()         display the occupancy grid
+% Example::
 %
-%   prm.plan(goal)          plan a path to coordinate goal
-%   prm.path(start)         display a path from start to goal
-%   p = prm.path(start)     return a path from start to goal
+%    load map1
+%    prm = PRM(map);
+%    prm.plan()
+%    prm.path(start, goal)
 %
+% See also Navigation, DXform, Dstar, PGraph.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+
 
 % Peter Corke 8/2009.
 
 classdef PRM < Navigation
 
     properties
-        npoints         % number of points to find
-        distthresh
+        npoints         % number of sample points
+        distthresh      % distance threshold, links between vertices
+                        % must be less than this.
 
         graph           % graph Object representing random nodes
 
-        vgoal
-        vstart
-        localGoal
-        localPath
-        gpath            % path through the graph
+        vgoal           % index of vertex closest to goal
+        vstart          % index of vertex closest to start
+        localGoal       % next vertex on the roadmap
+        localPath       % set of points along path to next vertex
+        gpath           % list of vertices between start and goal
     end
 
     methods
 
         % constructor
         function prm = PRM(varargin)
+            %PRM.PRM Create a PRM navigation object constructor
+            %
+            % P = PRM(MAP, options) is a probabilistic roadmap navigation
+            % object, and MAP is an occupancy grid, a representation of a
+            % planar world as a matrix whose elements are 0 (free space) or 1
+            % (occupied).
+            %
+            % Options::
+            %  'npoints', n      Number of sample points (default 100)
+            %  'distthresh', d   Distance threshold, edges only connect vertices closer 
+            %                    than d (default 0.3 max(size(occgrid)))
+            %
+            % See also Navigation.Navigation.
 
-            % invoke the superclass constructor
+
+            % invoke the superclass constructor, it handles some options
             prm = prm@Navigation(varargin{:});
 
-            prm.graph = PGraph(2);  % planar graph
+            % create an empty 2D graph
+            prm.graph = PGraph(2);
 
-            % TODO: need a means to set these
-            %  {'npoints', [], 'distthresh', []}
-            prm.npoints = 100;
-            prm.distthresh = 0.3*max(size(prm.occgrid));
+            % parse out PRM specific options and save in the navigation object
+            opt.npoints = 100;
+            opt.distthresh = 0.3*max(size(prm.occgrid));
+            [opt,args] = tb_optparse(opt, varargin);
+            prm.npoints = opt.npoints;
+            prm.distthresh = opt.distthresh;
         end
 
-        function plan(prm, goal)
-
+        function plan(prm)
+            %PRM.plan Create a probabilistic roadmap
+            %
+            % P.plan() creates the probabilistic roadmap by randomly
+            % sampling the free space in the map and building a graph with
+            % edges connecting close points.  The resulting graph is kept
+            % within the object.
 
             % build a graph over the free space
             prm.message('create the graph');
-            prm.graph.clear();
-            create_graph(prm);
+
+            prm.graph.clear();  % empty the graph
+            create_roadmap(prm);  % build the graph
         end
         
-        function path(prm, start, goal)
-            
+        function p = path(prm, start, goal)
+        %PRM.path Find a path between two points
+        %
+        % P.path(START, GOAL) finds and displays a path from START to GOAL
+        % which is overlaid on the occupancy grid.
+        %
+        % X = P.PATH(START, GOAL) is the path from START to GOAL as a
+        % 2xN matrix with columns representing points along the path.
             
             if nargin < 3
                 error('must specify start and goal');
@@ -67,16 +122,22 @@ classdef PRM < Navigation
             % set the goal coordinate
             prm.goal = goal;
 
-
-            
             % invoke the superclass path function, which iterates on our
             % next method
-            path@Navigation(prm, start);
-
-            
+            if nargout == 0
+                path@Navigation(prm, start);
+            else
+                p = path@Navigation(prm, start);
+            end
         end
 
+        % Handler invoked by Navigation.path() to start the navigation process
+        %
+        %   - find a path through the graph
+        %   - determine vertices closest to start and goal
+        %   - find path to first vertex
         function navigate_init(prm, start)
+
             % find the vertex closest to the goal
             prm.vgoal = prm.graph.closest(prm.goal);
             
@@ -92,6 +153,7 @@ classdef PRM < Navigation
             prm.message('planning path through graph');
             prm.graph.goal(prm.vgoal);   % set the goal 
             prm.gpath = prm.graph.path(prm.vstart);
+
             % the path is a list of nodes from vstart to vgoal
             % discard the first vertex, since we plan a local path to it
             prm.gpath = prm.gpath(2:end);
@@ -103,14 +165,15 @@ classdef PRM < Navigation
             prm.localPath = prm.localPath(2:end,:);
         end
 
+        % Invoked for each step on the path by path() method.
         function n = next(prm, p)
 
-            %disp('next')
             if all(p(:) == prm.goal)
-                n = [];     % we've arrived
+                n = [];     % signal that we've arrived
                 return;
             end
 
+            % we take the next point from the localPath
             if numrows(prm.localPath) == 0
                 % local path is consumed, move to next vertex
                 if length(prm.gpath) == 0
@@ -120,8 +183,7 @@ classdef PRM < Navigation
                     prm.localPath = prm.localPath(2:end,:);
                     prm.localGoal = [];
                 else
-                    % set local goal to next vertex in gpath and remove it
-                    % from the list
+                    % set local goal to next vertex in gpath and remove it from the list
                     prm.localGoal = prm.gpath(1);
                     prm.gpath = prm.gpath(2:end);
 
@@ -132,11 +194,12 @@ classdef PRM < Navigation
                 end
             end
 
-            n = prm.localPath(1,:);     % take the first point
+            n = prm.localPath(1,:)';     % take the first point
             prm.localPath = prm.localPath(2:end,:); % and remove from the path
         end
 
-        function create_graph(prm)
+        % create the roadmap
+        function create_roadmap(prm)
 
             for j=1:prm.npoints
                 % pick a point not in obstacle
@@ -160,7 +223,7 @@ classdef PRM < Navigation
                     if d(i) > prm.distthresh
                         continue;
                     end
-                    if ~prm.clearpath(new, prm.graph.coord(v(i)))
+                    if ~prm.testpath(new, prm.graph.coord(v(i)))
                         continue;
                     end
                     prm.graph.add_edge(vnew, v(i));
@@ -168,7 +231,8 @@ classdef PRM < Navigation
             end
         end
 
-        function c = clearpath(prm, p1, p2)
+        % test the path from p1 to p2 is entirely in free space
+        function c = testpath(prm, p1, p2)
             p = bresenham(p1, p2);
 
             for pp=p'
@@ -181,8 +245,18 @@ classdef PRM < Navigation
         end
 
         function s = char(prm)
-            s = '';
-            s = strvcat(s, sprintf('PRM: %dx%d', size(prm.occgrid)));
+        %PRM.char  Convert navigation object to string
+        %
+        % P.char() is a string representing the state of the navigation
+        % object in human-readable form.
+        %
+        % See also PRM.display.
+
+
+            % invoke the superclass char() method
+            s = char@Navigation(prm);
+
+            % add PRM specific stuff information
             s = strvcat(s, sprintf('  graph size: %d', prm.npoints));
             s = strvcat(s, sprintf('  dist thresh: %f', prm.distthresh));
             s = strvcat(s, char(prm.graph) );
@@ -190,21 +264,27 @@ classdef PRM < Navigation
         
         
         function visualize(prm, varargin)
+        %PRM.visualize
+        %
+        % P.visualize() displays the occupancy grid with an optional distance field
+        %
+        % Options:
+        %  'goal'            Superimpose the goal position if set
+        %  'nooverlay'       Don't overlay the PRM graph
             
-            opt.backgroundony = false;
-            [opt,varargin] = tb_optparse(opt, varargin);
+            opt.nooverlay = false;
+            [opt,args] = tb_optparse(opt, varargin);
             
             % display the occgrid
-            visualize@Navigation(prm);
+            visualize@Navigation(prm, args{:});
             
-            if ~opt.backgroundony
+            if ~opt.nooverlay
                 hold on
                 prm.graph.plot()%varargin{:});
                 hold off
                 
             end
         end
-
 
     end % method
 end % classdef

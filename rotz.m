@@ -1,13 +1,12 @@
 %ROTZ Rotation about Z axis
 %
-%	R = ROTZ(theta)
+% R = ROTZ(THETA) is a rotation matrix representing a rotation of THETA 
+% about the z-axis.
 %
-% Returns a 3x3 rotation matrix representing a rotation of theta 
-% about the Z axis.
-%
-% See also: ROTX, ROTY, ROTVEC.
+% See also ROTX, ROTY, ANGVEC2R.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -24,9 +23,11 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function r = rotz(t)
-	ct = cos(t);
-	st = sin(t);
-	r =    [ct	-st	0
-		st	ct	0
-		0	0	1];
+function R = rotz(t)
+    ct = cos(t);
+    st = sin(t);
+    R = [
+        ct  -st  0
+        st   ct  0
+        0    0   1
+        ];

@@ -1,14 +1,16 @@
-%EUL2JAC Compute the Jacobian from Euler angle rates to angular velocity
+%EUL2JAC Jacobian from Euler angle rates to angular velocity
 %
-%	J = EUL2JAC(eul)
-%	J = EUL2JAC(phi, theta, psi)
+% J = EUL2JAC(EUL) is a 3x3 Jacobian matrix that maps Euler angle rates to 
+% angular velocity, and EUL=[PHI, THETA, PSI]. Used in the creation of an 
+% analytical Jacobian.
 %
-% Returns a 3x3 Jacobian matrix to map Euler angle rates to angular
-% velocity.  Used in the creation of the analytical Jacobian.
+% J = EUL2JAC(PHI, THETA, PSI) as above but the Euler angles are passed
+% as separate arguments.
 %
-% See also: RPY2JAC, JACOB0, JACOBN
+% See also RPY2JAC, SERIALlINK.JACOBN.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -27,14 +29,14 @@
 
 function J = euljac(phi, theta, psi)
 
-    if length(phi) == 3,
+    if length(phi) == 3
         theta = phi(2);
         psi = phi(3);
         phi = phi(1);
     end
-	J = [	
+    J = [   
         cos(psi)*sin(theta)   -sin(psi)    0
         sin(psi)*sin(theta)  cos(psi)      0
         cos(theta)           0             1
         ];
-		
+        

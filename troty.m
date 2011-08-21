@@ -1,13 +1,15 @@
 %TROTY Rotation about Y axis
 %
-%	TR = TROTY(theta)
+% T = TROTY(THETA) is a homogeneous transformation representing a rotation 
+% of THETA about the y-axis.
 %
-% Returns a homogeneous transformation representing a rotation of theta 
-% about the Y axis.
+% Notes::
+% - translational component is zero
 %
-% See also: TROTX, TROTZ, ROTVEC.
+% See also ROTY, TROTX, TROTZ.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 

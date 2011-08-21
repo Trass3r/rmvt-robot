@@ -1,106 +1,130 @@
-%LINK Robot manipulator Link object
+%LINK Robot manipulator Link class
 %
 % A Link object holds all information related to a robot link such as
-% kinematics of the joint, rigid-body inertial parameters, motor and
+% kinematics parameteres, rigid-body inertial parameters, motor and
 % transmission parameters.
 %
-%	L = link
-%	L = link(link)
+% L = Link([theta d a alpha]) is a link object with the specified kinematic 
+% parameters theta, d, a and alpha.
 %
-% Create a default link, or a clone of the passed link.
+% Methods::
+%  A             return link transform (A) matrix
+%  RP            return joint type: 'R' or 'P'
+%  friction      return friction force
+%  nofriction    return Link object with friction parameters set to zero
+%  dyn           display link dynamic parameters
+%  islimit       true if joint exceeds soft limit
+%  isrevolute    true if joint is revolute
+%  isprismatic   true if joint is prismatic
+%  nofriction    remove joint friction
+%  display       print the link parameters in human readable form
+%  char          convert the link parameters to human readable string
 %
-%	L = link([alpha a theta d] [, CONVENTION])
-% 	L = link([alpha a theta d sigma]) [, CONVENTION])
-% 	L = link([alpha a theta d sigma offset] [, CONVENTION]
+% Properties (read/write)::
 %
-% If sigma or offset are not provided they default to zero.  Offset is a
-% constant amount added to the joint angle variable before forward kinematics
-% and is useful if you want the robot to adopt a 'sensible' pose for zero
-% joint angle configuration.
+%  alpha   kinematic: link twist
+%  a       kinematic: link twist
+%  theta   kinematic: link twist
+%  d       kinematic: link twist
+%  sigma   kinematic: 0 if revolute, 1 if prismatic
+%  mdh     kinematic: 0 if standard D&H, else 1
+%  offset  kinematic: joint variable offset
+%  qlim    kinematic: joint variable limits [min max]
 %
-% The optional CONVENTION argument is 'standard' for standard D&H parameters 
-% or 'modified' for modified D&H parameters.  If not specified the default
-% 'standard'.
+%  m       dynamic: link mass
+%  r       dynamic: link COG wrt link coordinate frame 3x1
+%  I       dynamic: link inertia matrix, symmetric 3x3, about link COG.
+%  B       dynamic: link viscous friction (motor referred)
+%  Tc      dynamic: link Coulomb friction
 %
-% Object methods
-%	L.A(q)         return link transform (A) matrix
-%	L.islimit(q)   return vector of exceed flags (-1, 0, +1) corresponding to q
+%  G       actuator: gear ratio
+%  J       actuator: motor inertia (motor referred)
 %
-% Object properties (read/write)
+% Notes::
+% - this is reference class object
+% - Link objects can be used in vectors and arrays
 %
-%	L.alpha	       kinematic: link twist
-%	L.a            kinematic: link twist
-%	L.theta        kinematic: link twist
-%	L.d            kinematic: link twist
-%	L.sigma	       kinematic: 0 if revolute, 1 if prismatic
-%	L.mdh	       kinematic 0 if standard D&H, else 1
-%	L.offset	   kinematic: joint variable offset
-%	L.qlim	       kinematic: joint variable limits [min max]
+% See also SerialLink, Link.Link.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-%	L.m            dynamic: link mass
-%	L.r            dynamic: link COG wrt link coordinate frame 3x1
-%	L.I            dynamic: link inertia matrix, symmetric 3x3, about link COG
-%                      Maybe be assigned as:
-%                         3x3 matrix (symmetry check enforced)
-%                         3x1 vector [Ixx Iyy Izz]
-%                         6x1 vector [Ixx Iyy Izz Ixy Iyz Ixz]
-%	L.B            dynamic: link viscous friction (motor referred)
-%	L.Tc           dynamic: link Coulomb friction [Tc_pos Tc_neg]
-%                      Maybe be assigned as:
-%                          2x1 vector
-%                          scalar -> [Tc -Tc]
-%
-%	L.G            actuator: gear ratio
-%	L.J            actuator: motor inertia (motor referred)
-%
-% Object properties (read only)
-%
-%	L.RP		return 'R' or 'P'
-%	L.dh		return legacy DH row
-%	L.dyn	return legacy DYN row
-%
-% For robot models prior to Toolbox release 5 (pre Matlab objects) the
-% following object constructors are provided.
-%
-% 	L = LINK(DYN_ROW)		create from row of legacy DYN matrix
-%	L = LINK(DYN_ROW, CONVENTION)	create from row of legacy DYN matrix
-%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 classdef Link < handle
     properties
         % kinematic parameters
-        theta
-        d
-        alpha
-        a
-        sigma
-        mdh
-        offset
-        name
+        theta % kinematic: link angle
+        d     % kinematic: link offset
+        alpha % kinematic: link twist
+        a     % kinematic: link length
+        sigma % revolute=0, prismatic=1
+        mdh   % standard DH=0, MDH=1
+        offset % joint coordinate offset
+        name   % joint coordinate name
 
         % dynamic parameters
-        m
-        r
-        I
-        Jm
-        B
+        m  % dynamic: link mass
+        r  % dynamic: position of COM with respect to link frame (3x1)
+        I  % dynamic: inertia of link with respect to COM (3x3)
+        Jm % dynamic: motor inertia
+        B  % dynamic: motor viscous friction (1x1 or 2x1)
 
-        Tc
-        G
-        qlim
+        Tc % dynamic: motor Coulomb friction (1x2 or 2x1)
+        G  % dynamic: gear ratio
+        qlim % joint coordinate limits (2x1)
     end
-
-    properties (Dependent = true, SetAccess = private)
-        dh
-        RP
-        dyn
-    end
-
 
     methods
         function l = Link(dh, convention)
+        %LINK Create robot link object
+        %
+        % This is class constructor function which has several call signatures.
+        %
+        % L = Link() is a Link object with default parameters.
+        %
+        % L = Link(L1) is a Link object that is a deep copy of the object L1.
+        %
+        % L = Link(DH, options) is a link object formed from the kinematic 
+        % parameter vector:
+        %  - DH = [theta d a alpha sigma offset] where offset is a constant added to 
+        %    the joint angle variable before forward kinematics and is useful if you 
+        %    want the robot to adopt a 'sensible' pose for zero joint angle 
+        %    configuration.
+        %  - DH = [theta d a alpha sigma] where sigma=0 for a revolute and 1 for a
+        %    prismatic joint, offset is zero.
+        %  - DH = [theta d a alpha], joint is assumed revolute and offset is zero.
+        %
+        % Options::
+        %
+        % 'standard'   for standard D&H parameters (default).
+        % 'modified'   for modified D&H parameters.
+        %
+        % Notes:
+        % - Link object is a reference object, a subclass of Handle object.
+        % - Link objects can be used in vectors and arrays
+        % - the parameter theta or d is unused in a revolute or prismatic 
+        %   joint respectively, it is simply a placeholder for the joint 
+        %   variable passed to L.A()
+        % - the link dynamic (inertial and motor) parameters are all set to
+        %   zero.  These must be set by explicitly assigning the object
+        %   properties: m, r, I, Jm, B, Tc, G.
 
-            if nargin == 0,
+ %TODO eliminate legacy dyn matrix
+ 
+            if nargin == 0
                 % create an 'empty' link
                 l.alpha = 0;
                 l.a = 0;
@@ -122,37 +146,45 @@ classdef Link < handle
 
             elseif isa(dh, 'Link')
                 % clone passed link
-                l = dh;
-            elseif length(dh) <= 6,
-                % legacy DH matrix
-                % link([alpha A theta D sigma])
+                l = copy(dh);
 
-                if length(dh) < 4,
+            elseif length(dh) <= 6
+                % legacy DH matrix
+                % link([theta d a alpha])
+                % link([theta d a alpha sigma])
+                % link([theta d a alpha sigma offset])
+
+                if length(dh) < 4
                         error('must provide params (theta d a alpha)');
                 end
+
+                % set the kinematic parameters
                 l.theta = dh(1);
                 l.d = dh(2);
                 l.a = dh(3);
                 l.alpha = dh(4);
 
                 l.sigma = 0;
-                if length(dh) >= 5,
+                l.offset = 0;
+                l.mdh = 0;  % default to standard D&H
+
+                % optionally set sigma and offset
+                if length(dh) >= 5
                     l.sigma = dh(5);
                 end
+                if length(dh) >= 6
+                    l.offset = dh(6);
+                end
+
+                % set the kinematic convention to be used
                 if nargin > 1
-                    if strncmp(convention, 'mod', 3) == 1,
+                    if strncmp(convention, 'mod', 3) == 1
                         l.mdh = 1;
-                    elseif strncmp(convention, 'sta', 3) == 1,
+                    elseif strncmp(convention, 'sta', 3) == 1
                         l.mdh = 0;
                     else
                         error('convention must be modified or standard');
                     end
-                else
-                        l.mdh = 0;	% default to standard D&H
-                end
-                l.offset = 0;
-                if length(dh) >= 6,
-                    l.offset = dh(6);
                 end
 
                 % we know nothing about the dynamics
@@ -165,105 +197,70 @@ classdef Link < handle
                 l.B = 0;
                 l.Tc = [0 0];
                 l.qlim = [];
-
-            else
-                % legacy DYN matrix
-
-                l.alpha = dh(1);
-                l.a = dh(2);
-                l.theta = dh(3);
-                l.d = dh(4);
-                l.sigma = dh(5);
-                l.mdh = 0;	% default to standard D&H
-                l.offset = 0;
-                
-                % it's a legacy DYN matrix
-                l.m = dh(6);
-                l.r = dh(7:9);		% a column vector
-                v = dh(10:15);
-                l.I = [	v(1) v(4) v(6)
-                    v(4) v(2) v(5)
-                    v(6) v(5) v(3)];
-                if length(dh) > 15,
-                    l.Jm = dh(16);
-                end
-                if length(dh) > 16,
-                    l.G = dh(17);
-                else
-                    l.G = 1;
-                end
-                if length(dh) > 17,
-                    l.B = dh(18);
-                else
-                    l.B = 0.0;
-                end
-                if length(dh) > 18,
-                    l.Tc = dh(19:20);
-                else
-                    l.Tc = [0 0];
-                end
-                l.qlim = [];
-                if nargin > 1
-                    if strncmp(convention, 'mod', 3) == 1,
-                        l.mdh = 1;
-                    elseif strncmp(convention, 'sta', 3) == 1,
-                        l.mdh = 0;
-                    else
-                        error('convention must be modified or standard');
-                    end
-                else
-                        l.mdh = 0;	% default to standard D&H
-                end
             end
         end % link()
 
         function  tau = friction(l, qd)
+        %Link.friction Joint friction force
+        %
+        % F = L.friction(QD) is the joint friction force/torque for link velocity QD
             tau = 0.0;
 
             qd = qd(:);
             tau = l.B * qd;
 
             tau = tau + (qd > 0) * l.Tc(1) + (qd < 0) * l.Tc(2);
+            tau = -tau;
         end % friction()
 
-        %NOFRICTION blah
         function  l2 = nofriction(l, only)
+        %Link.nofriction Remove friction
+        %
+        % LN = L.nofriction() is a link object with the same parameters as L except 
+        % nonlinear (Coulomb) friction parameter is zero.
+        %
+        % LN = L.nofriction('all') is a link object with the same parameters as L 
+        % except all friction parameters are zero.
 
-            l2 = link(l);
-
+            l2 = Link(l);
             if (nargin == 2) && strcmpi(only(1:3), 'all')
                 l2.B = 0;
             end
             l2.Tc = [0 0];
         end
 
-        function v = get.RP(l)
-			if l.sigma == 0,
-				v = 'R';
-			else
-				v = 'P';
-			end
+        function v = RP(l)
+        %Link.RP Joint type
+        %
+        % c = L.RP() is a character 'R' or 'P' depending on whether joint is revolute or 
+        % prismatic respectively.
+        % If L is a vector of Link objects return a string of characters in joint order.
+            v = '';
+            for ll=l
+                if ll.sigma == 0
+                    v = strcat(v, 'R');
+                else
+                    v = strcat(v, 'P');
+                end
+            end
         end % RP()
 
-		function v = get.dh(l)
-			v = [l.alpha l.a l.theta l.d l.sigma];
-        end % get.dh()
-
-		function v = get.dyn(l)
-            try
-                v = [l.alpha l.a l.theta l.d l.sigma l.m l.r(:)' diag(l.I)' l.I(2,1) l.I(2,3) l.I(1,3) l.Jm l.G l.B l.Tc(:)'];
-            catch
-                error('some dynamic params not set');
-            end
-        end %  get.dyn()
-
         function l = set.Tc(l, v)
-            if isempty(v),
+        %Link.Tc Set Coulomb friction
+        %
+        % L.Tc = F set Coulomb friction parameters to [-F F], for a symmetric
+        % Coulomb friction model.
+        %
+        % L.Tc = [FP FM] set Coulomb friction to [FP FM], for an asymmetric
+        % Coulomb friction model. FP>0 and FM<0.
+        %
+        % See also Link.friction.
+            if isempty(v)
                 return;
             end
-            if length(v) == 1,
+            if length(v) == 1
                 l.Tc = [v -v];
-            elseif length(v) == 2,
+            elseif length(v) == 2
                 l.Tc = v;
             else
                 error('Coulomb friction vector can have 1 (symmetric) or 2 (asymmetric) elements only')
@@ -271,32 +268,71 @@ classdef Link < handle
         end % set.Tc()
 
         function l = set.I(l, v)
-            if isempty(v),
+        %Link.I Set link inertia
+        %
+        % L.I = [Ixx Iyy Izz] set Link inertia to a diagonal matrix.
+        %
+        % L.I = [Ixx Iyy Izz Ixy Iyz Ixz] set Link inertia to a symmetric matrix with
+        % specified intertia and product of intertia elements.
+        %
+        % L.I = M set Link inertia matrix to 3x3 matrix M (which must be symmetric).
+            if isempty(v)
                 return;
             end
             if all(size(v) == [3 3])
-                if norm(v-v') > eps,
+                if norm(v-v') > eps
                     error('inertia matrix must be symmetric');
                 end
                 l.I = v;
-            elseif length(v) == 3,
+            elseif length(v) == 3
                 l.I = diag(v);
-            elseif length(v) == 6,
-                l.I = [	v(1) v(4) v(6)
+            elseif length(v) == 6
+                l.I = [ v(1) v(4) v(6)
                     v(4) v(2) v(5)
                     v(6) v(5) v(3)];
             end
         end % set.I()
 
         function v = islimit(l, q)
-			if isempty(l.qlim)
-				error('no limits assigned to link')
-			end
-			v = (q > l.qlim(2)) - (q < l.qlim(1));
+        %Link.islimit  Test joint limits
+        %
+        % L.islimit(Q) is true (1) if Q is outside the soft limits set for this joint.
+            if isempty(l.qlim)
+                error('no limits assigned to link')
+            end
+            v = (q > l.qlim(2)) - (q < l.qlim(1));
         end % islimit()
 
-        function T = A(L, q)
+        function v = isrevolute(L)
+        %Link.isrevolute  Test if joint is revolute
+        %
+        % L.isrevolute() is true (1) if joint is revolute.
+        %
+        % See also Link.isprismatic.
+            
+            v = L.sigma == 0;
+        end
 
+        function v = isprismatic(L)
+        %Link.isprismatic  Test if joint is prismatic
+        %
+        % L.isprismatic() is true (1) if joint is prismatic.
+        %
+        % See also Link.isrevolute.
+            v = L.sigma == 1;
+        end
+        
+
+        function T = A(L, q)
+        %Link.A Link transform matrix
+        %
+        % T = L.A(Q) is the 4x4 link homogeneous transformation matrix corresponding
+        % to the link variable Q which is either theta (revolute) or d (prismatic).
+        %
+        % Notes::
+        % - For a revolute joint the theta parameter of the link is ignored, and Q used instead.
+        % - For a prismatic joint the d parameter of the link is ignored, and Q used instead.
+        % - The link offset parameter is added to Q before computation of the transformation matrix.
             if L.mdh == 0
                 T = linktran([L.alpha L.a L.theta L.d L.sigma], ...
                     q+L.offset);
@@ -307,6 +343,17 @@ classdef Link < handle
         end % A()
 
         function display(l)
+        %Link.display Display parameters
+        %
+        % L.display() display link parameters in compact single line format.  If L is a 
+        % vector of Link objects display one line per element.
+        %
+        % Notes::
+        % - this method is invoked implicitly at the command line when the result
+        %   of an expression is a Link object and the command has no trailing
+        %   semicolon.
+        %
+        % See also Link.char, Link.dyn, SerialLink.showlink.
             loose = strcmp( get(0, 'FormatSpacing'), 'loose');
             if loose
                 disp(' ');
@@ -316,6 +363,12 @@ classdef Link < handle
         end % display()
 
         function s = char(links, from_robot)
+        %Link.char String representation of parameters
+        %
+        % s = L.char() is a string showing link parameters in compact single line format.  
+        % If L is a vector of Link objects return a string with one line per Link.
+        %
+        % See also Link.display.
 
             % display in the order theta d a alpha
             if nargin < 2
@@ -323,10 +376,10 @@ classdef Link < handle
             end
 
             s = '';
-            for j=1:length(links),
+            for j=1:length(links)
                 l = links(j);
                 if from_robot
-                    if l.sigma == 1,
+                    if l.sigma == 1
                         % prismatic joint
                         js = sprintf('|%3d|%11.4g|%11s|%11.4g|%11.4g|', ...
                             j, l.theta, sprintf('q%d', j), l.a, l.alpha);
@@ -336,7 +389,7 @@ classdef Link < handle
                     end
                 else
                     conv = l.RP;
-                    if l.mdh == 0,
+                    if l.mdh == 0
                         conv = [conv ',stdDH'];
                     else
                         conv = [conv ',modDH'];
@@ -347,7 +400,7 @@ classdef Link < handle
                         qname = sprintf('q%d', j);
                     end
 
-                    if l.sigma == 1,
+                    if l.sigma == 1
                         % prismatic joint
                         js = sprintf(' theta=%.4g, d=%s, a=%.4g, alpha=%.4g (%s)', ...
                             l.theta, qname, l.a, l.alpha, conv);
@@ -360,11 +413,21 @@ classdef Link < handle
             end
         end % char()
 
-        function show(l)
+        function dyn(l)
+        %Link.dyn Display the inertial properties of link
+        %
+        % L.dyn() displays the inertial properties of the link object in a multi-line format.
+        % The properties shown are mass, centre of mass, inertia, friction, gear ratio
+        % and motor properties.
+        %
+        % If L is a vector of Link objects show properties for each element.
 
-            if length(l) > 1,
-                for ll=l,
-                    show(ll);
+            if length(l) > 1
+                for j=1:length(l)
+                    ll = l(j);
+                    fprintf('%d: %f; %f %f %f; %f %f %f\n', ...
+                        j, ll.m, ll.r, diag(ll.I));
+                    %dyn(ll);
                 end
                 return;
             end
@@ -377,7 +440,7 @@ classdef Link < handle
                 fprintf('  r    = %f %f %f\n', l.r);
             end
             if ~isempty(l.I)
-                fprintf('  I    = | %f %f %f |\n', l.I(1,:));
+                fprintf('  J    = | %f %f %f |\n', l.I(1,:));
                 fprintf('         | %f %f %f |\n', l.I(2,:));
                 fprintf('         | %f %f %f |\n', l.I(3,:));
             end
@@ -385,7 +448,7 @@ classdef Link < handle
                 fprintf('  Jm   = %f\n', l.Jm);
             end
             if ~isempty(l.B)
-                fprintf('  B    = %f\n', l.B);
+                fprintf('  Bm   = %f\n', l.B);
             end
             if ~isempty(l.Tc)
                 fprintf('  Tc   = %f(+) %f(-)\n', l.Tc(1), l.Tc(2));
@@ -398,112 +461,125 @@ classdef Link < handle
             end
         end % show()
 
+        % Make a copy of a handle object. 
+        % http://www.mathworks.com/matlabcentral/newsreader/view_thread/257925
+        function new = copy(this) 
 
-    end % methods
-end % class
+            for j=1:length(this)
+                % Instantiate new object of the same class. 
+                new(j) = feval(class(this(j))); 
+                % Copy all non-hidden properties. 
+                p = properties(this(j)); 
+                for i = 1:length(p) 
+                    new(j).(p{i}) = this(j).(p{i}); 
+                end 
+            end
+        end 
 
+        end % methods
+    end % class
 
-%LINKTRAN	Compute the link transform from kinematic parameters
-%
-%	LINKTRAN(alpha, an, theta, dn)
-%	LINKTRAN(DH, q) is a homogeneous 
-%	transformation between link coordinate frames.
-%
-%	alpha is the link twist angle
-%	an is the link length
-%	theta is the link rotation angle
-%	dn is the link offset
-%	sigma is 0 for a revolute joint, non-zero for prismatic
-%
-%	In the second case, q is substitued for theta or dn according to sigma.
-%
-%	Based on the standard Denavit and Hartenberg notation.
+%%%%%%%%%%%% static class methods
 
-%	Copyright (C) Peter Corke 1993
+%LINKTRAN   Compute the link transform from kinematic parameters
+%
+%   LINKTRAN(alpha, an, theta, dn)
+%   LINKTRAN(DH, q) is a homogeneous 
+%   transformation between link coordinate frames.
+%
+%   alpha is the link twist angle
+%   an is the link length
+%   theta is the link rotation angle
+%   dn is the link offset
+%   sigma is 0 for a revolute joint, non-zero for prismatic
+%
+%   In the second case, q is substitued for theta or dn according to sigma.
+%
+%   Based on the standard Denavit and Hartenberg notation.
+
 function t = linktran(a, b, c, d)
 
-	if nargin == 4,
-		alpha = a;
-		an = b;
-		theta = c;
-		dn = d;
-	else
-		if numcols(a) < 4,
-			error('too few columns in DH matrix');
-		end
-		alpha = a(1);
-		an = a(2);
-		if numcols(a) > 4,
-			if a(5) == 0,	% revolute
-				theta = b;
-				dn = a(4);
-			else		% prismatic
-				theta = a(3);
-				dn = b;
-			end
-		else
-			theta = b;	% assume revolute if sigma not given
-			dn = a(4);
-		end
-	end
-	sa = sin(alpha); ca = cos(alpha);
-	st = sin(theta); ct = cos(theta);
+    if nargin == 4
+        alpha = a;
+        an = b;
+        theta = c;
+        dn = d;
+    else
+        if numcols(a) < 4
+            error('too few columns in DH matrix');
+        end
+        alpha = a(1);
+        an = a(2);
+        if numcols(a) > 4
+            if a(5) == 0,   % revolute
+                theta = b;
+                dn = a(4);
+            else        % prismatic
+                theta = a(3);
+                dn = b;
+            end
+        else
+            theta = b;  % assume revolute if sigma not given
+            dn = a(4);
+        end
+    end
+    sa = sin(alpha); ca = cos(alpha);
+    st = sin(theta); ct = cos(theta);
 
-	t =    [	ct	-st*ca	st*sa	an*ct
-			st	ct*ca	-ct*sa	an*st
-			0	sa	ca	dn
-			0	0	0	1];
+    t =    [    ct  -st*ca  st*sa   an*ct
+            st  ct*ca   -ct*sa  an*st
+            0   sa  ca  dn
+            0   0   0   1];
 end
 
-%MLINKTRAN	Compute the link transform from kinematic parameters
+%MLINKTRAN  Compute the link transform from kinematic parameters
 %
-%	MLINKTRAN(alpha, an, theta, dn)
-%	MLINKTRAN(DH, q) is a homogeneous 
-%	transformation between link coordinate frames.
+%   MLINKTRAN(alpha, an, theta, dn)
+%   MLINKTRAN(DH, q) is a homogeneous 
+%   transformation between link coordinate frames.
 %
-%	alpha is the link twist angle
-%	an is the link length
-%	theta is the link rotation angle
-%	dn is the link offset
-%	sigma is 0 for a revolute joint, non-zero for prismatic
+%   alpha is the link twist angle
+%   an is the link length
+%   theta is the link rotation angle
+%   dn is the link offset
+%   sigma is 0 for a revolute joint, non-zero for prismatic
 %
-%	In the second case, q is substitued for theta or dn according to sigma.
+%   In the second case, q is substitued for theta or dn according to sigma.
 %
-%	Based on the modified Denavit and Hartenberg notation.
+%   Based on the modified Denavit and Hartenberg notation.
 
-%	Copyright (C) Peter Corke 1993
 function t = mlinktran(a, b, c, d)
 
-	if nargin == 4,
-		alpha = a;
-		an = b;
-		theta = c;
-		dn = d;
-	else
-		if numcols(a) < 4,
-			error('too few columns in DH matrix');
-		end
-		alpha = a(1);
-		an = a(2);
-		if numcols(a) > 4,
-			if a(5) == 0,	% revolute
-				theta = b;
-				dn = a(4);
-			else		% prismatic
-				theta = a(3);
-				dn = b;
-			end
-		else
-			theta = b;	% assume revolute if no sigma given
-			dn = a(4);
-		end
-	end
-	sa = sin(alpha); ca = cos(alpha);
-	st = sin(theta); ct = cos(theta);
+    if nargin == 4
+        alpha = a;
+        an = b;
+        theta = c;
+        dn = d;
+    else
+        if numcols(a) < 4
+            error('too few columns in DH matrix');
+        end
+        alpha = a(1);
+        an = a(2);
+        if numcols(a) > 4
+            if a(5) == 0,   % revolute
+                theta = b;
+                dn = a(4);
+            else        % prismatic
+                theta = a(3);
+                dn = b;
+            end
+        else
+            theta = b;  % assume revolute if no sigma given
+            dn = a(4);
+        end
+    end
+    sa = sin(alpha); ca = cos(alpha);
+    st = sin(theta); ct = cos(theta);
 
-	t =    [	ct	-st	0	an
-			st*ca	ct*ca	-sa	-sa*dn
-			st*sa	ct*sa	ca	ca*dn
-			0	0	0	1];
+    t =    [    ct  -st 0   an
+            st*ca   ct*ca   -sa -sa*dn
+            st*sa   ct*sa   ca  ca*dn
+            0   0   0   1];
 end
 

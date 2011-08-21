@@ -1,12 +1,16 @@
 %VEX Convert skew-symmetric matrix to vector
 %
-%   v = skew(S);
+% V = VEX(S) is the vector which has the skew-symmetric matrix S.
 %
-% Assuming that S is skew-symmetric, extract the 3 unique values from it.  We
-% actually take the mean of the two elements that correspond to each unique
-% element, ie. vx = 0.5*(S(3,2)-S(2,3))
+% Notes::
+% - No checking is done to ensure that the matrix is skew-symmetric.
+% - The function takes the mean of the two elements that correspond to each unique
+%   element of the matrix, ie. vx = 0.5*(S(3,2)-S(2,3))
+%
+% See also SKEW.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 

@@ -1,13 +1,13 @@
 %RTDEMO 	Robot toolbox demonstrations
 %
 % Displays popup menu of toolbox demonstration scripts that illustrate:
-%   * homogeneous transformations
-%   * trajectories
-%   * forward kinematics
-%   * inverse kinematics
-%   * robot animation
-%   * inverse dynamics
-%   * forward dynamics
+%   - homogeneous transformations
+%   - trajectories
+%   - forward kinematics
+%   - inverse kinematics
+%   - robot animation
+%   - inverse dynamics
+%   - forward dynamics
 %
 % The scripts require the user to periodically hit <Enter> in order to move
 % through the explanation.  Set PAUSE OFF if you want the scripts to run
@@ -23,11 +23,27 @@
 % references, clarification of functions.
 %
 % $Revision: 1.1 $
-% Copyright (C) 1993-2002, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 % if demos are not already in the path, add them to the path
 if exist('rttrdemo') == 0
-    tbpath = fileparts(which('fkine'));
+    tbpath = fileparts(which('tr2eul'));
     demopath = fullfile(tbpath, 'demos');
     addpath( demopath );
     disp(['** Adding Robotics Toolbox demos to your Matlab path ' demopath]);
@@ -37,8 +53,8 @@ echo off
 clear all
 delete( get(0, 'Children') );
 
-puma560
-while 1,
+mdl_puma560
+while 1
  selection = menu('Robot Toolbox demonstrations', ...
  	'Transformations', ...
  	'Trajectory', ...
@@ -50,24 +66,24 @@ while 1,
  	'Forward dynamics', ...
  	'Exit');
 
- switch selection,
- case 1,
+ switch selection
+ case 1
  	rttrdemo
- case 2,
+ case 2
  	rttgdemo
- case 3,
+ case 3
  	rtfkdemo
- case 4,
+ case 4
  	rtandemo
- case 5,
+ case 5
  	rtikdemo
- case 6,
+ case 6
  	rtjademo
- case 7,
+ case 7
  	rtidemo
- case 8,
+ case 8
  	rtfddemo
- case 9,
+ case 9
 	delete( get(0, 'Children') );
  	break;
  end

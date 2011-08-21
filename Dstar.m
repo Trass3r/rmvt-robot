@@ -1,3 +1,47 @@
+%Dstar D* navigation class
+%
+% A concrete subclass of Navigation that implements the distance transform
+% navigation algorithm.  This provides minimum distance paths and
+% facilitates incremental replanning.
+%
+% Methods::
+%
+% plan           Compute the cost map given a goal and map
+% path           Compute a path to the goal
+% visualize      Display the obstacle map
+% display        Print the parameters in human readable form
+% char           Convert the parameters to a human readable string
+% modify_cost    Modify the costmap
+% costmap_get    Return the current costmap
+%
+% Example::
+%
+%    load map1
+%    ds = Dstar(map);
+%    ds.plan(goal)
+%    ds.path(start)
+%
+% See also Navigation, DXform, PRM.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
 % Implementation notes:
 %
 % All the state is kept in the structure called d
@@ -40,6 +84,17 @@ classdef Dstar < Navigation
 
         % constructor
         function ds = Dstar(world, goal)
+            %Dstar.Dstar D* navigation constructor
+            %
+            % DS = Dstar(MAP) is a D* navigation object, and MAP is an
+            % occupancy grid, a representation of a planar world as a
+            % matrix whose elements are 0 (free space) or 1 (occupied)..
+            % The occupancy grid is coverted to a costmap with a unit cost
+            % for traversing a cell.
+            %
+            % DS = Dstar(MAP, GOAL) as above but specify the goal point. 
+            %
+            % See also Navigation.Navigation.
 
             % invoke the superclass constructor
             ds = ds@Navigation(world);
@@ -55,6 +110,11 @@ classdef Dstar < Navigation
         end
 
         function reset(ds)
+            %Dstar.reset Reset the planner
+            %
+            % DS.reset() resets the D* planner.  The next instantiation
+            % of DS.plan() will perform a global replan.
+
             % build the matrices required to hold the state of each cell for D*
             ds.b = zeros(size(ds.costmap), 'uint32');  % backpointers
             ds.t = zeros(size(ds.costmap), 'uint8');   % tags
@@ -70,6 +130,9 @@ classdef Dstar < Navigation
         end
 
         function c = costmap_get(ds)
+            %Dstar.costmap_get Get the current costmap
+            %
+            % C = DS.costmap_get() returns the current costmap.
             c = ds.costmap;
         end
 
@@ -83,6 +146,12 @@ classdef Dstar < Navigation
         end
 
         function s = char(ds)
+            %Dstar.char Convert navigation object to string
+            %
+            % DS.char() is a string representing the state of the navigation
+            % object in human-readable form.
+            %
+            % See also Dstar.display.
             s = '';
             s = strvcat(s, sprintf('D*: costmap %dx%d, open list %d\n', size(ds.costmap), numcols(ds.openlist)));
         end
@@ -101,7 +170,19 @@ classdef Dstar < Navigation
         end
 
         function visualize(ds, varargin)
-            visualize@Navigation(ds, 'distance', ds.h);
+            %Dstar.visualize Visualize navigation environment
+            %
+            % DS.visualize() displays the occupancy grid and the goal distance
+            % in a new figure.  The goal distance is shown by intensity which
+            % increases with distance from the goal.  Obstacles are overlaid
+            % and shown in red.
+            %
+            % DS.visualize(P) as above but also overlays the points P in the
+            % path points which is an Nx2 matrix.
+            %
+            % See also Navigation.visualize.
+            
+            visualize@Navigation(ds, 'distance', ds.h, varargin{:});
 
         end
 
@@ -112,11 +193,26 @@ classdef Dstar < Navigation
                 n = [];
             else
                 [r,c] = ind2sub(size(ds.costmap), X);
-                n = [c,r];
+                n = [c;r];
             end
         end
 
         function plan(ds, goal)
+            %Dstar.plan Plan path to goal
+            %
+            % DS.plan() updates DS with a costmap of distance to the
+            % goal from every non-obstacle point in the map.  The goal is
+            % as specified to the constructor.
+            %
+            % DS.plan(GOAL) as above but uses the specified goal.
+            %
+            % Note::
+            % - if a path has already been planned, but the costmap was
+            %   modified, then reinvoking this method will replan,
+            %   incrementally updating the plan at lower cost than a full
+            %   replan.
+
+            
             if nargin > 1
                 ds.goal = goal;
             end
@@ -146,6 +242,13 @@ classdef Dstar < Navigation
         end
 
         function modify_cost(ds, point, newcost)
+            %Dstar.modify_cost Modify cost map
+            %
+            % DS.modify_cost(P, NEW) modifies the cost map at P=[X,Y] to
+            % have the value NEW.
+            %
+            % After one or more point costs have been updated the path
+            % should be replanned by calling DS.plan(). 
             X = sub2ind(size(ds.costmap), point(2), point(1));
             ds.costmap(X) = newcost;
             if ds.t(X) == ds.CLOSED

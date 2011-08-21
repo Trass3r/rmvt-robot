@@ -1,11 +1,11 @@
 %SKEW Create skew-symmetric matrix
 %
-%   S = skew(v)
+% S = SKEW(V) is a skew-symmetric matrix and V is a 3-vector.
 %
-% Create 3x3 skew-symmetric matrix from 3x1 vector v
-%
+% See also VEX.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 

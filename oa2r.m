@@ -1,16 +1,17 @@
-%OA2R Convert O/A vectors to rotation matrix
+%OA2R Convert orientation and approach vectors to rotation matrix
 %
-% 	R = OA2R(O, A)
+% R = OA2R(O, A) is a rotation matrix for the specified orientation and 
+% approach vectors formed from 3 vectors such that R = [N O A] and 
+% N = O x A.
 %
-% Returns a rotation matrix for the specified orientation and 
-% approach vectors formed from 3 vectors such that
-% R = [N O A] and N = O x A.  
-% The submatrix is guaranteed to be orthonormal so long as O and A are 
-% not parallel.
+% Notes::
+% - The submatrix is guaranteed to be orthonormal so long as O and A 
+%   are not parallel.
 %
-% See also: RPY2R, EUL2R, OA2TR
+% See also RPY2R, EUL2R, OA2TR.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -27,7 +28,7 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function r = oa2r(o, a)
+function R = oa2r(o, a)
 	n = cross(o, a);
     o = cross(a, n);
-	r = [unit(n(:)) unit(o(:)) unit(a(:))];
+	R = [unit(n(:)) unit(o(:)) unit(a(:))];
