@@ -1,13 +1,16 @@
-%FRICTION Compute friction torque for a ROBOT object
+%SerialLink.friction Friction force
 %
-%	TAU = FRICTION(ROBOT, QD)
+% TAU = R.friction(QD) is the vector of joint friction forces/torques for the 
+% robot moving with joint velocities QD.  
 %
-% Return the vector of joint friction torques for the specified
-% ROBOT object with link velocities of QD.  
+% The friction model includes viscous friction (linear with velocity)
+% and Coulomb friction (proportional to sign(QD)).
 %
-% SEE ALSO: LINK/FRICTION
+% See also Link.friction.
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -23,6 +26,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function  tau = friction(robot, qd)
 

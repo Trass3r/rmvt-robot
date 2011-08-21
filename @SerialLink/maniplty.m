@@ -1,35 +1,37 @@
-%MANIPLTY Manipulability measure
+%SerialLink.MANIPLTY Manipulability measure
 %
-%	M = MANIPLTY(ROBOT, Q)
-%	M = MANIPLTY(ROBOT, Q, WHICH)
+% M = R.maniplty(Q, OPTIONS) is the manipulability index measure for the robot
+% at the joint configuration Q.  It indicates dexterity, how isotropic the
+% robot's motion is with respect to the 6 degrees of Cartesian motion.
+% The measure is low when the manipulator is close to a singularity.
+% If Q is a matrix M is a column vector of  manipulability 
+% indices for each pose specified by a row of Q.
 %
-% Computes the manipulability index for the manipulator at the given pose.
+% Two measures can be selected:
+% - Yoshikawa's manipulability measure is based on the shape of the velocity
+%   ellipsoid and depends only on kinematic parameters.
+% - Asada's manipulability measure is based on the shape of the acceleration
+%   ellipsoid which in turn is a function of the Cartesian inertia matrix and
+%   the dynamic parameters.  The scalar measure computed here is the ratio of 
+%   the smallest/largest ellipsoid axis.  Ideally the ellipsoid would be 
+%   spherical, giving a ratio of 1, but in practice will be less than 1.
 %
-% For an n-axis manipulator Q may be an n-element vector, or an m x n
-% joint space trajectory.
+% Options::
+% 'T'           compute manipulability for just transational motion
+% 'R'           compute manipulability for just rotational motion
+% 'yoshikawa'   use Asada algorithm (default)
+% 'asada'       use Asada algorithm
 %
-% If Q is a vector MANIPLTY returns a scalar manipulability index.
-% If Q is a matrix MANIPLTY returns a column vector of  manipulability 
-% indices for each pose specified by Q.
+% Notes::
+% - by default the measure includes rotational and translational dexterity, but
+%   this involves adding different units.  It can be more useful to look at the
+%   translational and rotational manipulability separately.
 %
-% The argument WHICH can be either 'yoshikawa' (default) or 'asada' and
-% selects one of two manipulability measures.
-% Yoshikawa's manipulability measure gives an indication of how far 
-% the manipulator is from singularities and thus able to move and 
-% exert forces uniformly in all directions.
-%
-% Asada's manipulability measure is based on the manipulator's
-% Cartesian inertia matrix.  An n-dimensional inertia ellipsoid
-% 	X' M(q) X = 1
-% gives an indication of how well the manipulator can accelerate
-% in each of the Cartesian directions.  The scalar measure computed
-% here is the ratio of the smallest/largest ellipsoid axis.  Ideally
-% the ellipsoid would be spherical, giving a ratio of 1, but in
-% practice will be less than 1.
-%
-% See also: INERTIA, JACOB0.
+% See also SerialLink.inertia, SerialLink.jacob0.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -45,35 +47,56 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
-function w = maniplty(robot, q, which)
+function [w,mx] = maniplty(robot, q, varargin)
 	n = robot.n;
 
-	if nargin == 2,
-		which = 'yoshikawa';
-	end
+    opt.yoshikawa = true;
+    opt.asada = false;
+    opt.axes = {'all', 'T', 'R'};
+
+    opt = tb_optparse(opt, varargin);
 
 	if length(q) == robot.n,
 		q = q(:)';
 	end
 
 	w = [];
-	switch which,
-	case {'yoshikawa', 'yoshi', 'y'}
+    MX = [];
+
+    if opt.yoshikawa
 		for Q = q',
-			w = [w; yoshi(robot, Q)];
+			w = [w; yoshi(robot, Q, opt)];
 		end
-	case {'asada', 'a'}
+	elseif opt.asada
 		for Q = q',
-			w = [w; asada(robot, Q)];
+            if nargout > 1
+                [ww,mm] = asada(robot, Q);
+                w = [w; ww];
+                MX = cat(3, MX, mm);
+            else
+                w = [w; asada(robot, Q, opt)];
+            end
 		end
 	end
 
-function m = yoshi(robot, q)
+    if nargout > 1
+        mx = MX;
+    end
+
+function m = yoshi(robot, q, opt)
 	J = jacob0(robot, q);
+    switch opt.axes
+    case 'T'
+        J = J(1:3,:);
+    case 'R'
+        J = J(4:6,:);
+    end
 	m = sqrt(det(J * J'));
 
-function m = asada(robot, q)
+function [m, mx] = asada(robot, q, opt)
 	J = jacob0(robot, q);
     
     if rank(J) < 6,
@@ -81,8 +104,19 @@ function m = asada(robot, q)
         m = 0;
         return;
     end
+
+    switch opt.axes
+    case 'T'
+        J = J(1:3,:);
+    case 'R'
+        J = J(4:6,:);
+    end
 	Ji = inv(J);
 	M = inertia(robot, q);
 	Mx = Ji' * M * Ji;
-	e = eig(Mx);
+	e = eig(Mx(1:3,1:3));
 	m = min(e) / max(e);
+
+    if nargout > 1
+        mx = Mx;
+    end

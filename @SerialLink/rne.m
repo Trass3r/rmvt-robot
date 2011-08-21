@@ -1,41 +1,44 @@
-%RNE Compute inverse dynamics via recursive Newton-Euler formulation
+%SerialLink.rne Inverse dynamics
 %
-%	TAU = RNE(ROBOT, Q, QD, QDD)
-%	TAU = RNE(ROBOT, [Q QD QDD])
+% TAU = R.rne(Q, QD, QDD) is the joint torque required for the robot R
+% to achieve the specified joint position Q, velocity QD and acceleration QDD.
 %
-% Returns the joint torque required to achieve the specified joint position,
-% velocity and acceleration state.
+% TAU = R.rne(Q, QD, QDD, GRAV) as above but overriding the gravitational 
+% acceleration vector in the robot object R.
 %
-% Gravity vector is an attribute of the robot object but this may be 
-% overriden by providing a gravity acceleration vector [gx gy gz].
+% TAU = R.rne(Q, QD, QDD, GRAV, FEXT) as above but specifying a wrench 
+% acting on the end of the manipulator which is a 6-vector [Fx Fy Fz Mx My Mz].
 %
-%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV)
-%	TAU = RNE(ROBOT, [Q QD QDD], GRAV)
+% TAU = R.rne(X) as above where X=[Q,QD,QDD].
 %
-% An external force/moment acting on the end of the manipulator may also be
-% specified by a 6-element vector [Fx Fy Fz Mx My Mz].
+% TAU = R.rne(X, GRAV) as above but overriding the gravitational 
+% acceleration vector in the robot object R.
 %
-%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV, FEXT)
-%	TAU = RNE(ROBOT, [Q QD QDD], GRAV, FEXT)
+% TAU = R.rne(X, GRAV, FEXT) as above but specifying a wrench 
+% acting on the end of the manipulator which is a 6-vector [Fx Fy Fz Mx My Mz].
 %
-% where Q, QD and QDD are row vectors of the manipulator state; pos, vel, 
-% and accel.
+% If Q,QD and QDD, or X are matrices with M rows representing a trajectory then
+% TAU is an MxN matrix with rows corresponding to each trajectory state.
 %
-% The torque computed also contains a contribution due to armature
-% inertia.
+% Notes:
+% - The torque computed also contains a contribution due to armature
+%   inertia.
+% - RNE can be either an M-file or a MEX-file.  See the manual for details on
+%   how to configure the MEX-file.  The M-file is a wrapper which calls either
+%   RNE_DH or RNE_MDH depending on the kinematic conventions used by the robot
+%   object.
 %
-% RNE can be either an M-file or a MEX-file.  See the manual for details on
-% how to configure the MEX-file.  The M-file is a wrapper which calls either
-% RNE_DH or RNE_MDH depending on the kinematic conventions used by the robot
-% object.
-%
-% See also: ROBOT, ACCEL, GRAVLOAD, INERTIA.
+% See also SerialLink.accel, SerialLink.gravload, SerialLink.inertia.
 
+% TODO:
+% should use tb_optparse
 %
 % verified against MAPLE code, which is verified by examples
 %
 
-% Copyright (C) 1992-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -51,6 +54,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 
 function [tau,f] = rne(robot, varargin)

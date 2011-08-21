@@ -1,20 +1,19 @@
-%CINERTIA Compute the Cartesian (operational space) manipulator inertia matrix
+%SerialLink.cinertia Cartesian inertia matrix
 %
-%	M = CINERTIA(ROBOT, Q)
+% M = R.cinertia(Q) is the NxN Cartesian (operational space) inertia matrix which relates 
+% Cartesian force/torque to Cartesian acceleration at the joint configuration Q, and N 
+% is the number of robot joints.
 %
-% Return the n x n inertia matrix which relates Cartesian force/torque to 
-% Cartesian acceleration.
-% ROBOT is an n-axis robot object and describes the manipulator dynamics and 
-% kinematics, and Q is an n element vector of joint state.
-%
-% See also: INERTIA, ROBOT, RNE.
+% See also SerialLink.inertia, SerialLink.rne.
 
 % MOD HISTORY
 % 	4/99 add object support
 % $Log: not supported by cvs2svn $
 % $Revision: 1.2 $
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -30,6 +29,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function Mx = cinertia(robot, q)
 	J = jacob0(robot, q);

@@ -1,41 +1,18 @@
-%RNE_DH Compute inverse dynamics via recursive Newton-Euler formulation
+
+%SERIALLINK.RNE_DH Compute inverse dynamics via recursive Newton-Euler formulation
 %
-%	TAU = RNE(ROBOT, Q, QD, QDD)
-%	TAU = RNE(ROBOT, [Q QD QDD])
+% Recursive Newton-Euler for standard Denavit-Hartenberg notation.  Is invoked by
+% R.RNE().
 %
-% Returns the joint torque required to achieve the specified joint position,
-% velocity and acceleration state.
-%
-% Gravity vector is an attribute of the robot object but this may be 
-% overriden by providing a gravity acceleration vector [gx gy gz].
-%
-%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV)
-%	TAU = RNE(ROBOT, [Q QD QDD], GRAV)
-%
-% An external force/moment acting on the end of the manipulator may also be
-% specified by a 6-element vector [Fx Fy Fz Mx My Mz].
-%
-%	TAU = RNE(ROBOT, Q, QD, QDD, GRAV, FEXT)
-%	TAU = RNE(ROBOT, [Q QD QDD], GRAV, FEXT)
-%
-% where Q, QD and QDD are row vectors of the manipulator state; pos, vel, 
-% and accel.
-%
-% The torque computed also contains a contribution due to armature
-% inertia.
-%
-% RNE can be either an M-file or a MEX-file.  See the manual for details on
-% how to configure the MEX-file.  The M-file is a wrapper which calls either
-% RNE_DH or RNE_MDH depending on the kinematic conventions used by the robot
-% object.
-%
-% See also: ROBOT, ACCEL, GRAVLOAD, INERTIA.
+% See also SERIALLINK.RNE.
 
 %
 % verified against MAPLE code, which is verified by examples
 %
 
-% Copyright (C) 1992-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -51,11 +28,22 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 
 	z0 = [0;0;1];
 	grav = robot.gravity;	% default gravity from the object
 	fext = zeros(6, 1);
+    n = robot.n;
+
+    % check that robot object has dynamic parameters for each link
+	for j=1:n,
+        link = robot.links(j);
+        if isempty(link.r) || isempty(link.I) || isempty(link.m)
+            error('dynamic parameters (m, r, I) not set in link %d', j);
+        end
+    end
 
 	% Set debug to:
 	%	0 no messages
@@ -63,7 +51,6 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 	%	2 display print R and p*
 	debug = 0;
 
-	n = robot.n;
 	if numcols(a1) == 3*n,
 		Q = a1(:,1:n);
 		Qd = a1(:,n+1:2*n);
@@ -163,8 +150,9 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 					cross(wd,pstar) + ...
 					2*cross(w,Rt*z0*qd(j)) +...
 					cross(w, cross(w,pstar));
-			end
+            end
 
+            %whos
 			vhat = cross(wd,r') + ...
 				cross(w,cross(w,r')) + vd;
 			F = link.m*vhat;

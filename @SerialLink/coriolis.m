@@ -1,22 +1,28 @@
-%CORIOLIS Compute the manipulator Coriolis matrix
+%SerialLink.coriolis Coriolis matrix
 %
-% 	C = CORIOLIS(ROBOT, Q, QD)
+% C = R.CORIOLIS(Q, QD) is the NxN Coriolis/centripetal matrix for
+% the robot in configuration Q and velocity QD, where N is the number of
+% joints.  The product C*QD is the vector of joint force/torque due to velocity
+% coupling.  The diagonal elements are due to centripetal effects and the 
+% off-diagonal elements are due to Coriolis effects.  This matrix is also 
+% known as the velocity coupling matrix, since gives the disturbance forces
+% on all joints due to velocity of any joint.
 %
-% Returns the n element Coriolis/centripetal torque vector at the specified 
-% pose and velocity.
-% ROBOT is a robot object and describes the manipulator dynamics and 
-% kinematics.
-%
-% If Q and QD are row vectors, CORIOLIS(ROBOT,Q,QD) is a row vector 
-% of joint torques.
+% If Q and QD are row vectors, the result is a row-vector of joint torques.
 % If Q and QD are matrices, each row is interpretted as a joint state 
-% vector, and CORIOLIS(ROBOT,Q,QD) is a matrix each row being the 
-% corresponding joint %	torques.
+% vector, and the result is a matrix each row being the  corresponding joint 
+% torques.
 %
-% See also: ROBOT, RNE, ITORQUE, GRAVLOAD.
+% Notes::
+% - joint friction is also a joint force proportional to velocity but it is
+%   eliminated in the computation of this value.
+%
+% See also SerialLink.rne.
 
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -32,6 +38,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function C = coriolis(robot, q, qd)
 

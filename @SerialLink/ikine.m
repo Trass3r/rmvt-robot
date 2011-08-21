@@ -1,49 +1,45 @@
-%IKINE Inverse manipulator kinematics
+%SerialLink.IKINE Inverse manipulator kinematics
 %
-%	Q = IKINE(ROBOT, T)
-%	Q = IKINE(ROBOT, T, Q)
-%	Q = IKINE(ROBOT, T, Q, M)
+% Q = R.ikine(T) is the joint coordinates corresponding to the robot 
+% end-effector pose T which is a homogenenous transform.
 %
-% Returns the joint coordinates corresponding to the end-effector transform T.
-% Note that the inverse kinematic solution is generally not unique, and 
-% depends on the initial guess Q (which defaults to 0).
+% Q = R.ikine(T, Q0) specifies the initial estimate of the joint 
+% coordinates.
 %
-%	QT = IKINE(ROBOT, TG)
-%	QT = IKINE(ROBOT, TG, Q)
-%	QT = IKINE(ROBOT, TG, Q, M)
+% Q = R.ikine(T, Q0, M) specifies the initial estimate of the joint 
+% coordinates and a mask matrix.  For the case where the manipulator 
+% has fewer than 6 DOF the solution space has more dimensions than can
+% be spanned by the manipulator joint coordinates.  In this case
+% the mask matrix M specifies the Cartesian DOF (in the wrist coordinate 
+% frame) that will be ignored in reaching a solution.  The mask matrix 
+% has six elements that correspond to translation in X, Y and Z, and rotation 
+% about X, Y and Z respectively.  The value should be 0 (for ignore) or 1.
+% The number of non-zero elements should equal the number of manipulator DOF.
 %
-% Returns the joint coordinates corresponding to each of the transforms in 
-% the 4x4xN trajectory TG.
-% Returns one row of QT for each input transform.  The initial estimate 
-% of QT for each time step is taken as the solution from the previous 
-% time step.
+% For example when using a 5 DOF manipulator rotation about the wrist z-axis
+% might be unimportant in which case  M = [1 1 1 1 1 0].
 %
-% If the manipulator has fewer than 6 DOF then this method of solution
-% will fail, since the solution space has more dimensions than can
-% be spanned by the manipulator joint coordinates.  In such a case
-% it is necessary to provide a mask matrix, M, which specifies the 
-% Cartesian DOF (in the wrist coordinate frame) that will be ignored
-% in reaching a solution.  The mask matrix has six elements that
-% correspond to translation in X, Y and Z, and rotation about X, Y and
-% Z respectively.  The value should be 0 (for ignore) or 1.  The number
-% of non-zero elements should equal the number of manipulator DOF.
+% In all cases if T is 4x4xM it is taken as a homogeneous transform sequence 
+% and R.ikine() returns the joint coordinates corresponding to each of the 
+% transforms in the sequence.  Q is MxN where N is the number of robot joints.
+% The initial estimate of Q for each time step is taken as the solution 
+% from the previous time step.
 %
-% Solution is computed iteratively using the pseudo-inverse of the
-% manipulator Jacobian.
+% Notes::
+% - Solution is computed iteratively using the pseudo-inverse of the
+%   manipulator Jacobian.
+% - The inverse kinematic solution is generally not unique, and 
+%   depends on the initial guess Q0 (defaults to 0).
+% - Such a solution is completely general, though much less efficient 
+%   than specific inverse kinematic solutions derived symbolically.
+% - This approach allows a solution to obtained at a singularity, but 
+%   the joint angles within the null space are arbitrarily assigned.
 %
-% Such a solution is completely general, though much less efficient 
-% than specific inverse kinematic solutions derived symbolically.
-% 
-% This approach allows a solution to obtained at a singularity, but 
-% the joint angles within the null space are arbitrarily assigned.
-%
-% For instance with a typical 5 DOF manipulator one would ignore
-% rotation about the wrist axis, that is, M = [1 1 1 1 1 0].
-%
-%
-% See also: FKINE, TR2DIFF, JACOB0, IKINE6S.
+% See also SerialLink.fkine, tr2delta, SerialLink.jacob0, SerialLink.ikine6s.
  
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -59,6 +55,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function qt = ikine(robot, tr, q, m, newopt)
 	%  set default parameters for solution

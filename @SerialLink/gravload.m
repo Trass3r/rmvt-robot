@@ -1,21 +1,21 @@
-%GRAVLOAD Compute the gravity loading on manipulator joints
+%SerialLink.gravload Gravity loading
 %
-%	TAUG = GRAVLOAD(ROBOT, Q)
-%	TAUG = GRAVLOAD(ROBOT, Q, GRAV)
+% TAUG = R.gravload(Q) is the joint gravity loading for the robot in the
+% joint configuration Q.  Gravitational acceleration is a property of the
+% robot object.
 %
-% Compute the joint gravity loading for the manipulator ROBOT in the
-% configuration Q.
+% If Q is a row vector, the result is a row vector of joint torques.  If 
+% Q is a matrix, each row is interpreted as a joint configuration vector, 
+% and the result is a matrix each row being the corresponding joint torques.
 %
-% If Q is a row vector, the result is a row vector of joint torques.
-% If Q is a matrix, each row is interpretted as a joint state vector, and
-% the result is a matrix each row being the corresponding joint torques.
+% TAUG = R.gravload(Q, GRAV) is as above but the gravitational 
+% acceleration vector GRAV is given explicitly.
 %
-% Gravity vector can be given explicitly using the GRAV argument, otherwise
-% it defaults to the value of the ROBOT object.
-%
-% See also: ROBOT, RNE, ITORQUE, CORIOLIS.
+% See also SerialLink.rne, SerialLink.itorque, SerialLink.coriolis.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -31,14 +31,16 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function tg = gravload(robot, q, grav)
 	if numcols(q) ~= robot.n
 		error('Insufficient columns in q')
 	end
-	if nargin == 2,
+	if nargin == 2
 		tg = rne(robot, q, zeros(size(q)), zeros(size(q)));
-	elseif nargin == 3,
+	elseif nargin == 3
 		tg = rne(robot, q, zeros(size(q)), zeros(size(q)), grav);
 	end
 	

@@ -1,25 +1,22 @@
-%JACOB0 Compute manipulator Jacobian in world coordinates
+%SerialLink.JACOB0 Jacobian in world coordinates
 %
-%	J0 = JACOB0(ROBOT, Q)
+% J0 = R.jacob0(Q, OPTIONS) is a 6xN Jacobian matrix for the robot in pose Q.
+% The manipulator Jacobian matrix maps joint velocity to end-effector spatial
+% velocity V = J0*QD expressed in the world-coordinate frame.
 %
-% Returns a Jacobian matrix for the robot ROBOT in pose Q.
+% Options::
+% 'rpy'   Compute analytical Jacobian with rotation rate in terms of roll-pitch-yaw angles
+% 'eul'   Compute analytical Jacobian with rotation rates in terms of Euler angles
 %
-% The manipulator Jacobian matrix maps differential changes in joint space
-% to differential Cartesian motion (world coord frame) of the end-effector.
-% 		dX = J dQ
+% Note::
+% - the Jacobian is computed in the world frame and transformed to the end-effector frame.
 %
-% For an n-axis manipulator the Jacobian is a 6 x n matrix.
-%
-%	J0_A = JACOB0(ROBOT, Q, ang)
-%
-%  Returns the analytical Jacobian where the angular rates are expressed in
-% either RPY or Euler angle rates rather than angular velocity.  The string
-% ang is either 'rpy' or 'eul'.
-%
-% See also: JACOBN, DIFF2TR, TR2DIFF.
+% See also SerialLink.jacobn, deltatr, tr2delta.
 
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -35,6 +32,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function J0 = jacob0(robot, q, ang)
 	%

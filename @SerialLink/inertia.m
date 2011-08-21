@@ -1,15 +1,16 @@
-%INERTIA Compute the manipulator inertia matrix
+%SerialLink.INERTIA Manipulator inertia matrix
 %
-%	INERTIA(ROBOT, Q)
+% I = R.inertia(Q) is the NxN symmetric joint inertia matrix which relates 
+% joint torque to joint acceleration for the robot at joint configuration Q.
+% The diagonal elements I(j,j) are the inertia seen by joint actuator j.
+% The off-diagonal elements are coupling inertias that relate acceleration
+% on joint i to force/torque on joint j.
 %
-% Returns the n x n symmetric inertia matrix which relates joint torque 
-% to joint acceleration.
-% ROBOT describes the manipulator dynamics and kinematics, and Q is
-% an n element vector of joint state.
-%
-% See also: RNE, CINERTIA, ITORQUE, CORIOLIS, GRAVLOAD.
+% See also SerialLink.RNE, SerialLink.CINERTIA, SerialLink.ITORQUE.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -25,6 +26,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function M = inertia(robot, q)
 	n = robot.n;

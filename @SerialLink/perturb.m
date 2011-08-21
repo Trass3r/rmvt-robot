@@ -1,18 +1,17 @@
-%PERTURB Return robot object with perturbed dynamic parameters
+%SerialLink.perturb Perturb robot parameters
 %
-%	ROBOT = PERTURB(ROBOT, P)
-%
-% Return a new robot object in which the dynamic parameters (link mass and
-% inertia) have been perturbed.  The perturbation is multiplicative so that
-% values are multiplied by random numbers in the interval (1-P) to (1+P).
-%
-% Useful for investigating the robustness of various model-based control 
-% schemes.
-%
+% RP = R.perturb(P) is a new robot object in which the dynamic parameters (link
+% mass and inertia) have been perturbed.  The perturbation is multiplicative so 
+% that values are multiplied by random numbers in the interval (1-P) to (1+P).
 % The name string of the perturbed robot is prefixed by 'P/'.
 %
+% Useful for investigating the robustness of various model-based control 
+% schemes. For example to vary parameters in the range +/- 10 percent is:
+%    r2 = p560.perturb(0.1);
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -28,6 +27,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function  r2 = perturb(r, p)
 

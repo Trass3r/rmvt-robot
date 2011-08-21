@@ -1,24 +1,22 @@
-%ACCEL Compute manipulator forward dynamics
+%SerialLink.accel Manipulator forward dynamics
 %
-%	QDD = ACCEL(ROBOT, Q, QD, TORQUE)
-%	QDD = ACCEL(ROBOT, [Q QD TORQUE])
+% QDD = R.accel(Q, QD, TORQUE) is a vector of joint accelerations that result 
+% from applying the actuator force/torque to the manipulator robot in state Q and QD.
+% If Q, QD, TORQUE are matrices with M rows, then QDD is a matrix with M rows
+% of acceleration corresponding to the equivalent rows of Q, QD, TORQUE.
 %
-% Returns a vector of joint accelerations that result from applying the 
-% actuator TORQUE to the manipulator ROBOT in state Q and QD.
+% QDD = R.ACCEL(X) as above but X=[Q,QD,TORQUE].
 %
-% Uses the method 1 of Walker and Orin to compute the forward dynamics.
-% This form is useful for simulation of manipulator dynamics, in
-% conjunction with a numerical integration function.
+% Note::
+% - Uses the method 1 of Walker and Orin to compute the forward dynamics.
+% - This form is useful for simulation of manipulator dynamics, in
+%   conjunction with a numerical integration function.
 %
-% See also: RNE, ROBOT, ODE45.
+% See also SerialLink.rne, SerialLink, ode45.
 
-% MOD HISTORY
-% 4/99 add object support
-% 1/02 copy rne code from inertia.m to here for speed
-% $Log: not supported by cvs2svn $
-% $Revision: 1.3 $
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -34,16 +32,20 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 
 function qdd = accel(robot, Q, qd, torque)
 	n = robot.n;
 
-	if nargin == 2,
-	        q = Q(1:n);
+	if nargin == 2
+        % accel(X)
+	    q = Q(1:n);
 		qd = Q(n+1:2*n);
 		torque = Q(2*n+1:3*n);
 	else
+        % accel(Q, qd, torque)
 		q = Q;
 		if length(q) == robot.n,
 			q = q(:);

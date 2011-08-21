@@ -1,13 +1,13 @@
-%SHOWLINK show all link parameters of ROBOT object
+%SerialLink.showlink Show parameters of all links
 %
-%	SHOWLINK(robot)
+% R.showlink() shows details of all link parameters for the robot object,
+% including inertial parameters.
 %
-% Shows details of all link parameters for this robot object, including
-% inertial parameters.
-%
-% See also: LINK/SHOWLINK, LINK.
+% See also Link.showlink, Link.
 
-% Copyright (C) 1999-2008, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -23,6 +23,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 function showlink(r)
 
