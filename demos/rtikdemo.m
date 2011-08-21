@@ -1,17 +1,25 @@
 %RIKNDEMO Inverse kinematics demo
 
-% Copyright (C) 1993-2002, by Peter I. Corke
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2002-04-02 12:26:49  pic
-% Handle figures better, control echo at end of each script.
-% Fix bug in calling ctraj.
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% Revision 1.2  2002/04/01 11:47:17  pic
-% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-% references, clarification of functions.
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
-% $Revision: 1.1 $
+% http://www.petercorke.com
+
 figure(2)
 echo on
 %
@@ -22,7 +30,7 @@ echo on
 %
 % First generate the transform corresponding to a particular joint coordinate,
     q = [0 -pi/4 -pi/4 0 pi/8 0]
-    T = fkine(p560, q);
+    T = p560.fkine(q);
 %
 % Now the inverse kinematic procedure for any specific robot can be derived 
 % symbolically and in general an efficient closed-form solution can be 
@@ -49,8 +57,8 @@ pause % any key to continue
 % To examine the effect at a singularity lets repeat the last example but for a
 % different pose.  At the `ready' position two of the Puma's wrist axes are 
 % aligned resulting in the loss of one degree of freedom.
-    T = fkine(p560, qr);
-    qi = ikine(p560, T);
+    T = p560.fkine(qr);
+    qi = p560.ikine(T);
     qi'
 %
 % which is not the same as the original joint angle
@@ -58,7 +66,7 @@ pause % any key to continue
 pause % any key to continue
 %
 % However both result in the same end-effector position
-    fkine(p560, qi) - fkine(p560, qr)
+    p560.fkine(qi) - p560.fkine(qr)
 pause % any key to continue
     
 % Inverse kinematics may also be computed for a trajectory.
@@ -66,7 +74,7 @@ pause % any key to continue
     t = [0:.056:2]; 		% create a time vector
     T1 = transl(0.6, -0.5, 0.0) % define the start point
     T2 = transl(0.4, 0.5, 0.2)	% and destination
-    T = ctraj(T1, T2, length(t)); 	% compute a Cartesian path
+    T = ctraj(T1, T2, t); 	% compute a Cartesian path
 
 %
 % now solve the inverse kinematics.  When solving for a trajectory, the 
@@ -74,7 +82,7 @@ pause % any key to continue
 % previous inverse solution.
 %
     tic
-    q = ikine(p560, T); 
+    q = p560.ikine(T); 
     toc
 %
 % Clearly this approach is slow, and not suitable for a real robot controller 
@@ -98,6 +106,7 @@ pause % any key to continue
 pause % hit any key to continue
     
 % This joint space trajectory can now be animated
-    plot(p560, q)
+    clf
+    p560.plot(q)
 pause % any key to continue
 echo off
