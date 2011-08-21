@@ -1,16 +1,22 @@
-%TR2DELTA Convert transform difference to a delta vector
+%TR2DELTA Convert homogeneous transform to differential motion
 %
-%   Delta = tr2delta(T)
-%   Delta = tr2delta(T1, T2)
+% D = TR2DELTA(T0, T1) is the differential motion corresponding to 
+% infinitessimal motion from pose T0 to T1 which are homogeneous 
+% transformations. D=(dx, dy, dz, dRx, dRy, dRz) and is an approximation
+% to the average spatial velocity multiplied by time.
 %
-% Return a delta vector (dtx, dty, dtz, dRx, dRy, dRz) equivalent to the 
-% infinitessimal transformation T or from T1 to T2.
+% D = TR2DELTA(T) is the differential motion corresponding to the
+% infinitessimal relative pose T expressed as a homogeneous 
+% transformation.
 %
-% The Delta is an approximation to the velocity screw.
+% Notes::
+% - D is only an approximation to the described by T, and assumes
+%   that T0 ~ T1 or T ~ eye(4,4).
 %
-% SEE ALSO: skew, delta2tr
+% See also DELTA2TR, SKEW.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -27,23 +33,22 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function delta = tr2delta(T1, T2)
-%    if nargin == 1
-%        dT = T1;
-%    else
-%        % T2 = T1. Tdelta 
-%        % => inv(T1).T2 = Tdelta
-%        dT = inv(T1) * T2;
-%        dT = T2 - T1;
-%    end
-%
-%    delta = [	dT(1:3,4); skew( t2r(inv(T1)*dT) ) ];
+function delta = tr2delta(T0, T1)
+    if nargin == 1
+        T1 = T0;
+        T0 = eye(4,4);
+    end
+    R0 = t2r(T0); R1 = t2r(T1);
+    % in world frame
+    delta = [ (T1(1:3,4)-T0(1:3,4)); vex( R1*R0' - eye(3,3)) ];
+    % in T0 frame
+    %delta = [ R0'*(T1(1:3,4)-T0(1:3,4)); R0'*vex( R1*R0' - eye(3,3)) ];
 
 % TODO HACK understand/fix this and update Chapter 2
-    delta = [	T2(1:3,4)-T1(1:3,4);
-        0.5*(	cross(T1(1:3,1), T2(1:3,1)) + ...
-            cross(T1(1:3,2), T2(1:3,2)) + ...
-            cross(T1(1:3,3), T2(1:3,3)) ...
-        )];
+%    delta = [	T1(1:3,4)-T0(1:3,4);
+%        0.5*(	cross(T0(1:3,1), T1(1:3,1)) + ...
+%            cross(T0(1:3,2), T1(1:3,2)) + ...
+%            cross(T0(1:3,3), T1(1:3,3)) ...
+%        )];
 end
 
