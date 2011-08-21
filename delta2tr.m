@@ -1,13 +1,14 @@
-%DIFF2TR Convert a differential to a homogeneous transform
+%DELTA2TR Convert differential motion  to a homogeneous transform
 %
-% 	TR = DIFF2TR(D)
+% T = DELTA2TR(D) is a homogeneous transform representing differential 
+% translation and rotation. The delta vector D=(dx, dy, dz, dRx, dRy, dRz)
+% represents an infinitessimal motion, and is an approximation to the spatial 
+% velocity multiplied by time.
 %
-% Returns a homogeneous transform representing differential translation 
-% and rotation.  The matrix contains a skew symmetric rotation submatrix.
-%
-% See also: TR2DIFF.
+% See also TR2DELTA.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -24,8 +25,6 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function delta = diff2tr(d)
-	delta =[	0	-d(6)	d(5)	d(1)
-			d(6)	0	-d(4)	d(2)
-			-d(5)	d(4)	0	d(3)
-			0	0	0	0	];
+function delta = delta2tr(d)
+    d = d(:);
+    delta = eye(4,4) + [skew(d(4:6)) d(1:3); 0 0 0 0];
