@@ -1,22 +1,25 @@
-%TWOLINK Load kinematic and dynamic data for a simple 2-link mechanism
+%MDL_TWOLINK Create model of a simple 2-link mechanism
 %
-%	TWOLINK
+%	mdl_twolink
 %
-% Defines the object 'tl' in the current workspace which describes the 
-% kinematic and dynamic characterstics of a simple planar 2-link mechanism.
+% Script creates the workspace variable tl which describes the 
+% kinematic and dynamic characteristics of a simple planar 2-link mechanism.
 %
-% Example based on Fig 3-6 (p73) of Spong and Vidyasagar (1st edition).  
-% It is a planar mechanism operating in the XY (horizontal) plane and is 
-% therefore not affected by gravity.
+% Also define the vector:
+%   qz   corresponds to the zero joint angle configuration.
 %
-% Assume unit length links with all mass (unity) concentrated at the joints.
+% Notes::
+% - It is a planar mechanism operating in the XY (horizontal) plane and is 
+%   therefore not affected by gravity.
+% - Assume unit length links with all mass (unity) concentrated at the joints.
 %
-% Also define the vector qz = [0 0] which corresponds to the zero joint
-% angle configuration.
+% References::
+%  - Based on Fig 3-6 (p73) of Spong and Vidyasagar (1st edition).  
 %
-% See also: DH, DYN, PUMA560, PUMA560AKB, STANFORD.
+% See also SerialLink, mdl_puma560, mdl_stanford.
 
-% Copyright (C) 2000-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -39,5 +42,24 @@ twolink_dh = [
   0     0         1     0         0     1       1       0       0       0       0       0       0       0       0        0      1
 ];
 
-two_link = SerialLink(twolink_dh, 'name', 'Simple two link');
+a1 = 1;
+a2 = 1;
+%   theta d a alpha
+L(1) = Link([ 0     0   a1  0], 'standard');
+L(2) = Link([ 0     0   a2  0], 'standard');
+L(1).m = 1;
+L(1).r = [-0.5 0 0];
+L(1).I = zeros(3,3);
+L(1).G = 0;
+L(1).Jm = 0;
+L(1).B = 0;
+L(2).m = 1;
+L(2).r = [-0.5 0 0];
+L(2).I = zeros(3,3);
+L(2).G = 0;
+L(2).Jm = 0;
+L(2).B = 0;
+twolink = SerialLink(L, 'name', 'two link', ...
+    'comment', 'from Spong, Hutchinson, Vidyasagar');
 qz = [0 0];
+qn = [pi/6, -pi/6];

@@ -1,20 +1,20 @@
 %MDL_S4ABB2p8  Create kinematic model of ABB S4 2.8robot 
 %
-% MDL_S4ABB2p8 is a script creates the workspace variable R which describes
-% the kinematic characteristics of an ABB S4 2.8 robot using standard DH
-% conventions.
+%	mdl_s4abb2P8
 %
-% Also defines the workspace vector:
+% Script creates the workspace variable R which describes the 
+% kinematic characteristics of an ABB S4 2.8 robot using standard 
+% DH conventions.
+%
+% Also define the workspace vector:
 %   q0   mastering position.
 %
-% Author::
+% See also SerialLink, mdl_puma560akb, mdl_stanford, mdl_twolink.
+%
+% Author:
 %  Wynand Swart,
 %  Mega Robots CC, P/O Box 8412, Pretoria, 0001, South Africa
 %  wynand.swart@gmail.com
-%
-% See also SerialLink, mdl_fanuc10l, mdl_m16, mdl_motormanHP6, mdl_irb140, mdl_puma560.
-
-% MODEL: ABB, S4_2.8, S4 2.8m reach version, 6DOF, standard_DH
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
@@ -38,16 +38,15 @@
 %S4 ABB 2.8 robot
 
 %            theta    d      a    alpha
-clear L
-L(1) = Link([ 0      0.9    0.188  -pi/2   0]);
-L(2) = Link([ 0      0      0.95    0      0]);
-L(3) = Link([ 0      0      0.225  -pi/2   0]);
-L(4) = Link([ 0      1.705  0       pi/2   0]);
-L(5) = Link([ 0      0      0      -pi/2   0]);
-L(6) = Link([ 0      0.2    0      -pi/2   0]);
+L(1) = link([ 0      0.9    0.188  -pi/2   0]);
+L(2) = link([ 0      0      0.95    0      0]);
+L(3) = link([ 0      0      0.225  -pi/2   0]);
+L(4) = link([ 0      1.705  0       pi/2   0]);
+L(5) = link([ 0      0      0      -pi/2   0]);
+L(6) = link([ 0      0.2    0      -pi/2   0]);
 %##########################################################
 %Pose 0; At SYNCHRONISATION position
 %##########################################################
 q0 = [0     -pi/2         0       0      0     -pi/2];
-R=SerialLink(L, 'name', 'S4 ABB 2.8');
+R=robot(L, 'name', 'S4 ABB 2.8');
 %##########################################################

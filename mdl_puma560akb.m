@@ -1,30 +1,28 @@
 %MDL_PUMA560AKB Create model of Puma 560 manipulator
 %
-% MDL_PUMA560AKB is a script that creates the workspace variable p560m
-% which describes the kinematic and dynamic characterstics of a Unimation
-% Puma 560 manipulator modified DH conventions.
+%   mdl_puma560akb
 %
-% Also defines the workspace vectors:
+% Script creates the workspace variable p560m which describes the 
+% kinematic and dynamic characterstics of a Unimation Puma 560 manipulator 
+% modified DH conventions.
+%
+% Also define the workspace vectors:
 %   qz         zero joint angle configuration
 %   qr         vertical 'READY' configuration
 %   qstretch   arm is stretched out in the X direction
 %
-% Notes::
-% - SI units are used.
-%
 % References::
-% -  "The Explicit Dynamic Model and Inertial Parameters of the Puma 560 Arm"
-%    Armstrong, Khatib and Burdick
-%    1986
 %
-% See also SerialLink, mdl_puma560, mdl_stanford_mdh.
-
-% MODEL: Unimation, Puma560, dynamics, 6DOF, modified_DH
-
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Armstrong, Khatib and Burdick
+% "The Explicit Dynamic Model and Inertial Parameters of the Puma 560 Arm"
+% 1986
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% See also SerialLink, mdl_puma560, mdl_stanford, mdl_twolink.
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -38,17 +36,15 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 clear L
 %            theta    d        a    alpha
-L(1) = Link([  0      0        0       0       0], 'modified');
-L(2) = Link([  0      0.2435   0      -pi/2    0], 'modified');
-L(3) = Link([  0     -0.0934   0.4318  0       0], 'modified');
-L(4) = Link([  0      0.4331  -0.0203  pi/2    0], 'modified');
-L(5) = Link([  0      0        0      -pi/2    0], 'modified');
-L(6) = Link([  0      0        0       pi/2    0], 'modified');
+L(1) = link([  0      0        0       0       0], 'mod');
+L(2) = link([  0      0.2435   0      -pi/2    0], 'mod');
+L(3) = link([  0     -0.0934   0.4318  0       0], 'mod');
+L(4) = link([  0      0.4331  -0.0203  pi/2    0], 'mod');
+L(5) = link([  0      0        0      -pi/2    0], 'mod');
+L(6) = link([  0      0        0       pi/2    0], 'mod');
 
 
 L(1).m = 0;
@@ -101,5 +97,5 @@ qz = [0 0 0 0 0 0]; % zero angles, L shaped pose
 qr = [0 -pi/2 pi/2 0 0 0]; % ready pose, arm up
 qstretch = [0 0 pi/2 0 0 0]; % horizontal along x-axis
 
-p560m = SerialLink(L, 'name', 'Puma560-AKB', 'manufacturer', 'Unimation', 'comment', 'AK&B');
+p560m = robot(L, 'name', 'Puma560-AKB', 'manufacturer', 'Unimation', 'comment', 'AK&B');
 clear L
