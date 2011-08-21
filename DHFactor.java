@@ -1100,12 +1100,12 @@ class ElementList extends ArrayList {
     */
 }
 
-public class dhfactor {
+public class DHFactor {
 
     ElementList  results;
 
     // Matlab callable constructor
-	public dhfactor(String src) {
+	public DHFactor(String src) {
         results = parseString(src);
     }
 
