@@ -1,8 +1,11 @@
-%PLOTBOTOPT Define options for robot plotting
+%PLOTBOTOPT Define default options for robot plotting
 %
 % Default options for robot/plot function.
+%
+% See also SerialLink.plot.
 
-% Copyright (C) 2001-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
