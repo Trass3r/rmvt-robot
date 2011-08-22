@@ -12,17 +12,22 @@ install:
 	# create the Manifest
 	buildcontent $<
 
+	# copy all m-files and classes listed in the Manifest
 	mancp Manifest .. robot
 	mancp Manifest $(ROOT)/common common
 
-	# core toolbox components
+	# copy Java source code and jar file
 	cp -r ../*.java robot
-	cp -r ../*.class robot
+	(cd ..; make)
+	cp ../*.jar robot
+
+	# copy simulink models
 	cp -r ~/lib/matlab/rvctools/simulink robot
-	cp -r ../mex robot
 	cp -r ../examples robot
+	cp -r ../mex robot
 	cp -r ../demos robot
-	cp ~/lib/matlab/num*.m robot
+
+	# copy misc documentation files
 	cp ../README robot
 	cp ../RELEASE robot
 	cp ../CONTRIB robot
@@ -63,7 +68,7 @@ doco:
 	cp -r ../info/icons robot/info
 	cp -r ../doc/rtb-montage-notext.png robot/info
 
-    # copy over the autogen files
+	# copy over the autogen files
 	cp helpfuncbycat.xml robot/info
 	cp contents_toc.html robot/info
 
