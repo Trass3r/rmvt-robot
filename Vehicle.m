@@ -1,9 +1,11 @@
 %Vehicle Car-like vehicle class
 %
-% This class models the kinematics of a car-like vehicle (bicycle model) on
-% a plane that moves in SE(2).  For given steering and velocity inputs it
-% updates the true vehicle state and returns noise-corrupted odometry
-% readings.
+% This class models the kinematics of a car-like vehicle (bicycle model).  For
+% given steering and velocity inputs it updates the true vehicle state and returns
+% noise-corrupted odometry readings.
+%
+%  veh = Vehicle(V) creates a Vehicle object with odometry covariance V, where V is
+%  a 2x2 matrix corresponding to the odometry vector [dx dtheta].
 %
 % Methods::
 %   init         initialize vehicle state
@@ -19,24 +21,22 @@
 %   plot_xy      plot the true path of the vehicle
 %   add_driver   attach a driver object to this vehicle
 %   display      display state/parameters in human readable form
-%   char         convert to string
-%
-% Class methods::
-%   plotv        plot/animate a pose on current figure
+%   char         convert state/parameters to human readable string
 %
 % Properties (read/write)::
-%   x               true vehicle state: x, y, theta (3x1)
-%   V               odometry covariance (2x2)
-%   odometry        distance moved in the last interval (2x1)
-%   rdim             dimension of the robot (for drawing)
+%   x               true vehicle state 3x1
+%   V               odometry covariance
+%   odometry        distance moved in the last interval
+%   dim             dimension of the robot's world
+%   robotdim        dimension of the robot (for drawing)
 %   L               length of the vehicle (wheelbase)
 %   alphalim        steering wheel limit
 %   maxspeed        maximum vehicle speed
 %   T               sample interval
 %   verbose         verbosity
-%   x_hist          history of true vehicle state (Nx3)
+%   x_hist          history of true vehicle state Nx3
 %   driver          reference to the driver object
-%   x0              initial state, restored on init()
+%   x0              initial state, init() sets x := x0
 %
 % Examples::
 %
@@ -54,25 +54,20 @@
 % which will move the vehicle within the region -10<x<10, -10<y<10 which we
 % can see by
 %      v.run(1000)
-% which shows an animation of the vehicle moving for 1000 time steps
-% between randomly selected wayoints.
-%
-% Notes::
-% - Subclasses the MATLAB handle class which means that pass by reference semantics
-%   apply.
+% which will show an animation of the vehicle moving between randomly
+% selected wayoints.
 %
 % Reference::
 %
-%   Robotics, Vision & Control, Chap 6
+%   Robotics, Vision & Control,
 %   Peter Corke,
 %   Springer 2011
 %
 % See also RandomPath, EKF.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -86,95 +81,69 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 classdef Vehicle < handle
 
     properties
-        % state
         x           % true state (x,y,theta)
-        x_hist      % x history
-
-        % parameters
-        L           % length of vehicle
-        alphalim    % steering wheel limit
-        maxspeed    % maximum speed
-        dim         % dimension of the world -dim -> +dim in x and y
-        rdim    % dimension of the robot
-        dt           % sample interval
         V           % odometry covariance
-
         odometry    % distance moved in last interval
 
+        dim         % dimension of the world -dim -> +dim in x and y
+        robotdim    % dimension of the robot
+        L           % length of vehicle
+
+        alphalim    % steering wheel limit
+        maxspeed    % maximum speed
+
+        T           % sample interval
         verbose
 
+
+        x_hist          % x history
         driver      % driver object
-        x0          % initial state
+        x0
     end
 
     methods
 
-        function veh = Vehicle(V, varargin)
+        function veh = Vehicle(V)
         %Vehicle Vehicle object constructor
         %
-        % V = Vehicle(V_ACT, OPTIONS)  creates a Vehicle object with actual odometry 
-        % covariance V_ACT (2x2) matrix corresponding to the odometry vector [dx dtheta].
+        % V = Vehicle(VACT)  creates a Vehicle object with actual odometry 
+        % covariance VACT, where VACT is a 2x2 matrix corresponding to the 
+        % odometry vector [dx dtheta].
         %
-        % Options::
-        % 'stlim',A       Steering angle limited to -A to +A (default 0.5 rad)
-        % 'vmax',S        Maximum speed (default 5m/s)
-        % 'L',L           Wheel base (default 1m)
-        % 'x0',x0         Initial state (default (0,0,0) )
-        % 'dt',T          Time interval
-        % 'rdim',R        Robot size as fraction of plot window (default 0.2)
-        % 'verbose'       Be verbose
+        % Default parameters are:
+        %   alphalim   0.5
+        %   maxspeed   5
+        %   L          1
+        %   robotdim   0.2
+        %   x0         (0,0,0)
         %
-        % Notes::
-        % - Subclasses the MATLAB handle class which means that pass by reference semantics
-        %   apply.
+        % and can be overridden by assigning properties after the object has 
+        % been created.
             
-            if ~isnumeric(V)
-                error('first arg is V');
-            end
             veh.x = zeros(3,1);
+            veh.T = 0.1;
             if nargin < 1
                 V = zeros(2,2);
             end
-
-            opt.stlim = 0.5;
-            opt.vmax = 5;
-            opt.L = 1;
-            opt.rdim = 0.2;
-            opt.dt = 0.1;
-            opt.x0 = zeros(3,1);
-            opt = tb_optparse(opt, varargin);
-
             veh.V = V;
-
-            veh.dt = opt.dt;
-            veh.alphalim = opt.stlim;
-            veh.maxspeed = opt.vmax;
-            veh.L = opt.L;
-            veh.x0 = opt.x0(:);
-            veh.rdim = opt.rdim;
-            veh.verbose = opt.verbose;
-
+            veh.alphalim = 0.5;
+            veh.maxspeed = 5;
+            veh.L = 1;
+            veh.verbose = false;
             veh.x_hist = [];
+            veh.robotdim = 0.2;
+            veh.x0 = zeros(3,1);
         end
 
-        function init(veh, x0)
+        function init(veh)
             %Vehicle.init Reset state of vehicle object
             %
-            % V.init() sets the state V.x := V.x0, initializes the driver 
-            % object (if attached) and clears the history.
-            %
-            % V.init(X0) as above but the state is initialized to X0.
-            if nargin > 1
-                veh.x = x0(:);
-            else
-                veh.x = veh.x0;
-            end
+            % V.init() sets the state V.x := V.x0
+            veh.x = veh.x0;
             veh.x_hist = [];
             if ~isempty(veh.driver)
                 veh.driver.init()
@@ -184,15 +153,12 @@ classdef Vehicle < handle
         function add_driver(veh, driver)
             %Vehicle.add_driver Add a driver for the vehicle
             %
-            % V.add_driver(D) connects a driver object D to the vehicle.  The driver
+            % V.add_driver(D) adds a driver object D for the vehicle.  The driver
             % object has one public method:
-            %        [speed, steer] = D.demand();
+            %   [speed, steer] = D.demand();
             % that returns a speed and steer angle.
             %
-            % Notes::
-            % - The Vehicle.step() method invokes the driver if one is attached.
-            %
-            % See also Vehicle.step, RandomPath.
+            % See also RandomPath.
             veh.driver = driver;
             driver.veh = veh;
         end
@@ -200,47 +166,33 @@ classdef Vehicle < handle
         function xnext = f(veh, x, odo, w)
             %Vehicle.f Predict next state based on odometry
             %
-            % XN = V.f(X, ODO) is the predicted next state XN (1x3) based on current
-            % state X (1x3) and odometry ODO (1x2) = [distance, heading_change].
+            % XN = V.f(X, ODO) predict next state XN based on current state X and
+            % odometry ODO. X is 3x1, ODO is [distance,change_heading].
             %
-            % XN = V.f(X, ODO, W) as above but with odometry noise W.
-            %
-            % Notes::
-            % - Supports vectorized operation where X and XN (Nx3).
+            % XN = V.f(X, ODO, W) predict next state XN based on current state X,
+            % odometry ODO, and odometry noise W.
             if nargin < 4
                 w = [0 0];
             end
 
             dd = odo(1) + w(1); dth = odo(2);
-
-            % straightforward code:
-            % thp = x(3) + dth;
-            % xnext = zeros(1,3);
-            % xnext(1) = x(1) + (dd + w(1))*cos(thp);
-            % xnext(2) = x(2) + (dd + w(1))*sin(thp);
-            % xnext(3) = x(3) + dth + w(2);
-            %
-            % vectorized code:
-
-            thp = x(:,3) + dth;
-            xnext = x + [(dd+w(1))*cos(thp)  (dd+w(1))*sin(thp) ones(size(x,1),1)*dth+w(2)];
+            thp = x(3) + dth;
+            xnext = zeros(3,1);
+            xnext(1) = x(1) + (dd + w(1))*cos(thp);
+            xnext(2) = x(2) + (dd + w(1))*sin(thp);
+            xnext(3) = x(3) + dth + w(2);
         end
 
         function odo = update(veh, u)
             %Vehicle.update Update the vehicle state
             %
-            % ODO = V.update(U) is the true odometry value for
+            % ODO = V.update(U) returns noisy odometry readings (covariance V.V) for
             % motion with U=[speed,steer].
-            %
-            % Notes::
-            % - Appends new state to state history property x_hist.
-            % - Odometry is also saved as property odometry.
-
-            xp = veh.x; % previous state
-            veh.x(1) = veh.x(1) + u(1)*veh.dt*cos(veh.x(3));
-            veh.x(2) = veh.x(2) + u(1)*veh.dt*sin(veh.x(3));
-            veh.x(3) = veh.x(3) + u(1)*veh.dt/veh.L * u(2);
-            odo = [colnorm(veh.x(1:2)-xp(1:2)) veh.x(3)-xp(3)];
+            xp = veh.x;
+            veh.x(1) = veh.x(1) + u(1)*veh.T*cos(veh.x(3));
+            veh.x(2) = veh.x(2) + u(1)*veh.T*sin(veh.x(3));
+            veh.x(3) = veh.x(3) + u(1)*veh.T/veh.L * u(2);
+            odo = [norm2(veh.x(1:2)-xp(1:2)) veh.x(3)-xp(3)];
             veh.odometry = odo;
 
             veh.x_hist = [veh.x_hist; veh.x'];   % maintain history
@@ -250,10 +202,10 @@ classdef Vehicle < handle
         function J = Fx(veh, x, odo)
         %Vehicle.Fx  Jacobian df/dx
         %
-        % J = V.Fx(X, ODO) is the Jacobian df/dx (3x3) at the state X, for
-        % odometry input ODO (1x2) = [distance, heading_change].
+        % J = V.Fx(X, ODO) returns the Jacobian df/dx at the state X, for
+        % odometry input ODO.  J is 3x3.
         %
-        % See also Vehicle.f, Vehicle.Fv.
+        % See also Vehicle.F, Vehicle.Fv.
             dd = odo(1); dth = odo(2);
             thp = x(3) + dth;
 
@@ -267,8 +219,8 @@ classdef Vehicle < handle
         function J = Fv(veh, x, odo)
             %Vehicle.Fv  Jacobian df/dv
             %
-            % J = V.Fv(X, ODO) is the Jacobian df/dv (3x2) at the state X, for
-            % odometry input ODO (1x2) = [distance, heading_change].
+            % J = V.Fv(X, ODO) returns the Jacobian df/dv at the state X, for
+            % odometry input ODO.  J is 3x2.
             %
             % See also Vehicle.F, Vehicle.Fx.
             dd = odo(1); dth = odo(2);
@@ -281,8 +233,9 @@ classdef Vehicle < handle
                 ];
         end
 
+
         function odo = step(veh, varargin)
-            %Vehicle.step Advance one timestep
+            %Vehicle.step Move the vehicle model ahead one time step
             %
             % ODO = V.step(SPEED, STEER) updates the vehicle state for one timestep
             % of motion at specified SPEED and STEER angle, and returns noisy odometry.
@@ -292,36 +245,35 @@ classdef Vehicle < handle
             % is invoked to compute speed and steer angle.  If no driver is attached
             % then speed and steer angle are assumed to be zero.
             %
-            % Notes::
-            % - Noise covariance is the property V.
-            %
             % See also Vehicle.control, Vehicle.update, Vehicle.add_driver.
-
-            % get the control input to the vehicle from either passed demand or driver
             u = veh.control(varargin{:});
-
-            % compute the true odometry and update the state
             odo = veh.update(u);
+            %veh.showrobot();
+            %drawnow
 
-            % add noise to the odometry
             if veh.V
                 odo = veh.odometry + randn(1,2)*veh.V;
             end
         end
 
+        function odo = gstep(veh, varargin)
+            odo = veh.step(varargin{:});
+            veh.showrobot();
+            drawnow
+        end
 
         function u = control(veh, speed, steer)
             %Vehicle.control Compute the control input to vehicle
             %
-            % U = V.control(SPEED, STEER) is a control input (1x2) = [speed,steer]
-            % based on provided controls SPEED,STEER to which speed and steering angle
-            % limits have been applied.
+            % U = V.control(SPEED, STEER) returns a control input (speed,steer)
+            % based on provided controls SPEED,STEER to which speed and steering
+            % angle limits have been applied.
             %
-            % U = V.control() as above but demand originates with a "driver" object if
-            % one is attached, the driver's DEMAND() method is invoked. If no driver is
-            % attached then speed and steer angle are assumed to be zero.
+            % U = V.control() returns a control input (speed,steer) from a "driver"
+            % if one is attached, the driver's DEMAND() method is invoked. If no driver is attached
+            % then speed and steer angle are assumed to be zero.
             %
-            % See also Vehicle.step, RandomPath.
+            % See also RandomPath.
             if nargin < 2
                 % if no explicit demand, and a driver is attached, use
                 % it to provide demand
@@ -344,12 +296,10 @@ classdef Vehicle < handle
         function p = run(veh, nsteps)
             %Vehicle.run Run the vehicle simulation
             %
-            % V.run(N) runs the vehicle model for N timesteps and plots
-            % the vehicle pose at each step.
+            % V.run(N) run the vehicle simulation for N timesteps.
             %
-            % P = V.run(N) runs the vehicle simulation for N timesteps and
-            % return the state history (Nx3) without plotting.  Each row
-            % is (x,y,theta).
+            % P = V.run(N) run the vehicle simulation for N timesteps and
+            % return the state history as an Nx3 matrix.
             %
             % See also Vehicle.step.
 
@@ -361,91 +311,52 @@ classdef Vehicle < handle
             if ~isempty(veh.driver)
                 veh.driver.visualize();
             end
-
             veh.visualize();
             for i=1:nsteps
                 veh.step();
-                if nargout == 0
-                    % if no output arguments then plot each step
-                    veh.plot();
-                    drawnow
-                end
             end
             p = veh.x_hist;
         end
 
-        % TODO run and run2 should become superclass methods...
-
-        function p = run2(veh, T, x0, speed, steer)
-            %Vehicle.run2 Run the vehicle simulation with control inputs
+        function h = plot(veh, x)
+            %Vehicle.plot Plot vehicle
             %
-            % P = V.run2(T, X0, SPEED, STEER) runs the vehicle model for a time T with
-            % speed SPEED and steering angle STEER.  P (Nx3) is the path followed and
-            % each row is (x,y,theta).
+            % V.plot() plots the vehicle on the current axes at a pose given by
+            % the current state.  If the vehicle has been previously plotted its
+            % pose is updated.  The vehicle is depicted as a narrow triangle that
+            % travels "point first" and has a length V.robotdim.
             %
-            % Notes::
-            % - Faster and more specific version of run() method.
-            % - Used by the RRT planner.
-            %
-            % See also Vehicle.run, Vehicle.step, RRT.
-            veh.init(x0);
-
-            for i=1:(T/veh.dt)
-                veh.update([speed steer]);
-            end
-            p = veh.x_hist;
-        end
-
-        function h = plot(veh, varargin)
-        %Vehicle.plot Plot vehicle
-        %
-        % V.plot(OPTIONS) plots the vehicle on the current axes at a pose given by
-        % the current state.  If the vehicle has been previously plotted its
-        % pose is updated.  The vehicle is depicted as a narrow triangle that
-        % travels "point first" and has a length V.rdim.
-        %
-        % V.plot(X, OPTIONS) plots the vehicle on the current axes at the pose X.
-        %
-        % H = V.plotv(X, OPTIONS) draws a representation of a ground robot as an 
-        % oriented triangle with pose X (1x3) [x,y,theta].  H is a graphics handle.
-        %
-        % V.plotv(H, X) as above but updates the pose of the graphic represented
-        % by the handle H to pose X.
-        %
-        % Options::
-        % 'scale',S    Draw vehicle with length S x maximum axis dimension
-        % 'size',S     Draw vehicle with length S
-        % 'color',C    Color of vehicle.
-        % 'fill'       Filled
-        %
-        % See also Vehicle.plotv.
-
-            h = findobj(gcf, 'Tag', 'Vehicle.plot');
+            % V.plot(X) plots the vehicle on the current axes at the pose X.
+            h = findobj(gcf, 'Tag', 'mobilerobot');
             if isempty(h)
-                % no instance of vehicle graphical object found
-                h = Vehicle.plotv(veh.x, varargin{:});
-                set(h, 'Tag', 'Vehicle.plot');  % tag it
+                h = line(0, 0, 'Tag', 'mobilerobot');
             end
-            
-            if ~isempty(varargin) && isnumeric(varargin{1})
-                % V.plot(X)
-                Vehicle.plotv(h, varargin{1}); % use passed value
-            else
-                % V.plot()
-                Vehicle.plotv(h, veh.x);    % use current state
+
+            d = veh.robotdim;
+            points = [
+                d 0 1
+                -d -0.6*d 1
+                -d 0.6*d 1
+                d 0 1];
+            if nargin < 2
+                x = veh.x;
             end
+            T = transl([x(1:2)' 0]) * trotz(x(3));
+            T(:,3) = [];
+            T(3,:) = [];
+            points = T * points';
+            set(h, 'Xdata', points(1,:), 'Ydata', points(2,:), ...
+                'Zdata', repmat(veh.x(3), 1, 4) );
         end
+
 
         function out = plot_xy(veh, varargin)
-            %Vehicle.plot_xy Plots true path followed by vehicle
+            %Vehicle.plot_xy Plot true path followed by vehicle
             %
             % V.plot_xy() plots the true xy-plane path followed by the vehicle.
             %
             % V.plot_xy(LS) as above but the line style arguments LS are passed
             % to plot.
-            %
-            % Notes::
-            % - The path is extracted from the x_hist property.
             
             xyt = veh.x_hist;
             if nargout == 0
@@ -460,22 +371,14 @@ classdef Vehicle < handle
         end
 
         function verbosity(veh, v)
-        %Vehicle.verbosity Set verbosity
-        %
-        % V.verbosity(A) set verbosity to A.  A=0 means silent.
             veh.verbose = v;
         end
             
         function display(nav)
         %Vehicle.display Display vehicle parameters and state
         %
-        % V.display() displays vehicle parameters and state in compact 
+        % V.display() display vehicle parameters and state in compact 
         % human readable form.
-        %
-        % Notes::
-        % - This method is invoked implicitly at the command line when the result
-        %   of an expression is a Vehicle object and the command has no trailing
-        %   semicolon.
         %
         % See also Vehicle.char.
 
@@ -488,136 +391,28 @@ classdef Vehicle < handle
         end % display()
 
         function s = char(veh)
-        %Vehicle.char Convert to a string
+        %Vehicle.char Convert vehicle parameters and state to a string
         %
-        % s = V.char() is a string showing vehicle parameters and state in 
+        % s = V.char() is a string showing vehicle parameters and state in in 
         % a compact human readable format. 
-        %
-        % See also Vehicle.display.
 
             s = 'Vehicle object';
-            s = char(s, sprintf(...
+            s = strvcat(s, sprintf(...
             '  L=%g, maxspeed=%g, alphalim=%g, T=%f, nhist=%d', ...
-                veh.L, veh.maxspeed, veh.alphalim, veh.dt, ...
+                veh.L, veh.maxspeed, veh.alphalim, veh.T, ...
                 numrows(veh.x_hist)));
             if ~isempty(veh.V)
-                s = char(s, sprintf(...
+                s = strvcat(s, sprintf(...
                 '  V=(%g,%g)', ...
                     veh.V(1,1), veh.V(2,2)));
             end
-            s = char(s, sprintf('  x=%g, y=%g, theta=%g', veh.x)); 
+            s = strvcat(s, sprintf('  x=%g, y=%g, theta=%g', veh.x)); 
             if ~isempty(veh.driver)
-                s = char(s, '  driven by::');
-                s = char(s, [['    '; '    '] char(veh.driver)]);
+                s = strvcat(s, '  driven by::');
+                s = strvcat(s, [['    '; '    '] char(veh.driver)]);
             end
         end
 
     end % method
-
-    methods(Static)
-
-        function h_ = plotv(x, varargin)
-        %Vehicle.plotv Plot ground vehicle pose
-        %
-        % H = Vehicle.plotv(X, OPTIONS) draws a representation of a ground robot as an 
-        % oriented triangle with pose X (1x3) [x,y,theta].  H is a graphics handle.
-        % If X (Nx3) is a matrix it is considered to represent a trajectory in which case
-        % the vehicle graphic is animated.
-        %
-        % Vehicle.plotv(H, X) as above but updates the pose of the graphic represented
-        % by the handle H to pose X.
-        %
-        % Options::
-        % 'scale',S    Draw vehicle with length S x maximum axis dimension
-        % 'size',S     Draw vehicle with length S
-        % 'color',C    Color of vehicle.
-        % 'fill'       Filled with solid color as per 'color' option
-        % 'fps',F      Frames per second in animation mode (default 10)
-        %
-        % Example::
-        %
-        % Generate some path 3xN
-        %         p = PRM.plan(start, goal);
-        % Set the axis dimensions to stop them rescaling for every point on the path
-        %         axis([-5 5 -5 5]);
-        %
-        % Now invoke the static method
-        %         Vehicle.plotv(p);
-        %
-        % Notes::
-        % - This is a class method.
-        %
-        % See also Vehicle.plot.
-
-            if isscalar(x) && ishandle(x)
-                % plotv(h, x)
-                h = x;
-                x = varargin{1};
-                x = x(:)';
-                T = transl([x(1:2) 0]) * trotz( x(3) );
-                set(h, 'Matrix', T);
-                return
-            end
-
-            opt.scale = 1/60;
-            opt.size = [];
-            opt.fill = false;
-            opt.color = 'r';
-            opt.fps = 10;
-            
-            [opt,args] = tb_optparse(opt, varargin);
-
-            lineprops = { 'Color', opt.color' };
-            if opt.fill
-                lineprops = [lineprops 'fill' opt.color ];
-            end
-            
-            
-            % compute the dimensions of the robot
-            if ~isempty(opt.size)
-                d = opt.size;
-            else
-                % get the current axes dimensions
-                a = axis;
-                d = (a(2)+a(4) - a(1)-a(3)) * opt.scale;
-            end
-            
-            % draw it
-            points = [
-                d 0
-                -d -0.6*d
-                -d 0.6*d
-            ]';
-            
-            h = hgtransform();
-            hp = plot_poly(points, lineprops{:});
-            for hh=hp
-                set(hh, 'Parent', h);
-            end
-
-            if (numel(x) > 3) && (numcols(x) == 3)
-                % animation mode
-                for i=1:numrows(x)
-                    T = transl([x(i,1:2) 0]) * trotz( x(i,3) );
-                    set(h, 'Matrix', T);
-                    pause(1/opt.fps);
-                end
-            elseif (numel(x) == 3)
-                % compute the pose
-                % convert vector form of pose to SE(3)
-            
-                x = x(:)';
-                T = transl([x(1:2) 0]) * trotz( x(3) );
-                set(h, 'Matrix', T);
-            else
-                error('bad pose');
-            end
-
-            if nargout > 0
-                h_ = h;
-            end
-        end
-
-    end % static methods
 
 end % classdef

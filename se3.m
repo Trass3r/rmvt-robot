@@ -1,14 +1,7 @@
-%SE3 Lift SE(2) transform to SE(3)
-%
-% T3 = SE3(T2) returns a homogeneous transform (4x4) that represents
-% the same X,Y translation and Z rotation as does T2 (3x3).
-%
-% See also SE2, TRANSL, ROTX.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -22,8 +15,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 function T = se3(x)
 
     if all(size(x) == [3 3])
