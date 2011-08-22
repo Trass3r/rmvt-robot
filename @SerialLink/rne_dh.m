@@ -206,12 +206,12 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
 				% revolute
 				tau(p,j) = nn'*(R'*z0) + ...
 					link.G^2 * link.Jm*qdd(j) + ...
-					link.G * friction(link, qd(j));
+					abs(link.G) * friction(link, qd(j));
 			else
 				% prismatic
 				tau(p,j) = f'*(R'*z0) + ...
 					link.G^2 * link.Jm*qdd(j) + ...
-					link.G * friction(link, qd(j));
+					abs(link.G) * friction(link, qd(j));
 			end
 		end
         % this last bit needs work/testing

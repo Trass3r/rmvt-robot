@@ -148,7 +148,7 @@ classdef Link < handle
                 % clone passed link
                 l = copy(dh);
 
-            elseif length(dh) <= 6
+            else
                 % legacy DH matrix
                 % link([theta d a alpha])
                 % link([theta d a alpha sigma])
@@ -197,6 +197,10 @@ classdef Link < handle
                 l.B = 0;
                 l.Tc = [0 0];
                 l.qlim = [];
+
+                if length(dh) > 6
+                    warning('legacy DYN matrix format no longer supported');
+                end
             end
         end % link()
 
@@ -206,11 +210,14 @@ classdef Link < handle
         % F = L.friction(QD) is the joint friction force/torque for link velocity QD
             tau = 0.0;
 
-            qd = qd(:);
             tau = l.B * qd;
 
-            tau = tau + (qd > 0) * l.Tc(1) + (qd < 0) * l.Tc(2);
-            tau = -tau;
+            if qd > 0
+                tau = tau + l.Tc(1);
+            elseif qd < 0
+                tau = tau + l.Tc(2);
+            end
+            tau = -tau;     % friction opposes motion
         end % friction()
 
         function  l2 = nofriction(l, only)
