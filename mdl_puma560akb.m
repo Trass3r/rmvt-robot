@@ -39,12 +39,12 @@
 
 clear L
 %            theta    d        a    alpha
-L(1) = link([  0      0        0       0       0], 'mod');
-L(2) = link([  0      0.2435   0      -pi/2    0], 'mod');
-L(3) = link([  0     -0.0934   0.4318  0       0], 'mod');
-L(4) = link([  0      0.4331  -0.0203  pi/2    0], 'mod');
-L(5) = link([  0      0        0      -pi/2    0], 'mod');
-L(6) = link([  0      0        0       pi/2    0], 'mod');
+L(1) = Link([  0      0        0       0       0], 'mod');
+L(2) = Link([  0      0.2435   0      -pi/2    0], 'mod');
+L(3) = Link([  0     -0.0934   0.4318  0       0], 'mod');
+L(4) = Link([  0      0.4331  -0.0203  pi/2    0], 'mod');
+L(5) = Link([  0      0        0      -pi/2    0], 'mod');
+L(6) = Link([  0      0        0       pi/2    0], 'mod');
 
 
 L(1).m = 0;
@@ -97,5 +97,5 @@ qz = [0 0 0 0 0 0]; % zero angles, L shaped pose
 qr = [0 -pi/2 pi/2 0 0 0]; % ready pose, arm up
 qstretch = [0 0 pi/2 0 0 0]; % horizontal along x-axis
 
-p560m = robot(L, 'name', 'Puma560-AKB', 'manufacturer', 'Unimation', 'comment', 'AK&B');
+p560m = SerialLink(L, 'name', 'Puma560-AKB', 'manufacturer', 'Unimation', 'comment', 'AK&B');
 clear L
