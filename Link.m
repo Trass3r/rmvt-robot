@@ -172,7 +172,7 @@ classdef Link < handle
                 if length(dh) >= 5
                     l.sigma = dh(5);
                 end
-                if length(dh) >= 6
+                if length(dh) == 6
                     l.offset = dh(6);
                 end
 
@@ -187,19 +187,50 @@ classdef Link < handle
                     end
                 end
 
-                % we know nothing about the dynamics
-                l.m = [];
-                l.r = [];
-                v = [];
-                l.I = [];
-                l.Jm = [];
-                l.G = [];
-                l.B = 0;
-                l.Tc = [0 0];
-                l.qlim = [];
-
                 if length(dh) > 6
-                    warning('legacy DYN matrix format no longer supported');
+                    % legacy DYN matrix
+
+                    l.sigma = dh(5);
+                    l.mdh = 0;	% default to standard D&H
+                    l.offset = 0;
+                    
+                    % it's a legacy DYN matrix
+                    l.m = dh(6);
+                    l.r = dh(7:9)';		% a column vector
+                    v = dh(10:15);
+                    l.I = [	v(1) v(4) v(6)
+                            v(4) v(2) v(5)
+                            v(6) v(5) v(3)];
+                    if length(dh) > 15
+                        l.Jm = dh(16);
+                    end
+                    if length(dh) > 16
+                        l.G = dh(17);
+                    else
+                        l.G = 1;
+                    end
+                    if length(dh) > 17
+                        l.B = dh(18);
+                    else
+                        l.B = 0.0;
+                    end
+                    if length(dh) > 18
+                        l.Tc = dh(19:20);
+                    else
+                        l.Tc = [0 0];
+                    end
+                    l.qlim = [];
+                else
+                    % we know nothing about the dynamics
+                    l.m = [];
+                    l.r = [];
+                    v = [];
+                    l.I = [];
+                    l.Jm = [];
+                    l.G = [];
+                    l.B = 0;
+                    l.Tc = [0 0];
+                    l.qlim = [];
                 end
             end
         end % link()
