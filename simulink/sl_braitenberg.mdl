@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.13"
+    ComputedModelVersion    "1.14"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -26,13 +26,13 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Aug 21 15:30:22 2011"
-  RTWModifiedTimeStamp	  235841408
-  ModelVersionFormat	  "1.%<AutoIncrement:13>"
+  LastModifiedDate	  "Thu Aug 25 20:35:27 2011"
+  RTWModifiedTimeStamp	  236205306
+  ModelVersionFormat	  "1.%<AutoIncrement:14>"
   ConfigurationManager	  "customverctrl"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
-  LibraryLinkDisplay	  "none"
+  LibraryLinkDisplay	  "all"
   WideLines		  on
   ShowLineDimensions	  on
   ShowPortDataTypes	  off
@@ -754,7 +754,7 @@ Model {
   }
   System {
     Name		    "sl_braitenberg"
-    Location		    [1004, 125, 1656, 452]
+    Location		    [1004, 147, 1656, 474]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -844,8 +844,8 @@ Model {
       MaskValueString	      "0|-2|@sensorfield"
       System {
 	Name			"Left sensor"
-	Location		[1920, 515, 2505, 708]
-	Open			on
+	Location		[1115, 553, 1700, 746]
+	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
 	ScreenColor		"white"
@@ -963,8 +963,8 @@ Model {
       MaskValueString	      "0|2|@sensorfield"
       System {
 	Name			"Right sensor"
-	Location		[1920, 515, 2505, 708]
-	Open			on
+	Location		[1920, 537, 2505, 730]
+	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
 	ScreenColor		"white"
