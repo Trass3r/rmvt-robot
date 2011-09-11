@@ -11,7 +11,7 @@ Model {
       Name		      "q"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.22"
+    ComputedModelVersion    "1.23"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -31,9 +31,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sat Sep 10 09:20:48 2011"
-  RTWModifiedTimeStamp	  237547171
-  ModelVersionFormat	  "1.%<AutoIncrement:22>"
+  LastModifiedDate	  "Sat Sep 10 10:06:01 2011"
+  RTWModifiedTimeStamp	  237549827
+  ModelVersionFormat	  "1.%<AutoIncrement:23>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -116,7 +116,7 @@ Model {
 	  $ObjectID		  2
 	  Version		  "1.11.0"
 	  StartTime		  "0.0"
-	  StopTime		  "10.0"
+	  StopTime		  "1"
 	  AbsTol		  "auto"
 	  FixedStep		  "auto"
 	  InitialStep		  "auto"
@@ -133,8 +133,8 @@ Model {
 	  RelTol		  "1e-3"
 	  SolverMode		  "Auto"
 	  ConcurrentTasks	  off
-	  Solver		  "ode3"
-	  SolverName		  "ode3"
+	  Solver		  "ode45"
+	  SolverName		  "ode45"
 	  SolverJacobianMethodControl "auto"
 	  ShapePreserveControl	  "DisableAll"
 	  ZeroCrossControl	  "UseLocalSettings"
@@ -160,14 +160,14 @@ Model {
 	  SaveFinalState	  off
 	  SaveCompleteFinalSimState off
 	  SaveFormat		  "Array"
-	  SignalLoggingSaveFormat "ModelDataLogs"
+	  SignalLoggingSaveFormat "Dataset"
 	  SaveOutput		  on
 	  SaveState		  off
-	  SignalLogging		  on
+	  SignalLogging		  off
 	  DSMLogging		  on
 	  InspectSignalLogs	  off
 	  SaveTime		  on
-	  ReturnWorkspaceOutputs  off
+	  ReturnWorkspaceOutputs  on
 	  StateSaveName		  "xout"
 	  TimeSaveName		  "tout"
 	  OutputSaveName	  "yout"
@@ -518,7 +518,7 @@ Model {
       }
       Name		      "Configuration"
       CurrentDlgPage	      "Data Import//Export"
-      ConfigPrmDlgPosition     [ 840, 394, 1720, 1024 ] 
+      ConfigPrmDlgPosition     [ 774, 145, 1654, 775 ] 
     }
     PropName		    "ConfigurationSets"
   }
@@ -594,7 +594,7 @@ Model {
   }
   System {
     Name		    "sl_ztorque"
-    Location		    [591, 378, 1091, 638]
+    Location		    [127, 50, 627, 310]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200

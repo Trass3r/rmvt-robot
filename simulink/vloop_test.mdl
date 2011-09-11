@@ -17,11 +17,8 @@ Model {
       Name		      "qd*"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.9"
-    NumModelReferences	    1
-    ModelReference {
-      ModelRefBlockPath	      "vloop_test/vloop|vloop"
-    }
+    ComputedModelVersion    "1.8"
+    NumModelReferences	    0
     NumTestPointedSignals   0
   }
   SavedCharacterEncoding  "ISO-8859-1"
@@ -40,9 +37,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Jun  5 22:10:44 2011"
-  RTWModifiedTimeStamp	  229212585
-  ModelVersionFormat	  "1.%<AutoIncrement:9>"
+  LastModifiedDate	  "Sun May 30 07:47:59 2010"
+  RTWModifiedTimeStamp	  197106471
+  ModelVersionFormat	  "1.%<AutoIncrement:8>"
   ConfigurationManager	  "customverctrl"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -647,13 +644,6 @@ Model {
       SampleTime	      "-1"
     }
     Block {
-      BlockType		      ModelReference
-      Variant		      off
-      GeneratePreprocessorConditionals off
-      CopyOfModelProtected    off
-      DefaultDataLogging      off
-    }
-    Block {
       BlockType		      Outport
       Port		      "1"
       UseBusObject	      off
@@ -704,7 +694,7 @@ Model {
   }
   System {
     Name		    "vloop_test"
-    Location		    [771, 606, 1480, 903]
+    Location		    [627, 588, 1336, 885]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -718,13 +708,13 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    33
+    SIDHighWatermark	    32
     Block {
       BlockType		      BusCreator
       Name		      "Bus\nCreator"
       SID		      1
       Ports		      [2, 1]
-      Position		      [535, 22, 540, 93]
+      Position		      [535, 27, 540, 98]
       ShowName		      off
       Inputs		      "2"
       DisplayOption	      "bar"
@@ -752,7 +742,7 @@ Model {
       Name		      "Signal\nGenerator"
       SID		      24
       Ports		      [0, 1]
-      Position		      [110, 65, 140, 95]
+      Position		      [110, 75, 140, 105]
       WaveForm		      "sawtooth"
       Frequency		      "2"
       Port {
@@ -788,9 +778,9 @@ Model {
       Name		      "qd*/qd"
       SID		      5
       Ports		      [1]
-      Position		      [575, 44, 605, 76]
+      Position		      [575, 49, 605, 81]
       Floating		      off
-      Location		      [53, 448, 377, 687]
+      Location		      [41, 448, 365, 687]
       Open		      on
       NumInputPorts	      "1"
       ZoomMode		      "xonly"
@@ -836,38 +826,30 @@ Model {
       OutScaling	      "2^0"
     }
     Block {
-      BlockType		      ModelReference
+      BlockType		      Reference
       Name		      "vloop"
-      SID		      33
+      SID		      32
       Ports		      [2, 3]
-      Position		      [320, 56, 375, 164]
-      ModelNameDialog	      "vloop"
-      SimulationMode	      "Accelerator"
-      ModelReferenceVersion   "1.8"
-      List {
-	ListType		InputPortNames
-	port0			"qd*"
-	port1			"tau_d"
-      }
-      List {
-	ListType		OutputPortNames
-	port0			"qd"
-	port1			"qd error"
-	port2			"tau"
-      }
-      List {
-	ListType		OutputPortOutputBusAsStructs
-	port0			"off"
-	port1			"off"
-	port2			"off"
-      }
-      List {
-	ListType		OutputPortSignalNames
-	port0			"qd"
-	port1			""
-	port2			""
-      }
-      CopyOfModelName	      "vloop"
+      Position		      [315, 65, 365, 165]
+      DropShadow	      on
+      LibraryVersion	      "1.11"
+      SourceBlock	      "control/vloop"
+      SourceType	      ""
+      ShowPortLabels	      "FromPortIcon"
+      SystemSampleTime	      "-1"
+      FunctionWithSeparateData off
+      RTWMemSecFuncInitTerm   "Inherit from model"
+      RTWMemSecFuncExecute    "Inherit from model"
+      RTWMemSecDataConstants  "Inherit from model"
+      RTWMemSecDataInternal   "Inherit from model"
+      RTWMemSecDataParameters "Inherit from model"
+      J			      "372e-6"
+      B			      "817e-6"
+      Km		      "0.228"
+      tau_max		      "0.9"
+      Kv		      "1"
+      Ki		      "0"
+      T			      "0.001"
     }
     Block {
       BlockType		      Outport
@@ -899,10 +881,9 @@ Model {
 	DstPort			1
       }
       Branch {
-	Points			[0, 0; 50, 0]
+	Points			[50, 0]
 	Branch {
-	  Labels		  [1, 0]
-	  Points		  [0, -40]
+	  Points		  [0, -45]
 	  DstBlock		  "Bus\nCreator"
 	  DstPort		  1
 	}
@@ -927,13 +908,13 @@ Model {
     Line {
       SrcBlock		      "vloop"
       SrcPort		      1
-      Points		      [50, 0]
+      Points		      [60, 0]
       Branch {
 	DstBlock		"Bus\nCreator"
 	DstPort			2
       }
       Branch {
-	Points			[0, 25]
+	Points			[0, 20]
 	DstBlock		"qd"
 	DstPort			1
       }
@@ -941,14 +922,14 @@ Model {
     Line {
       SrcBlock		      "vloop"
       SrcPort		      2
-      Points		      [180, 0]
+      Points		      [190, 0]
       DstBlock		      "qd error"
       DstPort		      1
     }
     Line {
       SrcBlock		      "vloop"
       SrcPort		      3
-      Points		      [180, 0]
+      Points		      [190, 0]
       DstBlock		      "tau"
       DstPort		      1
     }
@@ -956,7 +937,7 @@ Model {
       Labels		      [3, 0]
       SrcBlock		      "Gain"
       SrcPort		      1
-      Points		      [10, 0; 0, -50]
+      Points		      [10, 0; 0, -45]
       DstBlock		      "vloop"
       DstPort		      2
     }
