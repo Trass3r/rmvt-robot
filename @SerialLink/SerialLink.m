@@ -1,7 +1,12 @@
 %SerialLink Serial-link robot class
 %
-% r = SerialLink(links, options) return a serial-link robot object from a 
+% r = SerialLink(links, options) is a serial-link robot object from a 
 % vector of Link objects.
+%
+% r = SerialLink(dh, options) is a serial-link robot object from a table
+% (matrix) of Denavit-Hartenberg parameters.  The columns of the matrix are
+% theta, d, alpha, a.  An optional fifth column sigma indicate 
+% revolute (sigma=0, default) or prismatic (sigma=1).
 %
 % Options::
 %
@@ -26,6 +31,7 @@
 %  dyn           show dynamic properties of links
 %  isspherical   true if robot has spherical wrist
 %  islimit       true if robot has spherical wrist
+%  payload       add a payload in end-effector frame
 %
 %  coriolis      return Coriolis joint force
 %  gravload      return gravity joint force
@@ -219,6 +225,9 @@ classdef SerialLink < handle
                         L(j).d =      dh_dyn(j,2);
                         L(j).alpha =  dh_dyn(j,3);
                         L(j).a =      dh_dyn(j,4);
+                        if numcols(dh_dyn) > 4
+                            L(j).sigma = dh_dyn(j,5);
+                        end
                     end
                     r.links = L;
                 else
@@ -467,6 +476,18 @@ classdef SerialLink < handle
                 v = true;
                 return;
             end
+        end
+        
+        function payload(r, m, p)
+        %SerialLink.payload Add payload to end of manipulator
+        %
+        % R.payload(M, P) adds a payload with point mass M at position P 
+        % in the end-effector coordinate frame.
+        %
+        % See also SerialLink.ikine6s.
+            lastlink = r.links(r.n);
+            lastlink.m = m;
+            lastlink.r = p;
         end
         
         function jt = jtraj(r, T1, T2, t, varargin)
