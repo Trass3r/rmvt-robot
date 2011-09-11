@@ -33,13 +33,15 @@ probably easier to run the script from inside MATLAB
 
 INSTALLING THE MEX FILE
 
-Move the MEX file frne.xxx to the directory above.  You can then invoke either
+1. Move the MEX file frne.xxx to the directory above.  You can then invoke either
 rne() or frne() and evaluate the speed improvement.  The results should be exactly
 the same.
 
-Move the MEX file frne.xxx to the directory above and rename it rne.xxx.  The MEX
+2. Move the MEX file frne.xxx to the directory above and rename it rne.xxx.  The MEX
 file will now be used instead of the M-file, and thus anything that calls rne() will
 use the MEX file and be faster.
+
+You can use the command "make install" to do this.
 
 NOTES ON PERFORMANCE
 
