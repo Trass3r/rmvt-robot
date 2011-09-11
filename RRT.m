@@ -14,12 +14,25 @@
 %   rrt.path(start)         display a path from start to goal
 %   p = rrt.path(start)     return a path from start to goal
 %
+% Options::
+% 'npoints',N    Number of nodes in the tree
+% 'time',T       Period to simulate dynamic model toward random point
+% 'xrange',X     Workspace span in x-direction [xmin xmax]
+% 'yrange',Y     Workspace span in y-direction [ymin ymax]
+% 'goal',P       Goal position (1x2) or pose (1x3) in workspace
+%
+% Notes::
+% - The bicycle model is hardwired into the class (should be a parameter)
+% - Default workspace is between -5 and +5 in the x- and y-directions
+%
 
 % Peter Corke 8/2009.
 
 %TODO
-%   really use kine_model, build strings for simulink, display method
+%   more info to the display method
 %   distance metric choice or weightings
+%   pass time and model options to the simulation
+
 classdef RRT < Navigation
 
     properties
@@ -37,6 +50,8 @@ classdef RRT < Navigation
 
         xrange
         yrange
+        
+        plant
     end
 
     methods
@@ -51,10 +66,19 @@ classdef RRT < Navigation
 
             % TODO: need a means to set these
             %  {'npoints', []
-            rrt.npoints = 500;
-            rrt.sim_time = 0.5;
-            rrt.yrange = [-5,5];
-            rrt.xrange = [-5,5];
+            
+            opt.npoints = 500;
+            opt.time = 0.5;
+            opt.yrange = [-5,5];
+            opt.xrange = [-5,5];
+            opt.goal = [0, 0];
+            
+            [opt,args] = tb_optparse(opt, varargin);
+            rrt.npoints = opt.npoints;
+            rrt.sim_time = opt.time;
+            rrt.xrange = opt.xrange;
+            rrt.yrange = opt.yrange;
+            rrt.goal = opt.goal;
         end
 
         function plan(rrt)
@@ -76,84 +100,6 @@ classdef RRT < Navigation
 
         end
         
-        
-%         function path(rrt, goal)
-% 
-%             if nargin > 1
-%                 rrt.goal_set(goal(:));
-%             end
-% 
-%             if isempty(rrt.goal)
-%                 error('No goal specified');
-%             end
-% 
-%             % build a graph over the free space
-%             rrt.message('create the graph');
-%             rrt.graph.clear();
-%             create_graph(rrt);
-%             disp('graph create done');
-% 
-%             return
-%             disp('plan still going');
-%             rrt.vgoal = rrt.graph.closest(rrt.goal);
-% 
-%             % find a path through the graph
-%             rrt.message('planning path through graph');
-%             rrt.graph.goal(rrt.vgoal);   % set the goal
-% 
-%         end
-% 
-%         function navigate_init2(rrt, p)
-%             disp('nav_init2');
-%             % find node closest to the start and goal points
-%             rrt.vstart = rrt.graph.closest(p);
-% 
-%             if rrt.graph.component(rrt.vstart) ~= rrt.graph.component(rrt.vgoal)
-%                 error('Navigation: start and goal not connected');
-%             end
-% 
-%             % create a path through the graph
-%             rrt.gpath = rrt.graph.path(rrt.vstart);
-%             rrt.gpath = rrt.gpath(2:end);
-% 
-%             % start the navigation engine with a path to the nearest vertex
-%             rrt.graph.showVertex(rrt.vstart);
-% 
-%             rrt.localPath = bresenham(p, rrt.graph.coord(rrt.vstart));
-%             rrt.localPath = rrt.localPath(2:end,:);
-%         end
-% 
-%         function n = next(rrt, p)
-% 
-%             if all(p(:)' == rrt.goal)
-%                 n = [];     % we've arrived
-%                 return;
-%             end
-% 
-%             if numrows(rrt.localPath) == 0
-%                 % local path is consumed, move to next vertex
-%                 if length(rrt.gpath) == 0
-%                     % we have arrived at the goal vertex
-%                     % make the path from this vertex to the goal coordinate
-%                     rrt.localPath = bresenham(p, rrt.goal);
-%                     rrt.localPath = rrt.localPath(2:end,:);
-%                     rrt.localGoal = [];
-%                 else
-%                     % set local goal to next vertex in gpath and remove it
-%                     % from the list
-%                     rrt.localGoal = rrt.gpath(1);
-%                     rrt.gpath = rrt.gpath(2:end);
-% 
-%                     % compute local path to the next vertex
-%                     rrt.localPath = bresenham(p, rrt.graph.coord(rrt.localGoal));
-%                     rrt.localPath = rrt.localPath(2:end,:);
-%                     rrt.graph.showVertex(rrt.localGoal);
-%                 end
-%             end
-% 
-%             n = rrt.localPath(1,:);     % take the first point
-%             rrt.localPath = rrt.localPath(2:end,:); % and remove from the path
-%         end
 
     function p = path(rrt, xstart, xgoal)
 
@@ -166,7 +112,7 @@ classdef RRT < Navigation
 
         pp = g.coord(p);
 
-        f1
+        figure
         clf
         plot2(pp', '-o');
         grid
@@ -235,16 +181,7 @@ classdef RRT < Navigation
 
                 % Step 4
                 % find the existing node closest in state space
-%                 dmin = Inf;
-%                 for v=1:rrt.graph.n
-%                     xv = rrt.graph.coord(v);
-%                     d = sum( (xv(1:2)-xrand(1:2)).^2 ) + angdiff(xv(3)-xrand(3))^2;
-%                     if d < dmin
-%                         xnear = xv;
-%                         vnear = v;
-%                         dmin = d;
-%                     end
-%                 end
+
                 vnear = rrt.graph.closest(xrand);
                 xnear = rrt.graph.coord(vnear);
 
