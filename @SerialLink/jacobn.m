@@ -1,8 +1,12 @@
 %SerialLink.JACOBN Jacobian in end-effector frame
 %
-% JN = R.jacobn(Q) is a 6xN Jacobian matrix for the robot in pose Q.
-% The manipulator Jacobian matrix maps joint velocity to end-effector spatial
-% velocity V = J0*QD in the end-effector frame.
+% JN = R.jacobn(Q, options) is a 6xN Jacobian matrix for the robot in 
+% pose Q. The manipulator Jacobian matrix maps joint velocity to 
+% end-effector spatial velocity V = J0*QD in the end-effector frame.
+%
+% Options::
+% 'trans'   Return translational submatrix of Jacobian
+% 'rot'     Return rotational submatrix of Jacobian 
 %
 % Reference::
 % 	Paul, Shimano, Mayer,
@@ -33,8 +37,13 @@
 %
 % http://www.petercorke.com
 
-function J = jacobn(robot, q)
+function J = jacobn(robot, q, varargin)
 
+    opt.trans = false;
+    opt.rot = false;
+    
+    opt = tb_optparse(opt, varargin);
+    
 	n = robot.n;
 	L = robot.links;		% get the links
 
@@ -62,4 +71,10 @@ function J = jacobn(robot, q)
 			% modified DH convention
 			U = L(j).A(q(j)) * U;
 		end
-	end
+    end
+    
+    if opt.trans
+        J0 = J0(1:3,:);
+    elseif opt.rot
+        J0 = J0(4:6,:);
+    end

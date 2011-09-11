@@ -5,8 +5,12 @@
 % velocity V = J0*QD expressed in the world-coordinate frame.
 %
 % Options::
-% 'rpy'   Compute analytical Jacobian with rotation rate in terms of roll-pitch-yaw angles
-% 'eul'   Compute analytical Jacobian with rotation rates in terms of Euler angles
+% 'rpy'     Compute analytical Jacobian with rotation rate in terms of 
+%           roll-pitch-yaw angles
+% 'eul'     Compute analytical Jacobian with rotation rates in terms of 
+%           Euler angles
+% 'trans'   Return translational submatrix of Jacobian
+% 'rot'     Return rotational submatrix of Jacobian 
 %
 % Note::
 % - the Jacobian is computed in the world frame and transformed to the end-effector frame.
@@ -35,7 +39,15 @@
 %
 % http://www.petercorke.com
 
-function J0 = jacob0(robot, q, ang)
+function J0 = jacob0(robot, q, varargin)
+
+    opt.rpy = false;
+    opt.eul = false;
+    opt.trans = false;
+    opt.rot = false;
+    
+    opt = tb_optparse(opt, varargin);
+    
 	%
 	%   dX_tn = Jn dq
 	%
@@ -48,21 +60,24 @@ function J0 = jacob0(robot, q, ang)
 	R = t2r(Tn);
 	J0 = [R zeros(3,3); zeros(3,3) R] * Jn;
 
-    if nargin == 3,
-        switch ang,
-        case 'rpy',
-            rpy = tr2rpy( fkine(robot, q) );
-            B = rpy2jac(rpy);
-            if rcond(B) < eps,
-                error('Representational singularity');
-            end
-            J0 = blkdiag( eye(3,3), inv(B) ) * J0;
-        case 'eul'
-            eul = tr2eul( fkine(robot, q) );
-            B = eul2jac(eul);
-            if rcond(B) < eps,
-                error('Representational singularity');
-            end
-            J0 = blkdiag( eye(3,3), inv(B) ) * J0;
+    if opt.rpy
+        rpy = tr2rpy( fkine(robot, q) );
+        B = rpy2jac(rpy);
+        if rcond(B) < eps,
+            error('Representational singularity');
         end
+        J0 = blkdiag( eye(3,3), inv(B) ) * J0;
+    elseif opt.eul
+        eul = tr2eul( fkine(robot, q) );
+        B = eul2jac(eul);
+        if rcond(B) < eps,
+            error('Representational singularity');
+        end
+        J0 = blkdiag( eye(3,3), inv(B) ) * J0;
+    end
+    
+    if opt.trans
+        J0 = J0(1:3,:);
+    elseif opt.rot
+        J0 = J0(4:6,:);
     end
