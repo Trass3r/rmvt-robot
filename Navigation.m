@@ -70,10 +70,11 @@ classdef Navigation < handle
 
         % TODO fix up set methods for goal
         % setup argument callback like features, can we inherit from that.
+        % occ grid should be an option
 
         % constructor
 
-        function nav = Navigation(occgrid, varargin)
+        function nav = Navigation(varargin)
         %Navigation.Navigation Create a Navigation object
         %
         % N = Navigation(OCCGRID, options) is a Navigation object that holds an
@@ -85,9 +86,9 @@ classdef Navigation < handle
         %  'goal', g     Specify the goal point
         %  'verbose'     Display debugging information
             
-            nav.occgrid_set(occgrid);
-            if nargin >= 1
-                nav.occgrid = occgrid;
+            if nargin >= 1 && isnumeric(varargin{1})
+                nav.occgrid = varargin{1};
+                varargin = varargin(2:end);
             end
             
             % default values of options
@@ -96,7 +97,7 @@ classdef Navigation < handle
             opt.seed = [];
             opt.goal = [];
             
-            [nav,args] = tb_optparse(nav, varargin);
+            [opt,args] = tb_optparse(nav, varargin);
             
             % save current random seed so we can repeat the expt
             defaultStream = RandStream.getDefaultStream;
