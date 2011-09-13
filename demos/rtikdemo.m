@@ -41,7 +41,7 @@ echo on
 % have several poses which result in the same transform for the last
 % link. The starting point for the first point may be specified, or else it
 % defaults to zero (which is not a particularly good choice in this case)
-    qi = ikine(p560, T);
+    qi = p560.ikine(T);
     qi'
 %
 % Compared with the original value
@@ -74,7 +74,7 @@ pause % any key to continue
     t = [0:.056:2]; 		% create a time vector
     T1 = transl(0.6, -0.5, 0.0) % define the start point
     T2 = transl(0.4, 0.5, 0.2)	% and destination
-    T = ctraj(T1, T2, t); 	% compute a Cartesian path
+    T = ctraj(T1, T2, length(t)); 	% compute a Cartesian path
 
 %
 % now solve the inverse kinematics.  When solving for a trajectory, the 

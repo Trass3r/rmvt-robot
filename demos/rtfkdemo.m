@@ -40,9 +40,8 @@ figure(2)
 % which are defined by qz
     qz
 %
-% The forward kinematics may be computed using fkine() with an appropropriate 
-% kinematic description, in this case, the matrix p560 which defines 
-% kinematics for the 6-axis Puma 560.
+% The forward kinematics may be computed using fkine() method of the
+% p560 robot object
     p560.fkine(qz)
 %
 % returns the homogeneous transform corresponding to the last link of the 
