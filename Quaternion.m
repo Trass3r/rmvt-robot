@@ -231,18 +231,21 @@ classdef Quaternion
         % If R is a vector QI is a vector of quaternions, each element
         % corresponding to sequential elements of R.
         %
+        % Notes:
+        % - the value of r is clipped to the interval 0 to 1
+        %
         % See also ctraj, Quaternion.scale.
 
             q1 = double(Q1);
             q2 = double(Q2);
 
-            if any(r<0) || any(r>1)
-                error('R out of range');
-            end
-
             theta = acos(q1*q2');
             count = 1;
 
+            % clip values of r
+            r(r<0) = 0;
+            r(r>1) = 1;
+            
             if length(r) == 1
                 if theta == 0
                     q = Q1;
