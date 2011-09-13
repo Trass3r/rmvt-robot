@@ -117,10 +117,12 @@
 %
 % http://www.petercorke.com
 
-function rnew = plot(robot, tg, varargin)
+function retval = plot(robot, tg, varargin)
 
+    % opts = PLOT(robot, options)
+    %  just convert options list to an options struct
     if (nargin == 2) && iscell(tg)
-        rnew = plot_options(robot, tg);
+        retval = plot_options(robot, tg);
         return;
     end
         
@@ -133,15 +135,17 @@ function rnew = plot(robot, tg, varargin)
         rh = findobj('Tag', robot.name);
         if ~isempty(rh),
             r = get(rh(1), 'UserData');
-            rnew = r.q;
+            retval = r.q;
         end
         return
     end
     
     % process options
     if (nargin > 2) && isstruct(varargin{1})
+        % options is a struct
         opt = varargin{1};
     else
+        % options is a list of options
         opt = plot_options(robot, varargin);
     end
 
@@ -206,7 +210,7 @@ function rnew = plot(robot, tg, varargin)
 
     count = opt.repeat;
     while count > 0
-        for p=1:np,
+        for p=1:np
             for r=rh',
                 animate( get(r, 'UserData'), tg(p,:), opt);
                 pause(opt.delay)
@@ -216,14 +220,14 @@ function rnew = plot(robot, tg, varargin)
     end
 
     % save the last joint angles away in the graphical robot
-    for r=rh',
+    for r=rh'
         rr = get(r, 'UserData');
         rr.q = tg(end,:);
         set(r, 'UserData', rr);
     end
 
-    if nargout > 0,
-        rnew = robot;
+    if nargout > 0
+        retval = robot;
     end
     
 
@@ -234,7 +238,7 @@ function rnew = plot(robot, tg, varargin)
 % Returns an options structure
 
 function o = plot_options(robot, optin)
-    %%%%%%%%%%%%%% process options
+    % process a cell array of options and return a struct
     o.erasemode = 'normal';
     o.joints = true;
     o.wrist = true;
@@ -242,7 +246,6 @@ function o = plot_options(robot, optin)
     o.shadow = true;
     o.wrist = true;
     o.jaxes = true;
-    o.dims = [];
     o.base = true;
     o.wristlabel = 'xyz';
     o.projection = 'perspective';
@@ -251,6 +254,7 @@ function o = plot_options(robot, optin)
     o.delay = 0;
     o.raise = true;
     o.cylinder = [0 0 0.7];
+    o.workspace = [];
 
     % read options string in the order and build up a list
     %   1. robot.plotopt
@@ -270,7 +274,7 @@ function o = plot_options(robot, optin)
         error(['unknown option: ' args{1}]);
     end
 
-    if isempty(o.dims),
+    if isempty(o.workspace),
         %
         % simple heuristic to figure the maximum reach of the robot
         %
@@ -279,10 +283,10 @@ function o = plot_options(robot, optin)
         for i=1:robot.n,
             reach = reach + abs(L(i).a) + abs(L(i).d);
         end
-        o.dims = [-reach reach -reach reach -reach reach];
+        o.workspace = [-reach reach -reach reach -reach reach];
         o.mag = reach/10;
     else
-        reach = min(abs(dims));
+        reach = min(abs(o.workspace));
     end
     o.mag = o.magscale * reach/10;
 
@@ -325,7 +329,7 @@ function h = create_new_robot(robot, opt)
     if ~ishold,
         % if current figure has hold on, then draw robot here
         % otherwise, create a new figure
-        axis(opt.dims);
+        axis(opt.workspace);
     end
     xlabel('X')
     ylabel('Y')

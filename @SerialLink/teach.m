@@ -87,7 +87,7 @@ function teach(r, varargin)
         end
     end
 
-    T6 = fkine(r, q);
+    T6 = r.fkine(q);
     fig = figure('Units', 'pixels', ...
         'Position', [0 -height width height*(n+2)], ...
         'Color', bgcol);
@@ -256,7 +256,7 @@ function teach(r, varargin)
 
     if isempty(rh),
         figure
-        plot(r, q);
+        r.plot(q);
     end
 end
         
