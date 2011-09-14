@@ -22,8 +22,8 @@
 % - This function performs poorly with non-linear joint friction, such as
 %   Coulomb friction.  The R.nofriction() method can be used to set this 
 %   friction to zero.
-% - If TORQFUN is not specified, or is given as 0,  then zero torque is 
-%   applied to the manipulator joints.
+% - If TORQFUN is not specified, or is given as 0 or [],  then zero torque
+%   is applied to the manipulator joints.
 % - The builtin integration function ode45() is used.
 %
 % See also SerialLink.accel, SerialLink.nofriction, SerialLink.RNE, ode45.
