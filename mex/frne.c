@@ -112,6 +112,7 @@ mexFunction(
         mexErrMsgTxt("first argument is not a robot structure\n");
 
     mx_robot = (mxArray *)ROBOT_IN;
+    
     njoints = mstruct_getint(mx_robot, 0, "n");
 
 /***********************************************************************
@@ -247,11 +248,11 @@ mexFunction(
     if (grav)
         robot.gravity = (Vect *)grav;
     else
-        robot.gravity = (Vect *)mxGetPr( mxGetProperty(mx_robot, 0, "gravity") );
+        robot.gravity = (Vect *)mxGetPr( mxGetProperty(mx_robot, (mwIndex)0, "gravity") );
     robot.dhtype = mstruct_getint(mx_robot, 0, "mdh");
 
     /* build link structure */
-    robot.links = (Link *)mxCalloc(njoints, sizeof(Link));
+    robot.links = (Link *)mxCalloc((mwSize) njoints, (mwSize) sizeof(Link));
 
 
 /***********************************************************************
@@ -265,7 +266,7 @@ mexFunction(
  ***********************************************************************/
 
     /* get pointer to the first link structure */
-    link0 = mxGetProperty(mx_robot, 0, "links");
+    link0 = mxGetProperty(mx_robot, (mwIndex) 0, "links");
     if (link0 == NULL)
         mexErrMsgTxt("couldnt find element link in robot object");
 
@@ -299,25 +300,25 @@ mexFunction(
      */
     for (j=0; j<njoints; j++) {
         Link    *l = &robot.links[j];
-        mxArray *links = mxGetProperty(mx_robot, 0, "links"); // links array
+        mxArray *links = mxGetProperty(mx_robot, (mwIndex) 0, "links"); // links array
 
-        l->alpha =  mxGetScalar( mxGetProperty(links, j, "alpha") );
-        l->A =      mxGetScalar( mxGetProperty(links, j, "a") );
-        l->theta =  mxGetScalar( mxGetProperty(links, j, "theta") );
-        l->D =      mxGetScalar( mxGetProperty(links, j, "d") );
-        l->sigma =  mxGetScalar( mxGetProperty(links, j, "sigma") );
-        l->offset = mxGetScalar( mxGetProperty(links, j, "offset") );
-        l->m =      mxGetScalar( mxGetProperty(links, j, "m") );
-        l->rbar =   (Vect *)mxGetPr( mxGetProperty(links, j, "r") );
-        l->I =      mxGetPr( mxGetProperty(links, j, "I") );
-        l->Jm =     mxGetScalar( mxGetProperty(links, j, "Jm") );
-        l->G =      mxGetScalar( mxGetProperty(links, j, "G") );
-        l->B =      mxGetScalar( mxGetProperty(links, j, "B") );
-        l->Tc =     mxGetPr( mxGetProperty(links, j, "Tc") );
+        l->alpha =  mxGetScalar( mxGetProperty(links, (mwIndex) j, "alpha") );
+        l->A =      mxGetScalar( mxGetProperty(links, (mwIndex) j, "a") );
+        l->theta =  mxGetScalar( mxGetProperty(links, (mwIndex) j, "theta") );
+        l->D =      mxGetScalar( mxGetProperty(links, (mwIndex) j, "d") );
+        l->sigma =  mxGetScalar( mxGetProperty(links, (mwIndex) j, "sigma") );
+        l->offset = mxGetScalar( mxGetProperty(links, (mwIndex) j, "offset") );
+        l->m =      mxGetScalar( mxGetProperty(links, (mwIndex) j, "m") );
+        l->rbar =   (Vect *)mxGetPr( mxGetProperty(links, (mwIndex) j, "r") );
+        l->I =      mxGetPr( mxGetProperty(links, (mwIndex) j, "I") );
+        l->Jm =     mxGetScalar( mxGetProperty(links, (mwIndex) j, "Jm") );
+        l->G =      mxGetScalar( mxGetProperty(links, (mwIndex) j, "G") );
+        l->B =      mxGetScalar( mxGetProperty(links, (mwIndex) j, "B") );
+        l->Tc =     mxGetPr( mxGetProperty(links, (mwIndex) j, "Tc") );
     }
 
     /* Create a matrix for the return argument */
-    TAU_OUT = mxCreateDoubleMatrix(nq, njoints, mxREAL);
+    TAU_OUT = mxCreateDoubleMatrix((mwSize) nq, (mwSize) njoints, mxREAL);
     tau = mxGetPr(TAU_OUT);
 
 #define MEL(x,R,C)  (x[(R)+(C)*nq])
@@ -423,7 +424,7 @@ mstruct_get_element(mxArray *m, int j, char *field)
 {
     mxArray *e;
 
-    if ((e = mxGetProperty(e, 0, field)) != NULL)
+    if ((e = mxGetProperty(m, (mwIndex)j, field)) != NULL)
         return e;
     else {
         error("No such field as %s", field);
