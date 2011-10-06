@@ -29,7 +29,7 @@ For Windows:
 
 probably easier to run the script from inside MATLAB
 
->> mex frne.c ne.c vmath.c
+>> make
 
 INSTALLING THE MEX FILE
 
