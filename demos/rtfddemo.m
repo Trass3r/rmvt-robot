@@ -40,7 +40,7 @@ pause % any key to continue
 % To simulate the motion of the Puma 560 from rest in the zero angle pose 
 % with zero applied joint torques
     tic
-    [t q qd] = p560.nofriction().fdyn( 0, 10);
+    [t q qd] = p560.nofriction().fdyn(10, [], qz);
     toc
 %
 % and the resulting motion can be plotted versus time
