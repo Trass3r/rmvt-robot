@@ -21,6 +21,7 @@
 % TAU is an MxN matrix with rows corresponding to each trajectory state.
 %
 % Notes:
+% - The robot base transform is ignored
 % - The torque computed also contains a contribution due to armature
 %   inertia.
 % - RNE can be either an M-file or a MEX-file.  See the manual for details on
