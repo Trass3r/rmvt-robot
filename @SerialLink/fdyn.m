@@ -52,20 +52,24 @@
 function [t, q, qd] = fdyn(robot, t1, torqfun, q0, qd0, varargin)
 
 	% check the Matlab version, since ode45 syntax has changed
-	v = ver;
-	if str2num(v(1).Version)<7,
+    if verLessThan('matlab', '7')  
 		error('fdyn now requires Matlab version >= 7');
 	end
 
 	n = robot.n;
 	if nargin == 2
 		torqfun = 0;
-		q0 = zeros(2*n,1);
+		q0 = zeros(1,n);
+		qd0 = zeros(1,n);
+	elseif nargin == 3
+		q0 = zeros(1,n);
+		qd0 = zeros(1,n);
 	elseif nargin == 4
-		q0 = zeros(2*n, 1);
-	elseif nargin >= 6
-		q0 = [q0(:); qd0(:)];
+		qd0 = zeros(1,n);
 	end
+
+    % concatenate q and qd into the initial state vector
+    q0 = [q0(:); qd0(:)];
 		
 	[t,y] = ode45(@fdyn2, [0 t1], q0, [], robot, torqfun, varargin{:});
 	q = y(:,1:n);
