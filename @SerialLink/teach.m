@@ -9,8 +9,6 @@
 %
 % See also SerialLink.plot.
 
-
-
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
@@ -67,7 +65,7 @@ function teach(r, varargin)
     maxVal = pi;    
 
     qlim = r.qlim;
-    if isempty(qlim),
+    if isempty(qlim)
         qlim = [minVal*ones(r.n,1) maxVal*ones(r.n,1)];
     end
 
@@ -100,9 +98,9 @@ function teach(r, varargin)
     rh = findobj('Tag', r.name);
 
     % attempt to get current joint config of graphical robot
-    if ~isempty(rh),
+    if ~isempty(rh)
         rr = get(rh(1), 'UserData');
-        if ~isempty(rr.q),
+        if ~isempty(rr.q)
             q = rr.q;
         end
     end
@@ -126,7 +124,7 @@ function teach(r, varargin)
 
         % if findjobj exists use it, since it lets us get continous callbacks while
         % a slider moves
-        if exist('findjobj'),
+        if exist('findjobj') && ~ispc
             drawnow
             jh = findjobj(h(i),'nomenu');
             jh.AdjustmentValueChangedCallback = {@sliderCallbackFunc, r.name, i};
@@ -254,7 +252,7 @@ function teach(r, varargin)
         'String', 'Quit');
 
 
-    if isempty(rh),
+    if isempty(rh)
         figure
         r.plot(q);
     end
@@ -270,13 +268,13 @@ function teach_callback(a, b)
     %disp(rh)
     handles = get(gco, 'Userdata');
     scale = handles{3};
-    for r=rh',
+    for r=rh'
         robot = get(r, 'UserData');
         q = robot.q;
-        if isempty(q),
+        if isempty(q)
             q = zeros(1,robot.n);
         end
-        if gco == handles{1},
+        if gco == handles{1}
             % get value from slider
             q(j) = get(gco, 'Value') / scale(j);
             set(handles{2}, 'String', num2str(scale(j)*q(j)));
@@ -293,7 +291,7 @@ function teach_callback(a, b)
     % compute and display the T6 pose
     T6 = robot.fkine(q);
     h3 = get(findobj('Tag', 'T6'), 'UserData');
-    for i=1:3,
+    for i=1:3
         set(h3(i,1), 'String', sprintf('%.3f', T6(i,4)));
         set(h3(i,2), 'String', sprintf('%.3f', T6(i,3)));
     end
@@ -303,7 +301,7 @@ function teach_callback(a, b)
 end
     
 function sliderCallbackFunc(src, ev, name, joint)
-    if get(src,'ValueIsAdjusting') == 1,
+    if get(src,'ValueIsAdjusting') == 1
         try
             teach_callback(name, joint);
             drawnow
