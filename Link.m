@@ -38,7 +38,7 @@
 %  Tc      dynamic: link Coulomb friction
 %
 %  G       actuator: gear ratio
-%  J       actuator: motor inertia (motor referred)
+%  Jm      actuator: motor inertia (motor referred)
 %
 % Notes::
 % - this is reference class object
@@ -283,6 +283,17 @@ classdef Link < handle
             end
         end % RP()
 
+        function l = set.r(l, v)
+        %Link.r Set centre of gravity
+        %
+        % L.r = r set the link centre of gravity (COG) to the 3-vector r.
+        %
+            if length(v) ~= 3
+                error('COG must be a 3-vector');
+            end
+            l.r = v(:)';
+        end % set.r()
+
         function l = set.Tc(l, v)
         %Link.Tc Set Coulomb friction
         %
@@ -478,7 +489,7 @@ classdef Link < handle
                 fprintf('  r    = %f %f %f\n', l.r);
             end
             if ~isempty(l.I)
-                fprintf('  J    = | %f %f %f |\n', l.I(1,:));
+                fprintf('  I    = | %f %f %f |\n', l.I(1,:));
                 fprintf('         | %f %f %f |\n', l.I(2,:));
                 fprintf('         | %f %f %f |\n', l.I(3,:));
             end
