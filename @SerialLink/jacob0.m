@@ -13,7 +13,10 @@
 % 'rot'     Return rotational submatrix of Jacobian 
 %
 % Note::
-% - the Jacobian is computed in the world frame and transformed to the end-effector frame.
+% - the Jacobian is computed in the world frame and transformed to the 
+%   end-effector frame.
+% - the default Jacobian returned is often referred to as the geometric 
+%   Jacobian, as opposed to the analytical Jacobian.
 %
 % See also SerialLink.jacobn, deltatr, tr2delta.
 

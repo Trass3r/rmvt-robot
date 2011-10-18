@@ -8,6 +8,9 @@
 % 'trans'   Return translational submatrix of Jacobian
 % 'rot'     Return rotational submatrix of Jacobian 
 %
+% Notes::
+% - this Jacobian is often referred to as the geometric Jacobian
+%
 % Reference::
 % 	Paul, Shimano, Mayer,
 % 	Differential Kinematic Control Equations for Simple Manipulators,
