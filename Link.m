@@ -288,6 +288,9 @@ classdef Link < handle
         %
         % L.r = r set the link centre of gravity (COG) to the 3-vector r.
         %
+            if isempty(v)
+                return;
+            end
             if length(v) ~= 3
                 error('COG must be a 3-vector');
             end
