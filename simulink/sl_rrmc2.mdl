@@ -6,12 +6,12 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.18"
+    ComputedModelVersion    "1.19"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
   SavedCharacterEncoding  "ISO-8859-1"
-  PreLoadFcn		  "puma560"
+  PreLoadFcn		  "fprintf('*** Loading Puma560 model to workspace\\n');\nmdl_puma560"
   SaveDefaultBlockParams  on
   ScopeRefreshTime	  0.035000
   OverrideScopeRefreshTime on
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sat Sep 10 13:13:27 2011"
-  RTWModifiedTimeStamp	  196717382
-  ModelVersionFormat	  "1.%<AutoIncrement:18>"
+  LastModifiedDate	  "Tue Oct 18 20:39:35 2011"
+  RTWModifiedTimeStamp	  240871172
+  ModelVersionFormat	  "1.%<AutoIncrement:19>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -706,7 +706,7 @@ Model {
   }
   System {
     Name		    "sl_rrmc2"
-    Location		    [467, 210, 1143, 626]
+    Location		    [467, 232, 1143, 648]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -944,7 +944,7 @@ Model {
       Ports		      [1, 3]
       Position		      [450, 177, 500, 233]
       BackgroundColor	      "red"
-      LibraryVersion	      "1.57"
+      LibraryVersion	      "1.60"
       SourceBlock	      "roblocks/T2xyz"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
@@ -1034,7 +1034,7 @@ Model {
       Position		      [480, 267, 530, 323]
       BlockMirror	      on
       BackgroundColor	      "red"
-      LibraryVersion	      "1.57"
+      LibraryVersion	      "1.60"
       SourceBlock	      "roblocks/fkine"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
@@ -1070,7 +1070,7 @@ Model {
       Ports		      [1, 1]
       Position		      [170, 35, 235, 105]
       BackgroundColor	      "red"
-      LibraryVersion	      "1.57"
+      LibraryVersion	      "1.60"
       SourceBlock	      "roblocks/jacob0\n"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
@@ -1117,7 +1117,7 @@ Model {
       Ports		      [2, 1]
       Position		      [300, 207, 350, 263]
       BackgroundColor	      "red"
-      LibraryVersion	      "1.57"
+      LibraryVersion	      "1.60"
       SourceBlock	      "roblocks/tr2diff"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
@@ -1144,7 +1144,7 @@ Model {
       Ports		      [3, 1]
       Position		      [130, 238, 180, 292]
       BackgroundColor	      "red"
-      LibraryVersion	      "1.57"
+      LibraryVersion	      "1.60"
       SourceBlock	      "roblocks/xyz2T"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"

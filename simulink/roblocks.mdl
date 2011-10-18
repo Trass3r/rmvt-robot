@@ -15,9 +15,9 @@ Library {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Aug 21 15:16:47 2011"
-  RTWModifiedTimeStamp	  235840599
-  ModelVersionFormat	  "1.%<AutoIncrement:57>"
+  LastModifiedDate	  "Tue Oct 18 20:52:04 2011"
+  RTWModifiedTimeStamp	  240871815
+  ModelVersionFormat	  "1.%<AutoIncrement:61>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -739,6 +739,11 @@ Library {
       LinearizeAsGain	      on
     }
     Block {
+      BlockType		      Reshape
+      OutputDimensionality    "1-D array"
+      OutputDimensions	      "[1,1]"
+    }
+    Block {
       BlockType		      S-Function
       FunctionName	      "system"
       SFunctionModules	      "''"
@@ -817,7 +822,7 @@ Library {
   }
   System {
     Name		    "roblocks"
-    Location		    [329, 79, 977, 1115]
+    Location		    [154, 198, 802, 1048]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -831,7 +836,7 @@ Library {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "428"
+    SIDHighWatermark	    "595"
     Block {
       BlockType		      SubSystem
       Name		      "Bicycle"
@@ -3874,7 +3879,7 @@ Library {
       MaskHideContents	      off
       System {
 	Name			"invJac"
-	Location		[1253, 657, 1549, 820]
+	Location		[1253, 679, 1797, 940]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -3934,16 +3939,16 @@ Library {
 	}
 	Block {
 	  BlockType		  Outport
-	  Name			  "cond"
-	  SID			  "268"
-	  Position		  [315, 33, 345, 47]
+	  Name			  "vdot"
+	  SID			  "270"
+	  Position		  [315, 118, 345, 132]
 	  IconDisplay		  "Port number"
 	}
 	Block {
 	  BlockType		  Outport
-	  Name			  "vdot"
-	  SID			  "270"
-	  Position		  [315, 118, 345, 132]
+	  Name			  "cond"
+	  SID			  "268"
+	  Position		  [315, 33, 345, 47]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
 	}
@@ -4308,11 +4313,10 @@ Library {
     Block {
       BlockType		      SubSystem
       Name		      "lspb"
-      SID		      "92"
+      SID		      "592"
       Ports		      [0, 3]
-      Position		      [170, 446, 205, 514]
+      Position		      [165, 444, 200, 516]
       BackgroundColor	      "red"
-      AncestorBlock	      "roblocks/jtraj"
       MinAlgLoopOccurrences   off
       PropExecContextOutsideSubsystem off
       RTWSystemCode	      "Auto"
@@ -4320,9 +4324,10 @@ Library {
       Opaque		      off
       RequestExecContextInheritance off
       MaskHideContents	      off
-      MaskDescription	      "Joint interpolated trajectory."
-      MaskHelp		      "Generate quintic polynomial to move from initial to final joint angles as specified.  Initial a"
-      "nd final velocity are assumed to be zero.\n\nOutputs joint angles as well as joint angle rates."
+      MaskDescription	      "Scalar trajectory."
+      MaskHelp		      "Generate linear segment with polynomial blend to move from initial to final joint angles as spe"
+      "cified.  Initial and final velocity are assumed to be zero.\n\nOutputs joint angles as well as joint angle rates"
+      " and acceleration."
       MaskPromptString	      "q0|qf|tmax"
       MaskStyleString	      "edit,edit,edit"
       MaskVariables	      "q0=@1;qf=@2;tmax=@3;"
@@ -4333,16 +4338,15 @@ Library {
       MaskToolTipString	      "on,on,on"
       MaskInitialization      "n = length(q0);\nif length(q0) ~= length(qf) ,\n error('q0 and qf must be same length')"
       "\nend\nt=[0:1000]'/1000*tmax;\n[q,qd,qdd] = lspb(q0, qf, t);"
-      MaskDisplay	      "port_label('output', 1, 'q')\nport_label('output', 2, 'qd')\nport_label('output', 3, 'qdd')"
       MaskIconFrame	      on
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskPortRotate	      "default"
-      MaskIconUnits	      "normalized"
-      MaskValueString	      "[0 0 0 0 0 0]|[pi/4 pi/2 -pi/2 0 0 0]|10"
+      MaskIconUnits	      "autoscale"
+      MaskValueString	      "0|0|0"
       System {
 	Name			"lspb"
-	Location		[521, 522, 885, 713]
+	Location		[605, 660, 829, 805]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -4350,66 +4354,65 @@ Library {
 	PaperOrientation	"landscape"
 	PaperPositionMode	"auto"
 	PaperType		"A4"
-	PaperUnits		"centimeters"
-	TiledPaperMargins	[1.270000, 1.270000, 1.270000, 1.270000]
+	PaperUnits		"inches"
+	TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
 	TiledPageScale		1
 	ShowPageBoundaries	off
-	ZoomFactor		"100"
-	SIDHighWatermark	"7"
+	ZoomFactor		"80"
 	Block {
 	  BlockType		  Clock
 	  Name			  "Clock"
-	  SID			  "92:1"
-	  Position		  [20, 30, 40, 50]
+	  SID			  "585"
+	  Position		  [25, 30, 45, 50]
 	  Decimation		  "10"
 	}
 	Block {
 	  BlockType		  MATLABFcn
 	  Name			  "MATLAB Fcn"
-	  SID			  "92:2"
+	  SID			  "586"
 	  Ports			  [1, 1]
-	  Position		  [105, 25, 165, 55]
+	  Position		  [110, 25, 170, 55]
 	  MATLABFcn		  "interp1(t,q,u)"
 	  OutputDimensions	  "n"
 	}
 	Block {
 	  BlockType		  MATLABFcn
 	  Name			  "MATLAB Fcn1"
-	  SID			  "92:3"
+	  SID			  "587"
 	  Ports			  [1, 1]
-	  Position		  [110, 75, 170, 105]
+	  Position		  [115, 75, 175, 105]
 	  MATLABFcn		  "interp1(t,qd,u)"
 	  OutputDimensions	  "n"
 	}
 	Block {
 	  BlockType		  MATLABFcn
 	  Name			  "MATLAB Fcn2"
-	  SID			  "92:4"
+	  SID			  "588"
 	  Ports			  [1, 1]
-	  Position		  [110, 125, 170, 155]
+	  Position		  [115, 125, 175, 155]
 	  MATLABFcn		  "interp1(t,qdd,u)"
 	  OutputDimensions	  "n"
 	}
 	Block {
 	  BlockType		  Outport
 	  Name			  "q"
-	  SID			  "92:5"
-	  Position		  [220, 33, 250, 47]
+	  SID			  "593"
+	  Position		  [225, 33, 255, 47]
 	  IconDisplay		  "Port number"
 	}
 	Block {
 	  BlockType		  Outport
 	  Name			  "qd"
-	  SID			  "92:6"
-	  Position		  [220, 83, 250, 97]
+	  SID			  "594"
+	  Position		  [225, 83, 255, 97]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
 	}
 	Block {
 	  BlockType		  Outport
 	  Name			  "qdd"
-	  SID			  "92:7"
-	  Position		  [220, 133, 250, 147]
+	  SID			  "595"
+	  Position		  [225, 133, 255, 147]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
 	}
@@ -4943,7 +4946,7 @@ Library {
       MaskValueString	      "robot"
       System {
 	Name			"tr2diff"
-	Location		[198, 462, 562, 611]
+	Location		[198, 506, 562, 655]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -4977,7 +4980,7 @@ Library {
 	  SID			  "113"
 	  Ports			  [1, 1]
 	  Position		  [215, 40, 275, 70]
-	  MATLABFcn		  "tr2diff(reshape(u(1:16),4,4), reshape(u(17:32),4,4))"
+	  MATLABFcn		  "tr2delta(reshape(u(1:16),4,4), reshape(u(17:32),4,4))"
 	  OutputDimensions	  "6"
 	}
 	Block {
@@ -4991,26 +4994,18 @@ Library {
 	  DisplayOption		  "bar"
 	}
 	Block {
-	  BlockType		  Reference
+	  BlockType		  Reshape
 	  Name			  "Reshape"
 	  SID			  "115"
 	  Ports			  [1, 1]
 	  Position		  [115, 33, 145, 57]
-	  SourceBlock		  "simulink3/Signals\n& Systems/Reshape"
-	  SourceType		  "Reshape"
-	  OutputDimensionality	  "1-D array"
-	  OutputDimensions	  "[1,1]"
 	}
 	Block {
-	  BlockType		  Reference
+	  BlockType		  Reshape
 	  Name			  "Reshape1"
 	  SID			  "116"
 	  Ports			  [1, 1]
 	  Position		  [125, 88, 155, 112]
-	  SourceBlock		  "simulink3/Signals\n& Systems/Reshape"
-	  SourceType		  "Reshape"
-	  OutputDimensionality	  "1-D array"
-	  OutputDimensions	  "[1,1]"
 	}
 	Block {
 	  BlockType		  Outport
@@ -5183,7 +5178,7 @@ Library {
       FontWeight	      "bold"
     }
     Annotation {
-      Name		      "Copyright (c) 2002-2009 Peter Corke"
+      Name		      "Copyright (c) 2002-2011 Peter Corke"
       Position		      [500, 1010]
     }
     Annotation {
