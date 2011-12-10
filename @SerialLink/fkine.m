@@ -44,7 +44,7 @@ function t = fkine(robot, q)
 	n = robot.n;
 
 	L = robot.links;
-	if length(q) == n
+	if numel(q) == n
 		t = robot.base;
 		for i=1:n
 			t = t * L(i).A(q(i));
