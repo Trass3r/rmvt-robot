@@ -46,7 +46,7 @@ function r = eul2r(phi, theta, psi)
         r = rotz(phi) * roty(theta) * rotz(psi);
     else
         for i=1:numrows(phi)
-            r(:,:,1) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
+            r(:,:,i) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
         end
 
                 
