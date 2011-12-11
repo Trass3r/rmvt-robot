@@ -300,7 +300,7 @@ classdef Link < handle
         function l = set.Tc(l, v)
         %Link.Tc Set Coulomb friction
         %
-        % L.Tc = F set Coulomb friction parameters to [-F F], for a symmetric
+        % L.Tc = F set Coulomb friction parameters to [FP FM], for a symmetric
         % Coulomb friction model.
         %
         % L.Tc = [FP FM] set Coulomb friction to [FP FM], for an asymmetric
@@ -313,6 +313,9 @@ classdef Link < handle
             if length(v) == 1
                 l.Tc = [v -v];
             elseif length(v) == 2
+                if v(1) < v(2)
+                    error('Coulomb friction is [Tc+ Tc-]');
+                end
                 l.Tc = v;
             else
                 error('Coulomb friction vector can have 1 (symmetric) or 2 (asymmetric) elements only')
