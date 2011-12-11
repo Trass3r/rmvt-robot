@@ -223,8 +223,9 @@ classdef SerialLink < handle
                         L(j) =        Link();
                         L(j).theta =  dh_dyn(j,1);
                         L(j).d =      dh_dyn(j,2);
-                        L(j).alpha =  dh_dyn(j,3);
-                        L(j).a =      dh_dyn(j,4);
+                        L(j).a =      dh_dyn(j,3);
+                        L(j).alpha =  dh_dyn(j,4);
+
                         if numcols(dh_dyn) > 4
                             L(j).sigma = dh_dyn(j,5);
                         end
