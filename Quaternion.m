@@ -130,11 +130,14 @@ classdef Quaternion
                     error('unknown dimension of input');
                 end
             elseif nargin == 2
-                if isvector(a1) && isscalar(a2)
+                if isscalar(a1) && isvector(a2)
                 %   Q = Quaternion(theta, v)    from vector plus angle
                     q.s = cos(a1/2);
                     q.v = sin(a1/2)*unit(a2(:)');
+                else
+                    error ('bad argument to quaternion constructor');
                 end
+            
             end
 
         end
