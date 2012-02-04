@@ -36,6 +36,6 @@ function h = ishomog(tr, rtest)
         end
 
     else
-        h = 0;
+        h = false;
     end
 

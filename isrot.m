@@ -26,11 +26,15 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function h = isrot(r, dtest)
-    if ndims(r) == 2
-        h =  all(size(r) == [3 3]);
+
+    d = size(r);
+    if ndims(r) >= 2
+        h =  all(d(1:2) == [3 3]);
+
         if h && nargin > 1
             h = abs(det(r) - 1) < eps;
         end
+
     else
         h = false;
     end
