@@ -24,6 +24,8 @@
 %  interp    interpolation (slerp) between q and q2, 0<=s<=1
 %  scale     interpolation (slerp) between identity and q, 0<=s<=1
 %  dot       derivative of quaternion with angular velocity w
+%  R         3x3 rotation matrix
+%  T         4x4 homogeneous transform matrix
 %
 % Arithmetic operators are overloaded::
 %  q+q2      return elementwise sum of quaternions
@@ -36,13 +38,14 @@
 % Properties (read only)::
 %  s         real part
 %  v         vector part
-%  R         3x3 rotation matrix
-%  T         4x4 homogeneous transform matrix
 %
 % Notes::
 % - Quaternion objects can be used in vectors and arrays
 %
 % See also trinterp, trplot.
+
+% TODO
+% properties s, v for the vector case
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
@@ -66,11 +69,6 @@
 %  .r, .t on a quaternion vector??
 
 classdef Quaternion
-
-    properties (Dependent = true)
-        R   % rotation matrix
-        T   % translation matrix
-    end
 
     properties (SetAccess = private)
         s       % scalar part
@@ -98,6 +96,10 @@ classdef Quaternion
         %
         % Q = Quaternion(T) is a unit quaternion equivalent to the rotational
         % part of the homogeneous transform T.
+        %
+        % Notes::
+        % - A sequence of rotation or homogeneous matrices cannot be passed, MATLAB constructors
+        %   can return only a single object not a vector.
 
             if nargin == 0
                 q.v = [0,0,0];
@@ -452,18 +454,28 @@ classdef Quaternion
             drawnow
         end
 
-        function r = get.R(q)
+        function r = R(q)
         %Quaternion.R Return equivalent orthonormal rotation matrix
         %
         % R = Q.R is the equivalent 3x3 orthonormal rotation matrix.
-            r = t2r( q2tr(q) );
+        %
+        % Notes:
+        % - for a quaternion sequence returns a rotation matrix sequence.
+            for i=1:numel(q)
+                r(:,:,i) = t2r( q2tr(q(i)) );
+            end
         end
 
-        function t = get.T(q)
+        function t = T(q)
         %Quaternion.T Return equivalent homogeneous transformationmatrix
         %
         % T = Q.T is the equivalent 4x4 homogeneous transformation matrix.
-            t = q2tr(q);
+        %
+        % Notes:
+        % - for a quaternion sequence returns a homogeneous transform matrix sequence
+            for i=1:numel(q)
+                t(:,:,i) = q2tr(q(i));
+            end
         end
 
         function qd = dot(q, omega)
