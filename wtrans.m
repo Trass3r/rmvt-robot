@@ -1,16 +1,15 @@
 %WTRANS Transform a wrench between coordinate frames
 %
-% WT = WTRANS(T, W) is a wrench (6x1) in the frame represented by the homogeneous
-% transform T (4x4) corresponding to the world frame wrench W (6x1).  
+% WT = WTRANS(T, W) is a wrench in the frame T corresponding to the world
+% frame wrench W.  
 %
-% The wrenches W and WT are 6-vectors of the form [Fx Fy Fz Mx My Mz]'.
+% The wrenches W and WT are 6-vectors of the form [Fx Fy Fz Mx My Mz].
 %
-% See also TR2DELTA, TR2JAC.
+% See also TR2DELTA.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -24,8 +23,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function Wt = wtrans(T, W)
 
