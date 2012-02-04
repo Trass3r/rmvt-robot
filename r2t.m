@@ -8,6 +8,8 @@
 %  - if R is 2x2 then T is 3x3, or
 %  - if R is 3x3 then T is 4x4.
 % - translational component is zero
+% - for a rotation matrix sequence returns a homogeneous transform
+%   sequence
 %
 % See also T2R.
 
@@ -31,6 +33,24 @@
 
 function T = r2t(R)
 
-    n = numrows(R);
-
-	T = [R zeros(n,1); zeros(1,n) 1];
+    % check dimensions: R is SO(2) or SO(3)
+    d = size(R);
+    if d(1) ~= d(2)
+        error('matrix must be square');
+    end
+    if ~any(d(1) == [2 3])
+        error('argument is not a rotation matrix (sequence)');
+    end
+    
+    Z = zeros(d(1),1);
+    B = [Z' 1];
+    
+    if numel(d) == 2
+        % single matrix case
+        T = [R Z; B];
+    else
+        %  matrix sequence case
+        for i=1:d(3)
+            T(:,:,i) = [R(:,:,i) Z; B];
+        end
+    end
