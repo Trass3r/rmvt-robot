@@ -53,9 +53,9 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
 		V = (q1-q0)/tf * 1.5;
 	else
 		if V < (q1-q0)/tf
-			error('V too small\n');
+			error('V too small');
 		elseif V > 2*(q1-q0)/tf
-			error('V too big\n');
+			error('V too big');
 		end
     end
 
@@ -125,8 +125,3 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
             sd = pd;
             sdd = pdd;
     end
-    
-	if nargout == 0
-	else
-		tg = p;
-	end
