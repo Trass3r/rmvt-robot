@@ -481,7 +481,7 @@ classdef Quaternion
         function qd = dot(q, omega)
             E = q.s*eye(3,3) - skew(q.v);
             omega = omega(:);
-            qd = Quaternion(-0.5*q.v*omega, 0.5*E*omega);
+            qd = Quaternion([-0.5*q.v*omega; 0.5*E*omega]);
         end
     end % methods
 end % classdef
