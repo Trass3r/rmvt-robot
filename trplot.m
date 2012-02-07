@@ -7,13 +7,16 @@
 % rotation matrix R.
 %
 % Options::
-% 'color', c         The color to draw the axes, Matlab colorspec.
-% 'axes'             Set dimensions of the Matlab axes
+% 'color', c         The color to draw the axes, MATLAB colorspec.
+% 'axis'             Set dimensions of the Matlab axes
+% 'noaxes'           Don't display the MATLAB axes
 % 'frame', f         The name which appears on the axis labels and the frame itself
 % 'text_opts', opt   A cell array of Matlab text properties
 % 'arrow'            Use arrows rather than line segments for the axes
 % 'width', w         Width of arrow tips
-% 'handle', h        Draw in the Matlab axes specified by h
+% 'handle', h        Draw in the MATLAB axes specified by h
+% 'view',V           Set plot view parameters V=[az el] angles, or 'auto' 
+%                    for view toward origin of coordinate frame
 %
 % See also TRPLOT2, TRANIMATE.
 
@@ -125,7 +128,7 @@ function hout = trplot(T, varargin)
     if opt.arrow
         % draw the 3 arrows
         S = [opt.color num2str(opt.width)];
-        ha = arrow3(mstart(:,1:3), mend(:,1:3), S);
+        ha = arrow3(mstart, mend, S);
         for h=ha'
             set(h, 'Parent', hg);
         end
@@ -135,7 +138,6 @@ function hout = trplot(T, varargin)
 
         end
     end
-
     % label the axes
     if isempty(opt.frame)
         fmt = '%c';
