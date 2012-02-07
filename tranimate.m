@@ -52,9 +52,9 @@ function tranimate(P2, varargin)
     if isa(P2, 'Quaternion')
         T2 = P2.T;   % convert quaternion to transform
         if ~isempty(args) && isa(args{1},'Quaternion')
-            T1 = T2;
-            Q1 = args{1};
-            T2 = Q1.T;
+            P1 = T2;
+            Q2 = args{1};
+            T2 = Q2.T;
             args = args(2:end);
         else
             T1 = eye(4,4);
@@ -62,7 +62,7 @@ function tranimate(P2, varargin)
     elseif isrot(P2)
         T2 = r2t(P2);
         if ~isempty(args) && isrot(args{1})
-            T1 = T2;
+            P1 = T2;
             T2 = r2t(args{1});
             args = args(2:end);
         else
@@ -71,15 +71,21 @@ function tranimate(P2, varargin)
     elseif ishomog(P2)
         T2 = P2;
         if ~isempty(args) && ishomog(args{1})
-            T1 = T2;
+            P1 = T2;
             T2 = args{1};
             args = args(2:end);
         else
             T1 = eye(4,4);
         end
     end
+    
+    % at this point
+    %   T1 is the initial pose
+    %   T2 is the final pose
+    %
+    %  T2 may be a sequence
         
-    if size(P2,3) > 1
+    if size(T2,3) > 1
         % tranimate(Ts)
         % we were passed a homog sequence
         if ~isempty(P1)
