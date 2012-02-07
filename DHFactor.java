@@ -1172,7 +1172,7 @@ public class DHFactor {
 		for (int i=0; i<results.size(); i++) {
 			e = (Element) results.get(i);
             if (e.type == Element.DH_STANDARD) {
-                // build up the string: theta a d alpha  (old Toolbox order)
+                // build up the string: theta d a alpha
                 if (e.prismatic == 1) {
                     // prismatic joint
                     d = "0";    // by definition
@@ -1186,7 +1186,9 @@ public class DHFactor {
                 s += theta; s += ", ";
                 s += d; s += ", ";
                 s += (e.A == null) ? "0" : e.A; s += ", ";
-                s += angle(e.alpha); s += "; ";
+                s += angle(e.alpha);
+                s += ", " + e.prismatic;
+                s += "; ";
             };
         }
         s += "]";
