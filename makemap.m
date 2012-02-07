@@ -1,9 +1,38 @@
-function world = makeworld(Nw)
+%MAKEMAP Make an occupancy map
+%
+% map = makemap(N) is an occupancy grid map (NxN) created by a simple 
+% interactive editor.  The map is initially unoccupied and obstacles can
+% be added using geometric primitives.
+%
+% map = makemap() as above but N=128.
+%
+% map = makemap(map0) as above but the map is initialized from the
+% occupancy grid map0, allowing obstacles to be added.
+%
+% With focus in the displayed figure window the following commands can
+% be entered:
+% left button     click and drag to create a rectangle
+% p               draw polygon
+% c               draw circle
+% u               undo last action
+% e               erase map
+% q               leave editing mode and return map
+%
+% See also: DXForm, PRM, RRT.
+
+function world = makemap(Nw)
+
     if nargin < 1
         Nw = 128;
     end
 
-    world = zeros(Nw, Nw);
+    if numel(size(Nw)) == 2
+        % we were passed a map
+        world = Nw;
+    else
+        % initialize a new map
+        world = zeros(Nw, Nw);
+    end
 
     imagesc(world);
     grid
@@ -12,7 +41,7 @@ function world = makeworld(Nw)
     caxis([0 1]);
     figure(gcf)
 
-    fprintf('makeworld:\n');
+    fprintf('makemap:\n');
     fprintf('  left button, click and drag to create a rectangle\n');
     fprintf('  p - draw polygon\n');
     fprintf('  c - draw circle\n');
@@ -65,7 +94,7 @@ function world = makeworld(Nw)
                     hold off
 
                     r = round(norm2(point1-point2));
-                    c = kcircle(r, 2*r+1);
+                    c = kcircle(r);
 
                     world_prev = world;
 
