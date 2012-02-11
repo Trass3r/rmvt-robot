@@ -1,16 +1,19 @@
-%EUL2R Convert Euler angles to homogeneous transformation
+%EUL2R Convert Euler angles to rotation matrix
 %
-% R = EUL2R(PHI, THETA, PSI) returns an orthonornal rotation matrix equivalent to
-% the specified Euler angles.  These correspond to rotations about the Z, Y, Z 
-% axes respectively. If PHI, THETA, PSI are column vectors then they are assumed to
-% represent a trajectory and R is a three dimensional matrix, where the last 
-% index corresponds to rows of PHI, THETA, PSI.
+% R = EUL2R(PHI, THETA, PSI, OPTIONS) is an orthonornal rotation matrix 
+% equivalent to the specified Euler angles.  These correspond to rotations 
+% about the Z, Y, Z axes respectively. If PHI, THETA, PSI are column vectors 
+% then they are assumed to represent a trajectory and R is a three dimensional 
+% matrix, where the last index corresponds to rows of PHI, THETA, PSI.
 %
-% R = EUL2R(EUL) as above but the Euler angles are taken from
+% R = EUL2R(EUL, OPTIONS) as above but the Euler angles are taken from
 % consecutive columns of the passed matrix EUL = [PHI THETA PSI].
 %
+% Options::
+%  'deg'      Compute angles in degrees (radians default)
+%
 % Note::
-% - the vectors PHI, THETA, PSI must be of the same length
+% - The vectors PHI, THETA, PSI must be of the same length.
 %
 % See also EUL2TR, RPY2TR, TR2EUL.
 
@@ -32,22 +35,34 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function r = eul2r(phi, theta, psi)
-    if (nargin == 1)
-        if numcols(phi) ~= 3
-            error('bad arguments')
-        end
-        theta = phi(:,2);
-        psi = phi(:,3);
-        phi = phi(:,1);
+function R = eul2r(phi, varargin)
+    opt.deg = false;
+    [opt,args] = tb_optparse(opt, varargin);
+
+    % unpack the arguments
+    if numcols(phi) == 3
+		theta = phi(:,2);
+		psi = phi(:,3);
+		phi = phi(:,1);
+	elseif nargin >= 3
+        theta = args{1};
+        psi = args{2};
+    else
+        error('bad arguments')
+    end
+
+    % optionally convert from degrees
+    if opt.deg
+        d2r = pi/180.0;
+        phi = phi * d2r;
+        theta = theta * d2r;
+        psi = psi * d2r;
     end
 
     if numrows(phi) == 1
-        r = rotz(phi) * roty(theta) * rotz(psi);
+        R = rotz(phi) * roty(theta) * rotz(psi);
     else
         for i=1:numrows(phi)
-            r(:,:,i) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
+            R(:,:,i) = rotz(phi(i)) * roty(theta(i)) * rotz(psi(i));
         end
-
-                
     end

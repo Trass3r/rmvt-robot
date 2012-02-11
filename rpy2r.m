@@ -1,21 +1,24 @@
 %RPY2R Roll-pitch-yaw angles to rotation matrix
 %
-% R = RPY2R(RPY) is an orthonormal rotation matrix equivalent to the specified 
-% roll, pitch, yaw angles which correspond to rotations about the X, Y, Z axes 
-% respectively. If RPY has multiple rows they are assumed to represent a 
-% trajectory and R is a three dimensional matrix, where the last index  
+% R = RPY2R(RPY, OPTIONS) is an orthonormal rotation matrix equivalent to the 
+% specified roll, pitch, yaw angles which correspond to rotations about the 
+% X, Y, Z axes respectively. If RPY has multiple rows they are assumed to 
+% represent a trajectory and R is a three dimensional matrix, where the last index  
 % corresponds to the rows of RPY.
 %
-% R = RPY2R(ROLL, PITCH, YAW) as above but the roll-pitch-yaw angles are passed
-% as separate arguments.
+% R = RPY2R(ROLL, PITCH, YAW, OPTIONS) as above but the roll-pitch-yaw angles 
+% are passed as separate arguments. If ROLL, PITCH and YAW are column vectors 
+% they are assumed to represent a trajectory and R is a three dimensional matrix,
+% where the last index corresponds to the rows of ROLL, PITCH, YAW.
 %
-% If ROLL, PITCH and YAW are column vectors then they are assumed to represent a 
-% trajectory and R is a three dimensional matrix, where the last index 
-% corresponds to the rows of ROLL, PITCH, YAW.
+% Options::
+%  'deg'   Compute angles in degrees (radians default)
+%  'zyx'   Return solution for sequential rotations about Z, Y, X axes (Paul book)
 %
 % Note::
-% - in previous releases (<8) the angles corresponded to rotations about ZYX.
-% - many texts (Paul, Spong) use the rotation order ZYX.
+% - In previous releases (<8) the angles corresponded to rotations about ZYX. Many 
+%   texts (Paul, Spong) use the rotation order ZYX. This old behaviour can be enabled 
+%   by passing the option 'zyx'
 %
 % See also TR2RPY, EUL2TR.
 
@@ -39,8 +42,10 @@
 
 function R = rpy2r(roll, varargin)
     opt.zyx = false;
+    opt.deg = false;
     [opt,args] = tb_optparse(opt, varargin);
 
+    % unpack the arguments
     if numcols(roll) == 3
 		pitch = roll(:,2);
 		yaw = roll(:,3);
@@ -48,6 +53,16 @@ function R = rpy2r(roll, varargin)
 	elseif nargin >= 3
         pitch = args{1};
         yaw = args{2};
+    else
+        error('bad arguments')
+    end
+
+    % optionally convert from degrees
+    if opt.deg
+        d2r = pi/180.0;
+        roll = roll * d2r;
+        pitch = pitch * d2r;
+        yaw = yaw * d2r;
     end
 
     if ~opt.zyx
