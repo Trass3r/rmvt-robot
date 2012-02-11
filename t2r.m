@@ -4,11 +4,11 @@
 % transformation matrix T:
 %
 % Notes::
-% - functions for T in SE(2) or SE(3)
+% - Works for T in SE(2) or SE(3)
 %   - If T is 4x4, then R is 3x3.
 %   - If T is 3x3, then R is  2x2.
-% - the validity of rotational part is not checked
-% - for a homogeneous transform sequence returns a rotation matrix sequence
+% - The validity of rotational part is not checked
+% - For a homogeneous transform sequence returns a rotation matrix sequence
 %
 % See also R2T, TR2RT, RT2TR.
 
