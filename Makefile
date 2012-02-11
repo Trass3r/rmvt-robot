@@ -1,4 +1,4 @@
-DH.jar:
+DH.jar: DHFactor.java
 	javac DHFactor.java
-	jar DH.jar *.class
+	jar cf DH.jar *.class
 	-\rm *.class
