@@ -1,6 +1,6 @@
 %TR2DELTA Convert homogeneous transform to differential motion
 %
-% D = TR2DELTA(T0, T1) is the differential motion corresponding to 
+% D = TR2DELTA(T0, T1) is the differential motion (6x1) corresponding to 
 % infinitessimal motion from pose T0 to T1 which are homogeneous 
 % transformations. D=(dx, dy, dz, dRx, dRy, dRz) and is an approximation
 % to the average spatial velocity multiplied by time.
@@ -10,7 +10,7 @@
 % transformation.
 %
 % Notes::
-% - D is only an approximation to the described by T, and assumes
+% - D is only an approximation to the motion T, and assumes
 %   that T0 ~ T1 or T ~ eye(4,4).
 %
 % See also DELTA2TR, SKEW.

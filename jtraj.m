@@ -1,19 +1,18 @@
 %JTRAJ Compute a joint space trajectory between two points
 %
-% [Q,QD,QDD] = JTRAJ(Q0, QF, N) is a joint space trajectory Q where the joint
-% coordinates vary from Q0 to QF.  A quintic (5th order) polynomial is used 
+% [Q,QD,QDD] = JTRAJ(Q0, QF, M) is a joint space trajectory Q (MxN) where the joint
+% coordinates vary from Q0 (1xN) to QF (1xN).  A quintic (5th order) polynomial is used 
 % with default zero boundary conditions for velocity and acceleration.  
-% Time is assumed to vary from 0 to 1 in N steps.  Joint velocity and 
-% acceleration can be optionally returned as QD and QDD respectively.
+% Time is assumed to vary from 0 to 1 in M steps.  Joint velocity and 
+% acceleration can be optionally returned as QD (MxN) and QDD (MxN) respectively.
 % The trajectory Q, QD and QDD are MxN matrices, with one row per time step,
 % and one column per joint.
 %
-% [Q,QD,QDD] = JTRAJ(Q0, QF, T) specifies the trajectory in terms of the
-% time vector T and the number of points in the trajectory is equal to the
-% length of T.
-%
-% [Q,QD,QDD] = JTRAJ(Q0, QF, N, QD0, QDF) as above but also specifies initial 
+% [Q,QD,QDD] = JTRAJ(Q0, QF, M, QD0, QDF) as above but also specifies initial 
 % and final joint velocity for the trajectory.
+%
+% [Q,QD,QDD] = JTRAJ(Q0, QF, T) as above but the trajectory length is defined
+% by the length of the time vector T (Mx1).
 %
 % [Q,QD,QDD] = JTRAJ(Q0, QF, T, QD0, QDF) as above but specifies initial and 
 % final joint velocity for the trajectory and a time vector.

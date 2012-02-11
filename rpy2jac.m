@@ -1,13 +1,15 @@
 %RPY2JAC Jacobian from RPY angle rates to angular velocity
 %
-% J = RPY2JAC(RPY) is a 3x3 Jacobian matrix that maps roll-pitch-yaw angle rates
-% to angular velocity, and RPY=[R,P,Y]. Used in the creation of the 
-% analytical Jacobian.
+% J = RPY2JAC(EUL) is a Jacobian matrix (3x3) that maps roll-pitch-yaw angle 
+% rates to angular velocity at the operating point RPY=[R,P,Y].
 %
 % J = RPY2JAC(R, P, Y) as above but the roll-pitch-yaw angles are passed
 % as separate arguments.
 %
-% See also EUL2JAC, SERIALLINK.JACOBN.
+% Notes::
+% - Used in the creation of an analytical Jacobian.
+%
+% See also EUL2JAC, SerialLink.JACOBN.
 
 
 % Copyright (C) 1993-2011, by Peter I. Corke

@@ -1,12 +1,14 @@
 %OA2R Convert orientation and approach vectors to rotation matrix
 %
 % R = OA2R(O, A) is a rotation matrix for the specified orientation and 
-% approach vectors formed from 3 vectors such that R = [N O A] and 
+% approach vectors (3x1) formed from 3 vectors such that R = [N O A] and 
 % N = O x A.
 %
 % Notes::
 % - The submatrix is guaranteed to be orthonormal so long as O and A 
 %   are not parallel.
+% - The vectors O and A are parallel to the Y- and Z-axes of the coordinate
+%   frame.
 %
 % See also RPY2R, EUL2R, OA2TR.
 
@@ -29,6 +31,7 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function R = oa2r(o, a)
+    o = o(:); a = a(:);
 	n = cross(o, a);
     o = cross(a, n);
 	R = [unit(n(:)) unit(o(:)) unit(a(:))];

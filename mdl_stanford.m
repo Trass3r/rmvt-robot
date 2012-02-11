@@ -1,15 +1,15 @@
 %MDL_STANFORD Create model of Stanford arm
 %
-%   mdl_stanford
+%      mdl_stanford
 %
 % Script creates the workspace variable stanf which describes the 
 % kinematic and dynamic characteristics of the Stanford (Scheinman) arm.
 %
-% Also define the vectors:
+% Also defines the vectors:
 %   qz   zero joint angle configuration.
 %
 % Note::
-% - gear ratios not currently known, though reflected armature inertia 
+% - Gear ratios not currently known, though reflected armature inertia 
 %   is known, so gear ratios are set to 1.
 %
 % References::

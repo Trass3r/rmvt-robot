@@ -268,7 +268,7 @@ classdef PRM < Navigation
         %
         % P.visualize() displays the occupancy grid with an optional distance field
         %
-        % Options:
+        % Options::
         %  'goal'            Superimpose the goal position if set
         %  'nooverlay'       Don't overlay the PRM graph
             

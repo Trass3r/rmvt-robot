@@ -4,18 +4,17 @@
 % pure translation.
 %
 % T = TRANSL(P) is a homogeneous transform representing a translation or 
-% point P=[X,Y,Z]. If P is an Mx3 matrix TRANSL returns a 4x4xM matrix 
-% representing a sequence of homogenous transforms such that T(:,:,i) corresponds to
+% point P=[X,Y,Z]. If P (Mx3) it represents a sequence and T (4x4xM)
+% is a sequence of homogenous transforms such that T(:,:,i) corresponds to
 % the i'th row of P.
 %
 % P = TRANSL(T) is the translational part of a homogenous transform as a 
-% 3-element column vector.  If T has three dimensions, ie. 4x4xN then T is 
-% considered a homgoeneous transform sequence and returns an Nx3 matrix where 
-% each row is the translational component of the corresponding transform in 
-% the sequence.
+% 3-element column vector.  If T (4x4xM) is a homgoeneous transform sequence 
+% the rows of P (Mx3) are the translational component of the corresponding 
+% transform in the sequence.
 %
 % Notes::
-% - somewhat unusually this function performs a function and its inverse.  An
+% - Somewhat unusually this function performs a function and its inverse.  An
 %   historical anomaly.
 %
 % See also CTRAJ.

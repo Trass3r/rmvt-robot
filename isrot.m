@@ -1,6 +1,6 @@
 %ISROT Test if argument is a rotation matrix
 %
-% ISROT(R) is true (1) if the argument is of dimension 3x3, else false (0).
+% ISROT(R) is true (1) if the argument is of dimension 3x3 or 3x3xN, else false (0).
 %
 % ISROT(R, 'valid') as above, but also checks the validity of the rotation
 % matrix.

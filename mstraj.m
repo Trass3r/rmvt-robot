@@ -1,29 +1,35 @@
 %MSTRAJ  Multi-segment multi-axis trajectory
 %
-% TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC) is a multi-segment trajectory 
-% based on via points SEGMENTS and velocity limits QDMAX.  The path comprises 
-% linear segments with polynomial blends.  The output trajectory is an MxN 
-% matrix, with one row per time step, and one column per axis.
+% TRAJ = MSTRAJ(P, QDMAX, Q0, DT, TACC) is a multi-segment trajectory (KxN)
+% based on via points P (MxN) and axis velocity limits QDMAX (1xN).  The 
+% path comprises linear segments with polynomial blends.  The output 
+% trajectory matrix has one row per time step, and one column per axis.
 %
-% - SEGMENTS is an NxM matrix of via points, 1 row per via point, one column 
+% - P (MxN) is a matrix of via points, 1 row per via point, one column 
 %   per axis.  The last via point is the destination.
-% - QDMAX is a row N-vector of axis velocity limits, or a column M-vector of 
-%   segment times
-% - Q0 is an N-vector of initial axis coordinates
+% - QDMAX (1xN) are axis velocity limits which cannot be exceeded, or
+% - QDMAX (Mx1) are the durations for each of the M segments
+% - Q0 (1xN) are the initial axis coordinates
 % - DT is the time step
-% - TACC is the acceleration time. If scalar this acceleration time is applied
-%   to all segment transitions, if an N-vector it specifies the acceleration 
-%   time for each segment.  TACC(i) is the acceleration time for the transition
-%   from segment i to segment i+1.  TACC(1) is also the acceleration time at
-%   the start of segment 1.
+% - TACC (1x1) this acceleration time is applied to all segment transitions
+% - TACC (1xM) acceleration time for each segment, TACC(i) is the acceleration 
+%   time for the transition from segment i to segment i+1.  TACC(1) is also 
+%   the acceleration time at the start of segment 1.
 %
 % TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC, QD0, QDF) as above but 
-% additionally specifies the initial and final axis velocities as N-vectors.
+% additionally specifies the initial and final axis velocities (1xN).
 %
 % Notes::
-% - can be used to create joint space trajectories
-% - can be used to create Cartesian trajectories with the "axes" assigned
-%   to translation and orientation in RPY or Euler angle form.:w
+% - If no output arguments are specified the trajectory is plotted.
+% - The path length K is a function of the number of via points, Q0, DT
+%   and TACC.
+% - The final via point P(M,:) is the destination.
+% - The motion has M segments from Q0 to P(1,:) to P(2,:)  to P(M,:).
+% - All axes reach their via points at the same time.
+% - Can be used to create joint space trajectories where each axis is a joint
+%   coordinate.
+% - Can be used to create Cartesian trajectories with the "axes" assigned
+%   to translation and orientation in RPY or Euler angle form.
 %
 % See also MSTRAJ, LSPB, CTRAJ.
 

@@ -1,13 +1,13 @@
 %TRNORM Normalize a homogeneous transform
 %
 % TN = TRNORM(T) is a normalized homogeneous transformation matrix in which 
-% the rotation submatrix is guaranteed to be a proper orthogonal matrix.
-% The O and A vectors are normalized and the normal vector is formed from
-% O x A.
+% the rotation submatrix R = [N,O,A] is guaranteed to be a proper orthogonal 
+% matrix. The O and A vectors are normalized and the normal vector is formed from
+% N = O x A, and then we ensure that O and A are orthogonal by O = A x N.
 %
 % Notes::
 % - Used to prevent finite word length arithmetic causing transforms to 
-%  become `unnormalized'.
+%   become `unnormalized'.
 %
 % See also OA2TR.
 

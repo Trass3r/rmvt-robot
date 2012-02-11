@@ -4,7 +4,7 @@
 % rotation of THETA about the vector V.
 %
 % Note::
-% - the translational part is zero.
+% - The translational part is zero.
 %
 % See also EUL2TR, RPY2TR, ANGVEC2R.
 

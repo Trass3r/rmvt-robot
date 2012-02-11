@@ -1,6 +1,6 @@
 %MDL_P8 Create model of Puma robot on an XY base
 %
-%   mdl_p8
+%      mdl_p8
 %
 % Script creates the workspace variable p8 which is an 8-axis robot
 % comprising a Puma 560 robot on an XY base.  Joints 1 and 2 are the base,

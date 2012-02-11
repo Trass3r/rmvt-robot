@@ -1,6 +1,6 @@
 %TR2JAC Jacobian for differential motion
 %
-% J = TR2JAC(T) is a 6x6 Jacobian matrix that maps spatial velocity or
+% J = TR2JAC(T) is a Jacobian matrix (6x6) that maps spatial velocity or
 % differential motion from the world frame to the frame represented by 
 % the homogeneous transform T.
 %

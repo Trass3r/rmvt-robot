@@ -1,10 +1,10 @@
 %TROTY Rotation about Y axis
 %
-% T = TROTY(THETA) is a homogeneous transformation representing a rotation 
+% T = TROTY(THETA) is a homogeneous transformation (4x4) representing a rotation 
 % of THETA about the y-axis.
 %
 % Notes::
-% - translational component is zero
+% - Translational component is zero.
 %
 % See also ROTY, TROTX, TROTZ.
 

@@ -9,9 +9,10 @@
 %   - inverse dynamics
 %   - forward dynamics
 %
-% The scripts require the user to periodically hit <Enter> in order to move
-% through the explanation.  Set PAUSE OFF if you want the scripts to run
-% completely automatically.
+% Notes::
+% - The scripts require the user to periodically hit <Enter> in order to move
+%   through the explanation.  
+% - Set PAUSE OFF if you want the scripts to run completely automatically.
 
 % $Log: not supported by cvs2svn $
 % Revision 1.3  2002-04-02 12:26:48  pic

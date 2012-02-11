@@ -1,7 +1,7 @@
 %JSINGU Show the linearly dependent joints in a Jacobian matrix
 %
-%   JSINGU(J) displays the linear dependency of joints in a Jacobian matrix, 
-%   which occurs at singularity.
+% JSINGU(J) displays the linear dependency of joints in a Jacobian matrix.
+% This dependency indicated joint axes that are aligned and causes singularity.
 %
 % See also SerialLink.jacobn.
 

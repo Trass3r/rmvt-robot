@@ -1,6 +1,10 @@
 %SKEW Create skew-symmetric matrix
 %
-% S = SKEW(V) is a skew-symmetric matrix and V is a 3-vector.
+% S = SKEW(V) is a skew-symmetric matrix formed from V (3x1).
+%
+%           | 0   -vz  vy|
+%           | vz   0  -vx|
+%           |-vy   vx  0 |
 %
 % See also VEX.
 

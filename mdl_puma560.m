@@ -1,6 +1,6 @@
 %MDL_PUMA560 Create model of Puma 560 manipulator
 %
-%	mdl_puma560
+%      mdl_puma560
 %
 % Script creates the workspace variable p560 which describes the 
 % kinematic and dynamic characteristics of a Unimation Puma 560 manipulator
@@ -12,6 +12,12 @@
 %   qr         vertical 'READY' configuration
 %   qstretch   arm is stretched out in the X direction
 %   qn         arm is at a nominal non-singular configuration
+%
+% Reference::
+% -  "A search for consensus among model parameters reported for the PUMA 560 robot",
+%     P. Corke and B. Armstrong-Helouvry, 
+%     Proc. IEEE Int. Conf. Robotics and Automation, (San Diego), 
+%     pp. 1608-1613, May 1994.
 %
 % See also SerialLink, mdl_puma560akb, mdl_stanford, mdl_twolink.
 

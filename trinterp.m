@@ -2,12 +2,13 @@
 %
 % T = TRINTERP(T0, T1, S) is a homogeneous transform interpolation 
 % between T0 when S=0 to T1 when S=1.  Rotation is interpolated using 
-% quaternion spherical linear interpolation.  If S is an N-vector then
-% T is a 4x4xN matrix where the transform T(:,:,i) corresponds to S(i).
+% quaternion spherical linear interpolation.  If S (Nx1) then T (4x4xN)
+% is a sequence of homogeneous transforms corresponding to the interpolation 
+% values in S.
 %
 % T = TRINTERP(T, S) is a transform that varies from the identity matrix when
-% S=0 to T when R=1. If S is an N-vector then T is a 4x4xN matrix where 
-% the transform T(:,:,i) corresponds to S(i).
+% S=0 to T when R=1.  If S (Nx1) then T (4x4xN) is a sequence of homogeneous 
+% transforms corresponding to the interpolation values in S.
 %
 % See also CTRAJ, QUATERNION.
 

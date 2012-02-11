@@ -7,38 +7,39 @@
 %
 % Properties::
 %
-% This is a structure with the following elements.
+% This is a structure with the following elements:
 %
-% J         Flyer rotational inertia matrix     3x3
-% h         Height of rotors above CoG          1x1
-% d         Length of flyer arms                1x1
-% nb        Number of blades per rotor          1x1
-% r         Rotor radius                        1x1
-% c         Blade chord                         1x1
-% e         Flapping hinge offset               1x1
-% Mb        Rotor blade mass                    1x1
-% Mc        Estimated hub clamp mass            1x1
-% ec        Blade root clamp displacement       1x1
-% Ib        Rotor blade rotational inertia      1x1
-% Ic        Estimated root clamp inertia        1x1
-% mb        Static blade moment                 1x1
-% Ir        Total rotor inertia                 1x1
-% Ct        Non-dim. thrust coefficient         1x1
-% Cq        Non-dim. torque coefficient         1x1
-% sigma     Rotor solidity ratio                1x1
-% thetat    Blade tip angle                     1x1
-% theta0    Blade root angle                    1x1
-% theta1    Blade twist angle                   1x1
-% theta75   3/4 blade angle                     1x1
-% thetai    Blade ideal root approximation      1x1
-% a         Lift slope gradient                 1x1
-% A         Rotor disc area                     1x1
-% gamma     Lock number                         1x1
+% J         Flyer rotational inertia matrix (3x3)
+% h         Height of rotors above CoG (1x1)
+% d         Length of flyer arms (1x1)
+% nb        Number of blades per rotor (1x1)
+% r         Rotor radius (1x1)
+% c         Blade chord (1x1)
+% e         Flapping hinge offset (1x1)
+% Mb        Rotor blade mass (1x1)
+% Mc        Estimated hub clamp mass (1x1)
+% ec        Blade root clamp displacement (1x1)
+% Ib        Rotor blade rotational inertia (1x1)
+% Ic        Estimated root clamp inertia (1x1)
+% mb        Static blade moment (1x1)
+% Ir        Total rotor inertia (1x1)
+% Ct        Non-dim. thrust coefficient (1x1)
+% Cq        Non-dim. torque coefficient (1x1)
+% sigma     Rotor solidity ratio (1x1)
+% thetat    Blade tip angle (1x1)
+% theta0    Blade root angle (1x1)
+% theta1    Blade twist angle (1x1)
+% theta75   3/4 blade angle (1x1)
+% thetai    Blade ideal root approximation (1x1)
+% a         Lift slope gradient (1x1)
+% A         Rotor disc area (1x1)
+% gamma     Lock number (1x1)
 %
 %
 % References::
-% - P.Pounds; Design, Construction and Control of a Large Quadrotor micro air vehicle.
-%   PhD thesis, Australian National University, 2007.
+% - Design, Construction and Control of a Large Quadrotor micro air vehicle.
+%   P.Pounds, PhD thesis, 
+%   Australian National University, 2007.
 %   http://www.eng.yale.edu/pep5/P_Pounds_Thesis_2008.pdf
 %
 % See also sl_quadcopter.

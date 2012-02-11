@@ -1,6 +1,7 @@
 %PLOTBOTOPT Define default options for robot plotting
 %
-% Default options for robot/plot function.
+% A user provided function that returns a cell array of default
+% plot options for the SerialLink.plot method.
 %
 % See also SerialLink.plot.
 
@@ -22,5 +23,5 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function o = plotbotopt
-	o = {'base' 'perspective' };
+function options = plotbotopt
+	options = {'base' 'perspective'};

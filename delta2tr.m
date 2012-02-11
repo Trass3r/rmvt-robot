@@ -1,7 +1,7 @@
 %DELTA2TR Convert differential motion  to a homogeneous transform
 %
 % T = DELTA2TR(D) is a homogeneous transform representing differential 
-% translation and rotation. The delta vector D=(dx, dy, dz, dRx, dRy, dRz)
+% translation and rotation. The vector D=(dx, dy, dz, dRx, dRy, dRz)
 % represents an infinitessimal motion, and is an approximation to the spatial 
 % velocity multiplied by time.
 %

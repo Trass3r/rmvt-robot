@@ -1,20 +1,20 @@
 %MDL_MotomanHP6  Create kinematic data of a Motoman HP6 manipulator
 %
-%	mdl_motomanHP6
+%      mdl_motomanHP6
 %
 % Script creates the workspace variable R which describes the 
 % kinematic characteristics of a Motoman HP6 manipulator
 % using standard DH conventions.
 %
-% Also define the workspace vector:
+% Also defines the workspace vector:
 %   q0    mastering position.
-%
-% See also SerialLink, mdl_puma560akb, mdl_stanford, mdl_twolink.
 %
 % Author:
 %  Wynand Swart,
 %  Mega Robots CC, P/O Box 8412, Pretoria, 0001, South Africa
-% wynand.swart@gmail.com
+%  wynand.swart@gmail.com
+%
+% See also SerialLink, mdl_puma560akb, mdl_stanford, mdl_twolink.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %

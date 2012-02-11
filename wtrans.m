@@ -1,11 +1,11 @@
 %WTRANS Transform a wrench between coordinate frames
 %
-% WT = WTRANS(T, W) is a wrench in the frame T corresponding to the world
-% frame wrench W.  
+% WT = WTRANS(T, W) is a wrench (6x1) in the frame represented by the homogeneous
+% transform T (4x4) corresponding to the world frame wrench W (6x1).  
 %
 % The wrenches W and WT are 6-vectors of the form [Fx Fy Fz Mx My Mz].
 %
-% See also TR2DELTA.
+% See also TR2DELTA, TR2JAC.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %

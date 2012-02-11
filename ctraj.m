@@ -1,16 +1,16 @@
 %CTRAJ Cartesian trajectory between two points
 %
-% TC = CTRAJ(T0, T1, N) is a Cartesian trajectory from pose T0 to T1
+% TC = CTRAJ(T0, T1, N) is a Cartesian trajectory (4x4xN) from pose T0 to T1
 % with N points that follow a trapezoidal velocity profile along the path.
-% The Cartesian trajectory is a 4x4xN matrix, with the last subscript being the
-% point index.
+% The Cartesian trajectory is a homogeneous transform sequence and the last 
+% subscript being the point index, that is, T(:,:,i) is the i'th point along
+% the path.
 %
-% TC = CTRAJ(T0, T1, S) as above but the elements of S specify the fractional 
-% distance  along the path, and these values are in the range [0 1].
-% The Cartesian trajectory is a 4x4xN matrix, with transform T(:,:,i) 
-% corresponding to S(i).
+% TC = CTRAJ(T0, T1, S) as above but the elements of S (Nx1) specify the 
+% fractional distance  along the path, and these values are in the range [0 1].
+% The i'th point corresponds to a distance S(i) along the path.
 %
-% See also MSTRAJ, TRINTERP, Quaternion.interp, TRANSL.
+% See also LSPB, MSTRAJ, TRINTERP, Quaternion.interp, TRANSL.
 
 
 % Copyright (C) 1993-2011, by Peter I. Corke

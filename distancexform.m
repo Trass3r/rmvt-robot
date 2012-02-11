@@ -11,7 +11,11 @@
 % of the distance transform being formed, with a delay of SHOW seconds between
 % frames.
 %
-% See also imorph, DXform.
+% Notes::
+% - The Machine Vision Toolbox function imorph is required.
+% - The goal is [X,Y] not MATLAB [row,col]
+%
+% See also IMORPH, DXform.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
@@ -32,6 +36,10 @@
 
 function d = distancexform(world, goal, metric, show)
     
+    if ~exist('imorph')
+        error('Machine Vision Toolbox is required by this function');
+    end
+
     if nargin < 4
         show = 0;
     end

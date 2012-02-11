@@ -1,11 +1,13 @@
-%EUL2JAC Jacobian from Euler angle rates to angular velocity
+%EUL2JAC Euler angle rate Jacobian
 %
-% J = EUL2JAC(EUL) is a 3x3 Jacobian matrix that maps Euler angle rates to 
-% angular velocity, and EUL=[PHI, THETA, PSI]. Used in the creation of an 
-% analytical Jacobian.
+% J = EUL2JAC(EUL) is a Jacobian matrix (3x3) that maps Euler angle rates to 
+% angular velocity at the operating point EUL=[PHI, THETA, PSI]. 
 %
 % J = EUL2JAC(PHI, THETA, PSI) as above but the Euler angles are passed
 % as separate arguments.
+%
+% Notes::
+% - Used in the creation of an analytical Jacobian.
 %
 % See also RPY2JAC, SERIALlINK.JACOBN.
 

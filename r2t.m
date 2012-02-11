@@ -4,12 +4,12 @@
 % rotation matrix R with a zero translational component.
 %
 % Notes::
-% - functions for T in SE(2) or SE(3)
+% - Works for T in either SE(2) or SE(3)
 %  - if R is 2x2 then T is 3x3, or
 %  - if R is 3x3 then T is 4x4.
-% - translational component is zero
-% - for a rotation matrix sequence returns a homogeneous transform
-%   sequence
+% - Translational component is zero.
+% - For a rotation matrix sequence returns a homogeneous transform
+%   sequence.
 %
 % See also T2R.
 
