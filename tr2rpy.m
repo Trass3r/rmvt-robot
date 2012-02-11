@@ -16,8 +16,8 @@
 %  'zyx'   Return solution for sequential rotations about Z, Y, X axes (Paul book)
 %
 % Notes::
-% - There is a singularity for the case where THETA=0 in which case PHI is arbitrarily
-%   set to zero and PSI is the sum (PHI+PSI).
+% - There is a singularity for the case where P=pi/2 in which case R is arbitrarily
+%   set to zero and Y is the sum (R+Y).
 % - Note that textbooks (Paul, Spong) use the rotation order ZYX.
 %
 % See also  rpy2tr, tr2eul.
@@ -51,7 +51,7 @@ function rpy = tr2rpy(m, varargin)
 	if length(s) > 2
 		rpy = [];
 		for i=1:s(3)
-			rpy = [rpy; tr2rpy(m(:,:,i), varargin)];
+			rpy = [rpy; tr2rpy(m(:,:,i), varargin{:})];
 		end
 		return
 	end

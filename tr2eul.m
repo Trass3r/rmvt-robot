@@ -8,14 +8,15 @@
 % EUL = TR2EUL(R, OPTIONS) are the ZYZ Euler angles expressed as a row vector
 % corresponding to the orthonormal rotation matrix R.
 %
+% If R or T represents a trajectory (has 3 dimensions), then each row of EUL
+% corresponds to a step of the trajectory.
+%
+% Options::
+%  'deg'      Compute angles in degrees (radians default)
+%
 % Notes::
 % - There is a singularity for the case where THETA=0 in which case PHI is arbitrarily
 %   set to zero and PSI is the sum (PHI+PSI).
-% - If R or T represents a trajectory (has 3 dimensions), then each row of EUL
-%   corresponds to a step of the trajectory.
-%
-% Options:
-%  'deg'      Compute angles in degrees (radians default)
 %
 % See also  EUL2TR, TR2RPY.
 
@@ -48,6 +49,10 @@ function euler = tr2eul(m, varargin)
 		for i=1:s(3)
 			euler = [euler; tr2eul(m(:,:,i))];
 		end
+
+        if opt.deg
+            euler = euler * 180/pi;
+        end
 		return
 	end
 
