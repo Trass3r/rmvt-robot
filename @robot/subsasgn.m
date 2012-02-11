@@ -55,6 +55,7 @@ function r = subsasgn(r, s, v)
 		for i=1:r.n,
 			L{i}.offset = v(i);
 		end
+        r.link = L;
 	case 'qlim',
 		if numrows(v) ~= r.n,
 			error('insufficient rows in joint limit matrix');
@@ -63,6 +64,7 @@ function r = subsasgn(r, s, v)
 		for i=1:r.n,
 			L{i}.qlim = v(i,:);
 		end
+        r.link = L;
 	case 'gravity',
 		r.gravity = v;
 	%%%%%%%%% graphics support
