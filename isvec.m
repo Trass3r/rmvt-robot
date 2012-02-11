@@ -32,5 +32,5 @@ function h = isvec(v, l)
     if min(size(v)) == 1
         h =  length(v) == l;
     else
-        h = 0;
+        h = false;
     end
