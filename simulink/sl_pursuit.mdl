@@ -26,7 +26,7 @@ Model {
       Name		      "v"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.16"
+    ComputedModelVersion    "1.14"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -46,9 +46,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Jul 15 20:58:18 2012"
-  RTWModifiedTimeStamp	  264286354
-  ModelVersionFormat	  "1.%<AutoIncrement:16>"
+  LastModifiedDate	  "Sun Feb  5 21:55:52 2012"
+  RTWModifiedTimeStamp	  250379747
+  ModelVersionFormat	  "1.%<AutoIncrement:14>"
   ConfigurationManager	  "customverctrl"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -131,7 +131,7 @@ Model {
 	  $ObjectID		  2
 	  Version		  "1.11.0"
 	  StartTime		  "0.0"
-	  StopTime		  "15"
+	  StopTime		  "200"
 	  AbsTol		  "auto"
 	  FixedStep		  "0.2"
 	  InitialStep		  "auto"
@@ -142,14 +142,14 @@ Model {
 	  MaxConsecutiveZCs	  "1000"
 	  ExtrapolationOrder	  4
 	  NumberNewtonIterations  1
-	  MaxStep		  "0.1"
+	  MaxStep		  "auto"
 	  MinStep		  "auto"
 	  MaxConsecutiveMinStep	  "1"
 	  RelTol		  "1e-3"
 	  SolverMode		  "Auto"
 	  ConcurrentTasks	  off
-	  Solver		  "ode45"
-	  SolverName		  "ode45"
+	  Solver		  "ode3"
+	  SolverName		  "ode3"
 	  SolverJacobianMethodControl "auto"
 	  ShapePreserveControl	  "DisableAll"
 	  ZeroCrossControl	  "UseLocalSettings"
@@ -597,7 +597,7 @@ Model {
       }
       Name		      "Configuration"
       CurrentDlgPage	      "Solver"
-      ConfigPrmDlgPosition     [ 280, 126, 1160, 756 ] 
+      ConfigPrmDlgPosition     [ 704, 815, 1584, 1445 ] 
     }
     PropName		    "ConfigurationSets"
   }
@@ -718,7 +718,7 @@ Model {
   }
   System {
     Name		    "sl_pursuit"
-    Location		    [1376, 113, 2205, 415]
+    Location		    [95, 65, 924, 367]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -732,16 +732,16 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "97"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "51"
+    SIDHighWatermark	    "46"
     Block {
       BlockType		      Reference
       Name		      "Bicycle"
-      SID		      "49"
+      SID		      "42"
       Ports		      [2, 3]
-      Position		      [555, 132, 615, 208]
+      Position		      [555, 133, 615, 207]
       DropShadow	      on
-      LibraryVersion	      "1.53"
-      SourceBlock	      "roblocks/Dynamics/Bicycle"
+      LibraryVersion	      "1.61"
+      SourceBlock	      "roblocks/Bicycle"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
       SystemSampleTime	      "-1"
@@ -752,21 +752,20 @@ Model {
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
       GeneratePreprocessorConditionals off
-      accel		      "1"
-      vlim		      "2"
-      alim		      "1"
-      L			      "1"
+      accel		      "Inf"
+      vlim		      "5"
+      alim		      "Inf"
       x0		      "[0, 0, 0]"
       handbrake		      "0"
     }
     Block {
       BlockType		      Reference
       Name		      "Circle"
-      SID		      "47"
+      SID		      "45"
       Ports		      [0, 1]
-      Position		      [40, 60, 80, 120]
-      LibraryVersion	      "1.53"
-      SourceBlock	      "roblocks/Trajectory/Circle"
+      Position		      [35, 60, 75, 120]
+      LibraryVersion	      "1.61"
+      SourceBlock	      "roblocks/Circle"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
       SystemSampleTime	      "-1"
@@ -778,14 +777,7 @@ Model {
       RTWMemSecDataParameters "Inherit from model"
       GeneratePreprocessorConditionals off
       radius		      "1"
-      freq		      "0.2"
-    }
-    Block {
-      BlockType		      Fcn
-      Name		      "Fcn"
-      SID		      "50"
-      Position		      [195, 250, 255, 280]
-      Expr		      "sqrt(u(1)^2+u(2)^2)"
+      freq		      "0.1"
     }
     Block {
       BlockType		      Gain
@@ -830,24 +822,6 @@ Model {
       D			      "0"
     }
     Block {
-      BlockType		      Scope
-      Name		      "Scope"
-      SID		      "51"
-      Ports		      [1]
-      Position		      [290, 249, 320, 281]
-      Floating		      off
-      Location		      [1356, 592, 1680, 831]
-      Open		      on
-      NumInputPorts	      "1"
-      List {
-	ListType		AxesTitles
-	axes1			"%<SignalLabel>"
-      }
-      SaveName		      "ScopeData3"
-      DataFormat	      "StructureWithTime"
-      SampleTime	      "0"
-    }
-    Block {
       BlockType		      Sum
       Name		      "Sum"
       SID		      "27"
@@ -887,12 +861,12 @@ Model {
     Block {
       BlockType		      Reference
       Name		      "angdiff"
-      SID		      "48"
+      SID		      "44"
       Ports		      [2, 1]
-      Position		      [370, 162, 390, 213]
-      LibraryVersion	      "1.53"
-      SourceBlock	      "roblocks/Trajectory/angdiff"
-      SourceType	      ""
+      Position		      [375, 162, 395, 213]
+      LibraryVersion	      "1.61"
+      SourceBlock	      "roblocks/angdiff"
+      SourceType	      "SubSystem"
       ShowPortLabels	      "FromPortIcon"
       SystemSampleTime	      "-1"
       FunctionWithSeparateData off
@@ -910,13 +884,15 @@ Model {
       Ports		      [1]
       Position		      [555, 244, 585, 276]
       Floating		      off
-      Location		      [1016, 567, 1340, 806]
+      Location		      [1083, 384, 1407, 623]
       Open		      on
       NumInputPorts	      "1"
       List {
 	ListType		AxesTitles
 	axes1			"%<SignalLabel>"
       }
+      YMin		      "0"
+      YMax		      "4.25"
       SaveName		      "ScopeData2"
       DataFormat	      "StructureWithTime"
       SampleTime	      "0"
@@ -950,7 +926,7 @@ Model {
       Name		      "throttle"
       SID		      "37"
       Position		      [205, 72, 340, 108]
-      Expr		      "sqrt(u(1)^2+u(2)^2)-0.1"
+      Expr		      "sqrt(u(1)^2+u(2)^2)-0.05"
     }
     Block {
       BlockType		      Scope
@@ -959,13 +935,15 @@ Model {
       Ports		      [1]
       Position		      [510, 79, 540, 111]
       Floating		      off
-      Location		      [683, 553, 1007, 792]
+      Location		      [970, 92, 1294, 331]
       Open		      on
       NumInputPorts	      "1"
       List {
 	ListType		AxesTitles
 	axes1			"%<SignalLabel>"
       }
+      YMin		      "0.05"
+      YMax		      "0.475"
       SaveName		      "ScopeData1"
       DataFormat	      "StructureWithTime"
       SampleTime	      "0"
@@ -1032,7 +1010,7 @@ Model {
     Line {
       SrcBlock		      "Circle"
       SrcPort		      1
-      Points		      [15, 0]
+      Points		      [20, 0]
       Branch {
 	DstBlock		"Sum"
 	DstPort			2
@@ -1067,15 +1045,8 @@ Model {
       }
       Branch {
 	Points			[0, 85]
-	Branch {
-	  DstBlock		  "steering"
-	  DstPort		  1
-	}
-	Branch {
-	  Points		  [0, 90]
-	  DstBlock		  "Fcn"
-	  DstPort		  1
-	}
+	DstBlock		"steering"
+	DstPort			1
       }
     }
     Line {
@@ -1108,7 +1079,7 @@ Model {
 	}
       }
       Branch {
-	Points			[0, 25; -290, 0]
+	Points			[0, 25; -290, 0; 0, -40]
 	DstBlock		"angdiff"
 	DstPort			2
       }
@@ -1124,13 +1095,13 @@ Model {
       SrcPort		      1
       Points		      [15, 0]
       Branch {
+	DstBlock		"Bicycle"
+	DstPort			2
+      }
+      Branch {
 	Points			[0, 70]
 	DstBlock		"steer angle"
 	DstPort			1
-      }
-      Branch {
-	DstBlock		"Bicycle"
-	DstPort			2
       }
     }
     Line {
@@ -1143,20 +1114,14 @@ Model {
 	DstPort			1
       }
       Branch {
-	DstBlock		"v"
-	DstPort			1
-      }
-      Branch {
 	Points			[60, 0]
 	DstBlock		"Bicycle"
 	DstPort			1
       }
-    }
-    Line {
-      SrcBlock		      "Fcn"
-      SrcPort		      1
-      DstBlock		      "Scope"
-      DstPort		      1
+      Branch {
+	DstBlock		"v"
+	DstPort			1
+      }
     }
   }
 }

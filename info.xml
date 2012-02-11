@@ -7,7 +7,7 @@
 <name>Robotics</name>
 <type>toolbox</type>
 <icon>ApplicationIcon.MATLAB</icon>
-<help_location>./htmldoc</help_location>
+<help_location>info</help_location>
 
 <list>
 

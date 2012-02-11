@@ -16,7 +16,7 @@ Model {
       Name		      "alpha"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.9"
+    ComputedModelVersion    "1.7"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -36,9 +36,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sun Jul 15 20:09:56 2012"
-  RTWModifiedTimeStamp	  264283772
-  ModelVersionFormat	  "1.%<AutoIncrement:9>"
+  LastModifiedDate	  "Fri Aug 26 20:19:45 2011"
+  RTWModifiedTimeStamp	  236290780
+  ModelVersionFormat	  "1.%<AutoIncrement:7>"
   ConfigurationManager	  "customverctrl"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -668,7 +668,7 @@ Model {
   }
   System {
     Name		    "sl_lanechange"
-    Location		    [465, 371, 975, 595]
+    Location		    [465, 349, 975, 573]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -690,8 +690,8 @@ Model {
       Ports		      [2, 3]
       Position		      [265, 68, 325, 142]
       DropShadow	      on
-      LibraryVersion	      "1.53"
-      SourceBlock	      "roblocks/Dynamics/Bicycle"
+      LibraryVersion	      "1.57"
+      SourceBlock	      "roblocks/Bicycle"
       SourceType	      ""
       ShowPortLabels	      "FromPortIcon"
       SystemSampleTime	      "-1"
@@ -705,7 +705,6 @@ Model {
       accel		      "1"
       vlim		      "1"
       alim		      "2"
-      L			      "1"
       x0		      "[0, 0, 0]"
       handbrake		      "0"
     }

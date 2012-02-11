@@ -1,10 +1,12 @@
 %UNIT Unitize a vector
 %
-%	VN = UNIT(V)
+% VN = UNIT(V) is a unit vector parallel to V.
 %
-% Returns a unit vector aligned with V.
+% Note::
+% - Reports error for the case where norm(V) is zero.
 
-% Copyright (C) 1990-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -22,4 +24,9 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function u = unit(v)
-	u = v / norm(v,'fro');
+    n = norm(v, 'fro');
+    if n < eps
+        error('vector has zero norm');
+    end
+
+	u = v / n;

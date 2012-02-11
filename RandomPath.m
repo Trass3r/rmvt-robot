@@ -1,24 +1,26 @@
 %RandomPath Vehicle driver class
 %
-% Create a "driver" object capable of steering a Vehicle object through random 
-% waypoints within a rectangular region and at constant speed.
+% D = RandomPath(DIM, SPEED) returns a "driver" object capable of driving 
+% a Vehicle object through random waypoints at constant specified SPEED.  
+% The waypoints are positioned inside a region bounded by +/- DIM in 
+% the x- and y-directions.
 %
-% The driver object is connected to a Vehicle object by the latter's
-% add_driver() method.  The driver's demand() method is invoked on every
-% call to the Vehicle's step() method.
+% The driver object is attached to a Vehicle object by the latter's
+% add_driver() method.
 %
 % Methods::
 %  init       reset the random number generator
 %  demand     return speed and steer angle to next waypoint
 %  display    display the state and parameters in human readable form
-%  char       convert to string
+%  char       convert the state and parameters to human readable form
 %      
 % Properties::
-%  goal          current goal/waypoint coordinate
+%  goal          current goal coordinate
 %  veh           the Vehicle object being controlled
-%  dim           dimensions of the work space (2x1) [m]
-%  speed         speed of travel [m/s]
-%  closeenough   proximity to waypoint at which next is chosen [m]
+%  dim           dimensions of the work space
+%  speed         speed of travel
+%  closeenough   proximity to waypoint at which next is chosen
+%  randstream    random number stream used for coordinates
 %
 % Example::
 %
@@ -26,26 +28,25 @@
 %    veh.add_driver( RandomPath(20, 2) );
 %
 % Notes::
-% - It is possible in some cases for the vehicle to move outside the desired
+% - it is possible in some cases for the vehicle to move outside the desired
 %   region, for instance if moving to a waypoint near the edge, the limited
-%   turning circle may cause the vehicle to temporarily move outside.
-% - The vehicle chooses a new waypoint when it is closer than property
+%   turning circle may cause it to move outside.
+% - the vehicle chooses a new waypoint when it is closer than property
 %   closeenough to the current waypoint.
-% - Uses its own random number stream so as to not influence the performance
+% - uses its own random number stream so as to not influence the performance
 %   of other randomized algorithms such as path planning.
 %
 % Reference::
 %
-%   Robotics, Vision & Control, Chap 6,
+%   Robotics, Vision & Control,
 %   Peter Corke,
 %   Springer 2011
 %
 % See also Vehicle.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -59,12 +60,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
-% TODO
-%  should be a subclass of VehicleDriver
-%  Vehicle should be an abstract superclass
 
 classdef RandomPath < handle
     properties
@@ -80,29 +75,21 @@ classdef RandomPath < handle
 
     methods
 
-        function driver = RandomPath(dim, varargin)
+        function driver = RandomPath(dim, speed)
         %RandomPath.RandomPath Create a driver object
         %
-        % D = RandomPath(DIM, OPTIONS) returns a "driver" object capable of driving 
-        % a Vehicle object through random waypoints.  The waypoints are positioned 
-        % inside a rectangular region bounded by +/- DIM in the x- and y-directions.
-        %
-        % Options::
-        % 'speed',S      Speed along path (default 1m/s).
-        % 'dthresh',D    Distance from goal at which next goal is chosen.
+        % D = RandomPath(DIM, SPEED) returns a "driver" object capable of driving 
+        % a Vehicle object through random waypoints at specified SPEED.  The waypoints
+        % are positioned inside a region bounded by +/- DIM in the x- and y-directions.
         %
         % See also Vehicle.
 
-        % TODO options to specify region, maybe accept a Map object?
-
             driver.dim = dim;
-
-            opt.speed = 1;
-            opt.dthresh = 0.05 * dim;
-            opt = tb_optparse(opt, varargin);
-
-            driver.speed = opt.speed;
-            driver.closeenough = opt.dthresh;
+            if nargin < 3
+                speed = 1;
+            end
+            driver.speed = speed;
+            driver.closeenough = 0.05 * dim;
             drive.d_prev = Inf;
             driver.randstream = RandStream.create('mt19937ar');
         end
@@ -110,7 +97,7 @@ classdef RandomPath < handle
         function init(driver)
         %RandomPath.init Reset random number generator
         %
-        % R.init() resets the random number generator used to create the waypoints.
+        % R.INIT() resets the random number generator used to create the waypoints.
         % This enables the sequence of random waypoints to be repeated.
         %
         % See also RANDSTREAM.
@@ -161,7 +148,7 @@ classdef RandomPath < handle
             steer = d_heading;
 
             % if nearly at goal point, choose the next one
-            d = colnorm(driver.veh.x(1:2) - driver.goal);
+            d = norm2(driver.veh.x(1:2) - driver.goal);
             if d < driver.closeenough
                 driver.setgoal();
             elseif d > driver.d_prev
@@ -173,7 +160,7 @@ classdef RandomPath < handle
         function display(driver)
         %RandomPath.display Display driver parameters and state
         %
-        % R.display() displays driver parameters and state in compact 
+        % R.display() display driver parameters and state in compact 
         % human readable form.
         %
         % See also RandomPath.char.
@@ -186,12 +173,12 @@ classdef RandomPath < handle
         end % display()
 
         function s = char(driver)
-        %RandomPath.char Convert to string
+        %RandomPath.char Convert driver parameters and state to a string
         %
         % s = R.char() is a string showing driver parameters and state in in 
         % a compact human readable format. 
             s = 'RandomPath driver object';
-            s = char(s, sprintf('  current goal=(%g,%g), dimension %.1f', ...
+            s = strvcat(s, sprintf('  current goal=(%g,%g), dimension %.1f', ...
                 driver.goal, driver.dim));
         end
 

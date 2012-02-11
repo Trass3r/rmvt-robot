@@ -1,6 +1,6 @@
 % test harness for jacob_dot
 
-if exist('p560') == 0,
+if exist('p560') == 0
     puma560
 end
 

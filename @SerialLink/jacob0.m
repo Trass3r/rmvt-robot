@@ -1,9 +1,8 @@
 %SerialLink.JACOB0 Jacobian in world coordinates
 %
-% J0 = R.jacob0(Q, OPTIONS) is the Jacobian matrix (6xN) for the robot in
-% pose Q (1xN), and N is the number of robot joints.  The manipulator
-% Jacobian matrix maps joint velocity to end-effector spatial velocity V =
-% J0*QD expressed in the world-coordinate frame.
+% J0 = R.jacob0(Q, OPTIONS) is a 6xN Jacobian matrix for the robot in pose Q.
+% The manipulator Jacobian matrix maps joint velocity to end-effector spatial
+% velocity V = J0*QD expressed in the world-coordinate frame.
 %
 % Options::
 % 'rpy'     Compute analytical Jacobian with rotation rate in terms of 
@@ -14,17 +13,19 @@
 % 'rot'     Return rotational submatrix of Jacobian 
 %
 % Note::
-% - The Jacobian is computed in the end-effector frame and transformed to
-%   the world frame.
-% - The default Jacobian returned is often referred to as the geometric 
+% - the Jacobian is computed in the world frame and transformed to the 
+%   end-effector frame.
+% - the default Jacobian returned is often referred to as the geometric 
 %   Jacobian, as opposed to the analytical Jacobian.
 %
-% See also SerialLink.jacobn, jsingu, deltatr, tr2delta, jsingu.
+% See also SerialLink.jacobn, deltatr, tr2delta.
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -65,14 +66,14 @@ function J0 = jacob0(robot, q, varargin)
     if opt.rpy
         rpy = tr2rpy( fkine(robot, q) );
         B = rpy2jac(rpy);
-        if rcond(B) < eps
+        if rcond(B) < eps,
             error('Representational singularity');
         end
         J0 = blkdiag( eye(3,3), inv(B) ) * J0;
     elseif opt.eul
         eul = tr2eul( fkine(robot, q) );
         B = eul2jac(eul);
-        if rcond(B) < eps
+        if rcond(B) < eps,
             error('Representational singularity');
         end
         J0 = blkdiag( eye(3,3), inv(B) ) * J0;

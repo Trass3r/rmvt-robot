@@ -1,13 +1,13 @@
-%TR2JAC Compute a Jacobian to map differentials between frames
+%TR2JAC Jacobian for differential motion
 %
-%	J = TR2JAC(T)
+% J = TR2JAC(T) is a Jacobian matrix (6x6) that maps spatial velocity or
+% differential motion from the world frame to the frame represented by 
+% the homogeneous transform T.
 %
-% Returns a 6x6 Jacobian matrix to map differentials (joint velocity) between 
-% frames related by the homogeneous transform T.
-%
-% See also: TR2DIFF, DIFF2TR.
+% See also WTRANS, TR2DELTA, DELTA2TR.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -24,9 +24,10 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function J = tr2jac(t)
-	J = [	t(1:3,1)'	cross(t(1:3,4),t(1:3,1))'
-		t(1:3,2)'	cross(t(1:3,4),t(1:3,2))'
-		t(1:3,3)'	cross(t(1:3,4),t(1:3,3))'
-		zeros(3,3)	t(1:3,1:3)'		];
+function J = tr2jac(T)
 		
+    R = t2r(T);
+    J = [
+                 R'  (skew(transl(T))*R)'
+        zeros(3,3)                     R'
+        ];

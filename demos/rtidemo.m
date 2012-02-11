@@ -1,18 +1,26 @@
 %RTIDDEMO Inverse dynamics demo
 
-% Copyright (C) 1993-2002, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 echo off
-% 6/99	fix syntax errors
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2002-04-02 12:26:49  pic
-% Handle figures better, control echo at end of each script.
-% Fix bug in calling ctraj.
-%
-% Revision 1.2  2002/04/01 11:47:17  pic
-% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-% references, clarification of functions.
-%
-% $Revision: 1.1 $
+
 figure(2)
 echo on
 %
@@ -30,7 +38,7 @@ echo on
 % For example, for a Puma 560 in the zero angle pose, with all joint velocities
 % of 5rad/s and accelerations of 1rad/s/s, the joint torques required are
 %
-    tau = rne(p560, qz, 5*ones(1,6), ones(1,6))
+    tau = p560.rne(qz, 5*ones(1,6), ones(1,6))
 pause % any key to continue
 
 % As with other functions the inverse dynamics can be computed for each point 
@@ -38,7 +46,7 @@ pause % any key to continue
 % and acceleration as well
     t = [0:.056:2]; 		% create time vector
     [q,qd,qdd] = jtraj(qz, qr, t); % compute joint coordinate trajectory
-    tau = rne(p560, q, qd, qdd); % compute inverse dynamics
+    tau = p560.rne(q, qd, qdd); % compute inverse dynamics
 %
 %  Now the joint torques can be plotted as a function of time
     plot(t, tau(:,1:3))
@@ -49,7 +57,7 @@ pause % any key to continue
 %
 % Much of the torque on joints 2 and 3 of a Puma 560 (mounted conventionally) is
 % due to gravity.  That component can be computed using gravload()
-    taug = gravload(p560, q);
+    taug = p560.gravload(q);
     plot(t, taug(:,1:3))
     xlabel('Time (s)');
     ylabel('Gravity torque (Nm)')
@@ -73,7 +81,7 @@ pause % any key to continue
 %
 %  Let's compute the variation in joint 1 inertia, that is M(1,1), as the 
 % manipulator moves along the trajectory (this may take a few minutes)
-    M = inertia(p560, q);
+    M = p560.inertia(q);
     M11 = squeeze(M(1,1,:));
     plot(t, M11);
     xlabel('Time (s)');

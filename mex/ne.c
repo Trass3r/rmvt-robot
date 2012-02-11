@@ -461,10 +461,10 @@ newton_euler (
 		/*
 		 * add actuator dynamics and friction
 		 */
-		t +=   l->G * (
-			l->G * l->Jm * qdd[j*stride] +
-			l->B * qd[j*stride] +
-			(qd[j*stride] > 0 ? l->Tc[0] : 0.0) +
+		t +=   l->G * l->G * l->Jm * qdd[j*stride]; // inertia
+        t -= fabs(l->G) * (
+            l->B * qd[j*stride] +    // viscous friction
+			(qd[j*stride] > 0 ? l->Tc[0] : 0.0) +    // Coulomb friction
 			(qd[j*stride] < 0 ? l->Tc[1] : 0.0)
 		);
 		tau[j*stride] = t;

@@ -1,48 +1,17 @@
 %SerialLink.teach Graphical teach pendant
 %
-% R.teach(Q, OPTIONS) allows the user to "drive" a graphical robot by means
-% of a graphical slider panel. If no graphical robot exists one is created
-% in a new window.  Otherwise all current instances of the graphical robot
-% are driven.  The robots are set to the initial joint angles Q.
+% R.teach() drive a graphical robot by means of a graphical slider panel.
+% If no graphical robot exists one is created in a new window.  Otherwise
+% all current instanes of the graphical robots are driven.
 %
-% R.teach(OPTIONS) as above but with options and the initial joint angles
-% are taken from the pose of an existing graphical robot, or if that doesn't
-% exist then zero.
+% R.teach(Q) specifies the initial joint angle, otherwise it is taken from 
+% one of the existing graphical robots.
 %
-% Options::
-% 'eul'           Display tool orientation in Euler angles (default)
-% 'rpy'           Display tool orientation in roll/pitch/yaw angles
-% 'approach'      Display tool orientation as approach vector (z-axis)
-% '[no]deg'       Display angles in degrees (default true)
-% 'callback',CB   Set a callback function, called with robot object and
-%                 joint angle vector: CB(R, Q)
-%
-% Example::
-%
-% To display the velocity ellipsoid for a Puma 560
-%
-%        p560.teach('callback', @(r,q) r.vellipse(q));
-%
-% GUI::
-%
-% - The specified callback function is invoked every time the joint configuration changes.
-%   the joint coordinate vector.
-% - The Quit (red X) button destroys the teach window.
-%
-% Notes::
-% - If the robot is displayed in several windows, only one has the
-%   teach panel added.
-% - The slider limits are derived from the joint limit properties.  If not
-%   set then for
-%   - a revolute joint they are assumed to be [-pi, +pi]
-%   - a prismatic joint they are assumed unknown and an error occurs.
-%
-% See also SerialLink.plot, SerialLink.getpos.
+% See also SerialLink.plot.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -59,405 +28,299 @@
 %
 % http://www.petercorke.com
 
-% a ton of handles and parameters created by this function are stashed in 
-% a structure which is passed into all callbacks 
+%% TODO:
+%%  make the sliders change the animation while moving
+%% http://www.mathworks.com/matlabcentral/newsreader/view_thread/159374
+%% 1. download FINDJOBJ from the file exchange: http://www.mathworks.com/matlabcentral/fileexchange/14317
+%% 2. hSlider = uicontrol('style','slider', ...); %create the slider, get its Matlab handle
+%% 3. jSlider = findjobj(hSlider,'nomenu'); %get handle of the underlying java object
+%% 4. jSlider.AdjustmentValueChangedCallback = @myMatlabFunction; %set callback
+%% 
+%% Note: you can also use the familiar format:
+%% set(jSlider,'AdjustmentValueChangedCallback',@myMatlabFunction)
+%% 
+%% Feel free to explore many other properties (and ~30 callbacks)
+%% available in jSlider but not in its Matlab front-end interface hSlider.
+%% 
+%% Warning: FINDJOBJ relies on undocumented and unsupported Matlab/Java
+%% functionality.
 
-function teach(robot, varargin)
-    
-    %-------------------------------
-    % parameters for teach panel
-    bgcol = [135 206 250]/255;  % background color
-    height = 0.06;  % height of slider rows
-    %-------------------------------
-    
-    
-    %---- handle options
-    opt.deg = true;
-    opt.orientation = {'rpy', 'eul', 'approach'};
-    opt.callback = [];    
-    [opt,args] = tb_optparse(opt, varargin);
-    
-    % stash some options into the persistent object
-    handles.orientation = opt.orientation;
-    handles.callback = opt.callback;
-    handles.opt = opt;
+function teach(r, varargin)
+    bgcol = [135 206 250]/255;
 
-    
-    % we need to have qlim set to finite values for a prismatic joint
-    qlim = robot.qlim;
-    if any(isinf(qlim))
-        error('RTB:teach:badarg', 'Must define joint coordinate limits for prismatic axes, set qlim properties for prismatic Links');
+    opt.degrees = false;
+    opt.q0 = [];
+% TODO: options for rpy, or eul angle display
+
+    opt = tb_optparse(opt, varargin);
+
+    % drivebot(r, q)
+    % drivebot(r, 'deg')
+    scale = ones(r.n,1);
+
+    n = r.n;
+    width = 300;
+    height = 40;
+    minVal = -pi;
+    maxVal = pi;    
+
+    qlim = r.qlim;
+    if isempty(qlim)
+        qlim = [minVal*ones(r.n,1) maxVal*ones(r.n,1)];
     end
-    
-    if isempty(args)
-        q = [];
+
+    if isempty(opt.q0)
+        q = zeros(1,n);
     else
-        q = args{1};
+        q = opt.q0;
     end
-    
-    % set up scale factor, from actual limits in radians/metres to display units
-    qscale = ones(robot.n,1);
-    for j=1:robot.n
-        L=robot.links(j);
-        if opt.deg && L.isrevolute
-            qscale(j) = 180/pi;
-        end
-    end
-    
-    handles.qscale = qscale;
-    handles.robot = robot;
-   
-    
-    %---- install the panel at the side of the figure
-    
-    % find the right figure to put it in
-    c = findobj(gca, 'Tag', robot.name);  % check the current axes
-    if isempty(c)
-        % doesn't exist in current axes, look wider
-        c = findobj(0, 'Tag', robot.name);  % check all figures
-        if isempty(c)
-            % create robot in arbitrary pose
-            robot.plot( zeros(1, robot.n) );
-            ax = gca;
+
+    % set up scale factor
+    scale = [];
+    for L=r.links
+        if opt.degrees && L.revolute
+            scale = [scale 180/pi];
         else
-            ax = get(c(1), 'Parent'); % get first axis holding the robot
+            scale = [scale 1];
         end
-    else
-        % found it in current axes
-        ax = gca;
     end
-    handles.fig = get(ax, 'Parent');  % get the figure that holds the axis
-    
-    % shrink the current axes to make room
-    %   [l b w h]
-    set(ax, 'OuterPosition', [0.25 0 0.70 1])
-    
-    handles.curax = ax;
-    
-    % create the panel itself
-    panel = uipanel(handles.fig, ...
-        'Title', 'Teach', ...
-        'BackGroundColor', bgcol,...
-        'Position', [0 0 .25 1]);
-    set(panel, 'Units', 'pixels'); % stop automatic resizing
-    handles.panel = panel;
-    set(handles.fig, 'Units', 'pixels');
 
-    set(handles.fig, 'ResizeFcn', @(src,event) resize_callback(robot, handles));
-    
+    T6 = r.fkine(q);
+    fig = figure('Units', 'pixels', ...
+        'Position', [0 -height width height*(n+2)+20], ...
+        'Color', bgcol);
+    set(fig,'MenuBar','none')
+    delete( get(fig, 'Children') )
 
-    
-    %---- get the current robot state
-    
-    if isempty(q)
-        % check to see if there are any graphical robots of this name
-        rhandles = findobj('Tag', robot.name);
-        
-        % find the graphical element of this name
-        if isempty(rhandles)
-            error('RTB:teach:badarg', 'No graphical robot of this name found');
+    % first we check to see if there are any graphical robots of
+    % this name, if so we use them, otherwise create a robot plot.
+
+    rh = findobj('Tag', r.name);
+
+    % attempt to get current joint config of graphical robot
+    if ~isempty(rh)
+        rr = get(rh(1), 'UserData');
+        if ~isempty(rr.q)
+            q = rr.q;
         end
-        % get the info from its Userdata
-        info = get(rhandles(1), 'UserData');
-        
-        % the handle contains current joint angles (set by plot)
-        if ~isempty(info.q)
-            q = info.q;
-        end
-    else
-    robot.plot(q);
     end
-    handles.q = q;
-    T6 = robot.fkine(q);
 
-    
-    %---- now make the sliders
-    n = robot.n;
-    for j=1:n
+    % now make the sliders
+    for i=1:n
         % slider label
-        uicontrol(panel, 'Style', 'text', ...
-            'Units', 'normalized', ...
+        uicontrol(fig, 'Style', 'text', ...
+            'Units', 'pixels', ...
             'BackgroundColor', bgcol, ...
-            'Position', [0 height*(n-j+2) 0.15 height], ...
-            'FontUnits', 'normalized', ...
-            'FontSize', 0.5, ...
-            'String', sprintf('q%d', j));
-        
+            'Position', [0 height*(n-i)+20 width*0.1 height*0.4], ...
+            'String', sprintf('q%d', i));
+
         % slider itself
-        q(j) = max( qlim(j,1), min( qlim(j,2), q(j) ) ); % clip to range
-        handles.slider(j) = uicontrol(panel, 'Style', 'slider', ...
-            'Units', 'normalized', ...
-            'Position', [0.15 height*(n-j+2) 0.65 height], ...
-            'Min', qlim(j,1), ...
-            'Max', qlim(j,2), ...
-            'Value', q(j), ...
-            'Tag', sprintf('Slider%d', j));
-        
+        q(i) = max( qlim(i,1), min( qlim(i,2), q(i) ) ); % clip to range
+        h(i) = uicontrol(fig, 'Style', 'slider', ...
+            'Units', 'pixels', ...
+            'Position', [width*0.1 height*(n-i)+20 width*0.7 height*0.4], ...
+            'Min', scale(i)*qlim(i,1), ...
+            'Max', scale(i)*qlim(i,2), ...
+            'Value', scale(i)*q(i), ...
+            'Tag', sprintf('Slider%d', i), ...
+            'Callback', @(src,event)teach_callback(r.name, i));
+
+        % if findjobj exists use it, since it lets us get continous callbacks while
+        % a slider moves
+        if exist('findjobj') && ~ispc
+            drawnow
+            jh = findjobj(h(i),'nomenu');
+            jh.AdjustmentValueChangedCallback = {@sliderCallbackFunc, r.name, i};
+        end
         % text box showing slider value, also editable
-        handles.edit(j) = uicontrol(panel, 'Style', 'edit', ...
-            'Units', 'normalized', ...
-            'Position', [0.80 height*(n-j+2)+.01 0.20 0.9*height], ...
-            'BackgroundColor', bgcol, ...
-            'String', num2str(qscale(j)*q(j), 3), ...
-            'HorizontalAlignment', 'left', ...
-            'FontUnits', 'normalized', ...
-            'FontSize', 0.4, ...
-            'Tag', sprintf('Edit%d', j));
+        h2(i) = uicontrol(fig, 'Style', 'edit', ...
+            'Units', 'pixels', ...
+            'Position', [width*0.8 height*(n-i-0.1)+20 width*0.2 height*0.7], ...
+            'String', num2str(scale(i)*q(i)), ...
+            'Tag', sprintf('Edit%d', i), ...
+            'Callback', @(src,event)teach_callback(r.name, i));
+
+        % hang handles off the slider and edit objects
+        handles = {h(i) h2(i) scale};
+        set(h(i), 'Userdata', handles);
+        set(h2(i), 'Userdata', handles);
     end
-    
-    %---- set up the position display box
-    
-    % X
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
+
+    % robot name text box
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
+        'FontSize', 20, ...
         'HorizontalAlignment', 'left', ...
+        'Position', [0 height*(n+1.2)+20 0.8*width 0.8*height], ...
+        'BackgroundColor', 'white', ...
+        'String', r.name);
+
+    % X
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
+        'BackgroundColor', bgcol, ...
+        'Position', [0 height*(n+0.5)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
         'String', 'x:');
-    
-    handles.t6.t(1) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
+
+    h3(1,1) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.06*width height*(n+0.5)+20 width*0.2 height*0.6], ...
         'String', sprintf('%.3f', T6(1,4)), ...
         'Tag', 'T6');
-    
+
     % Y
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
         'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-2*height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
-        'HorizontalAlignment', 'left', ...
+        'Position', [0.26*width height*(n+0.5)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
         'String', 'y:');
-    
-    handles.t6.t(2) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-2*height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
+
+    h3(2,1) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.32*width height*(n+0.5)+20 width*0.2 height*0.6], ...
         'String', sprintf('%.3f', T6(2,4)));
-    
+
     % Z
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
         'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-3*height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
-        'HorizontalAlignment', 'left', ...
+        'Position', [0.52*width height*(n+0.5)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
         'String', 'z:');
-    
-    handles.t6.t(3) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-3*height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
+
+    h3(3,1) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.58*width height*(n+0.5)+20 width*0.2 height*0.6], ...
         'String', sprintf('%.3f', T6(3,4)));
-    
-    % Orientation
-    switch opt.orientation
-        case 'approach'
-            labels = {'ax:', 'ay:', 'az:'};
-        case 'eul'
-            labels = {[char(hex2dec('3c6')) ':'], [char(hex2dec('3b8')) ':'], [char(hex2dec('3c8')) ':']}; % phi theta psi
-        case'rpy'
-            labels = {'R:', 'P:', 'Y:'};
-    end
-    
-    %---- set up the orientation display box
 
     % AX
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
         'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-5*height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
-        'HorizontalAlignment', 'left', ...
-        'String', labels(1));
-    
-    handles.t6.r(1) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-5*height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
+        'Position', [0 height*(n)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
+        'String', 'ax:');
+
+    h3(1,2) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.06*width height*(n)+20 width*0.2 height*0.6], ...
         'String', sprintf('%.3f', T6(1,3)));
-    
+
     % AY
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
         'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-6*height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
-        'HorizontalAlignment', 'left', ...
-        'String', labels(2));
-    
-    handles.t6.r(2) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-6*height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
+        'Position', [0.26*width height*(n)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
+        'String', 'ay:');
+
+    h3(2,2) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.32*width height*(n)+20 width*0.2 height*0.6], ...
         'String', sprintf('%.3f', T6(2,3)));
-    
+
     % AZ
-    uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
+    uicontrol(fig, 'Style', 'text', ...
+        'Units', 'pixels', ...
         'BackgroundColor', bgcol, ...
-        'Position', [0.05 1-7*height 0.2 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.9, ...
-        'HorizontalAlignment', 'left', ...
-        'String', labels(3));
-    
-    handles.t6.r(3) = uicontrol(panel, 'Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.3 1-7*height 0.6 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.8, ...
-        'String', sprintf('%.3f', T6(3,3)));   
+        'Position', [0.52*width height*(n)+20 0.06*width height/2], ...
+        'BackgroundColor', 'yellow', ...
+        'FontSize', 10, ...
+        'HorizontalAlignment', 'right', ...
+        'String', 'az:');
 
-    %---- add buttons
-    uicontrol(panel, 'Style', 'pushbutton', ...
-        'Units', 'normalized', ...
-        'Position', [0.80 height*(0)+.01 0.15 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.7, ...
-        'CallBack', @(src,event) quit_callback(robot, handles), ...
-        'BackgroundColor', 'white', ...
-        'ForegroundColor', 'red', ...
-        'String', 'X');
-    
-    % the record button
-    handles.record = [];
-    if ~isempty(opt.callback)
-    uicontrol(panel, 'Style', 'pushbutton', ...
-        'Units', 'normalized', ...
-        'Position', [0.1 height*(0)+.01 0.30 height], ...
-        'FontUnits', 'normalized', ...
-        'FontSize', 0.6, ...
-        'CallBack', @(src,event) record_callback(robot, handles), ...
+    h3(3,2) = uicontrol(fig, 'Style', 'edit', ...
+        'Units', 'pixels', ...
+        'Position', [0.58*width height*(n)+20 width*0.2 height*0.6], ...
+        'String', sprintf('%.3f', T6(3,3)));
+
+
+    set(h3(1,1), 'Userdata', h3);
+    uicontrol(fig, 'Style', 'pushbutton', ...
+        'Units', 'pixels', ...
+        'FontSize', 16, ...
+        'Position', [0.8*width height*n+20 0.2*width 2*height], ...
+        'CallBack', 'delete(gcf)', ...
         'BackgroundColor', 'red', ...
-        'ForegroundColor', 'white', ...
-        'String', 'REC');
+        'String', 'Quit');
+
+
+    if isempty(rh)
+        figure
+        r.plot(q);
     end
-    
-    %---- now assign the callbacks
-    for j=1:n
-        % text edit box
-        set(handles.edit(j), ...
-            'Interruptible', 'off', ...
-            'Callback', @(src,event)teach_callback(src, robot.name, j, handles));
+end
         
-        % slider
-        set(handles.slider(j), ...
-            'Interruptible', 'off', ...
-            'BusyAction', 'queue', ...
-            'Callback', @(src,event)teach_callback(src, robot.name, j, handles));
-    end
-end
+function teach_callback(a, b)
+% called on changes to a slider or to the edit box showing joint coordinate
+% teach_callback(robot name, joint index)
 
-function teach_callback(src, name, j, handles)
-    
-    % called on changes to a slider or to the edit box showing joint coordinate
-    %
-    % src      the object that caused the event
-    % name     name of the robot
-    % j        the joint index concerned (1..N)
-    % slider   true if the
-    
-    qscale = handles.qscale;
-    
-    switch get(src, 'Style')
-        case 'slider'
-            % slider changed, get value and reflect it to edit box
-            newval = get(src, 'Value');
-            set(handles.edit(j), 'String', num2str(qscale(j)*newval, 3));
-        case 'edit'
-            % edit box changed, get value and reflect it to slider
-            newval = str2double(get(src, 'String')) / qscale(j);
-            set(handles.slider(j), 'Value', newval);
-    end
-    %fprintf('newval %d %f\n', j, newval);
-    
+    name = a; % name of the robot
+    j = b;    % joint index
 
-    
-    % find all graphical objects tagged with the robot name, this is the
+    % find all graphical objects tagged with the robot name, this is the 
     % instancs of that robot across all figures
-    
-    h = findobj('Tag', name);
-    
-    
-    % find the graphical element of this name
-    if isempty(h)
-        error('RTB:teach:badarg', 'No graphical robot of this name found');
+    rh = findobj('Tag', name);
+
+    % get the handles {slider, textbox, scale factor}
+    handles = get(gcbo, 'Userdata');
+    scale = handles{3};
+
+    for r=rh'       % for every graphical robot instance
+        robot = get(r, 'UserData'); % get the robot object
+        q = robot.q;    % get its current joint angles
+        if isempty(q)
+            q = zeros(1,robot.n);
+        end
+
+        if gcbo == handles{1}
+            % get value from slider
+            q(j) = get(gcbo, 'Value') / scale(j);
+            set(handles{2}, 'String', num2str(scale(j)*q(j)));
+        elseif gcbo == handles{2}
+            % get value from text box
+            q(j) = str2num(get(gcbo, 'String')) / scale(j);
+            set(handles{1}, 'Value', q(j));
+        else
+            warning('shouldnt happen');
+        end
+        robot.q = q;
+        set(r, 'UserData', robot);
+        robot.plot(q)
     end
-    % get the info from its Userdata
-    info = get(h(1), 'UserData');
-    
-    % update the stored joint coordinates
-    info.q(j) = newval;
-    % and save it back to the graphical object
-    set(h(1), 'UserData', info);
-    
-    % update all robots of this name
-    animate(handles.robot, info.q);
-    
-    
-    % compute the robot tool pose
-    T6 = handles.robot.fkine(info.q);
-    
-    % convert orientation to desired format
-    switch handles.orientation
-        case 'approach'
-            orient = T6(:,3);    % approach vector
-        case 'eul'
-            orient = tr2eul(T6, 'setopt', handles.opt);
-        case'rpy'
-            orient = tr2rpy(T6, 'setopt', handles.opt);
-    end
-    
-    % update the display in the teach window
+
+    % compute and display the T6 pose
+    T6 = robot.fkine(q);
+    h3 = get(findobj('Tag', 'T6'), 'UserData');
     for i=1:3
-        set(handles.t6.t(i), 'String', sprintf('%.3f', T6(i,4)));
-        set(handles.t6.r(i), 'String', sprintf('%.3f', orient(i)));
+        set(h3(i,1), 'String', sprintf('%.3f', T6(i,4)));
+        set(h3(i,2), 'String', sprintf('%.3f', T6(i,3)));
     end
+
+    robot.T = T6;
+    robot.notify('Moved');
+    drawnow
+end
     
-    if ~isempty(handles.callback)
-        handles.callback(handles.robot, info.q);
+function sliderCallbackFunc(src, ev, name, joint)
+    if get(src,'ValueIsAdjusting') == 1
+        try
+            teach_callback(name, joint);
+            drawnow
+        catch
+            return
+        end
     end
-    
-    %notify(handles.robot, 'Moved');
-
-end
-
-function record_callback(robot, handles)
-    
-    if ~isempty(handles.callback)
-        handles.callback(h.q);
-    end
-end
-
-function quit_callback(robot, handles)
-    set(handles.fig, 'ResizeFcn', '');
-    delete(handles.panel);
-    set(handles.curax, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1])
-end
-
-function resize_callback(robot, handles)
-
-    % come here on figure resize events
-    fig = gcbo;   % this figure (whose callback is executing)
-    fs = get(fig, 'Position');  % get size of figure
-    ps = get(handles.panel, 'Position');  % get position of the panel
-    % update dimensions of the axis area
-    set(handles.curax, 'Units', 'pixels', ...
-        'OuterPosition', [ps(3) 0 fs(3)-ps(3) fs(4)]);
-    % keep the panel anchored to the top left corner
-    set(handles.panel, 'Position', [1 fs(4)-ps(4) ps(3:4)]);
 end

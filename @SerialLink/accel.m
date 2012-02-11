@@ -1,33 +1,23 @@
 %SerialLink.accel Manipulator forward dynamics
 %
 % QDD = R.accel(Q, QD, TORQUE) is a vector (Nx1) of joint accelerations that result 
-% from applying the actuator force/torque to the manipulator robot R in
-% state Q and QD, and N is the number of robot joints.
+% from applying the actuator force/torque to the manipulator robot in state Q and QD.
+% If Q, QD, TORQUE are matrices with M rows, then QDD is a matrix with M rows
+% of acceleration corresponding to the equivalent rows of Q, QD, TORQUE.
 %
-% If Q, QD, TORQUE are matrices (KxN) then QDD is a matrix (KxN) where each row 
-% is the acceleration corresponding to the equivalent rows of Q, QD, TORQUE.
-%
-% QDD = R.accel(X) as above but X=[Q,QD,TORQUE] (1x3N).
+% QDD = R.ACCEL(X) as above but X=[Q,QD,TORQUE].
 %
 % Note::
-% - Useful for simulation of manipulator dynamics, in
-%   conjunction with a numerical integration function.
 % - Uses the method 1 of Walker and Orin to compute the forward dynamics.
-% - Featherstone's method is more efficient for robots with large numbers
-%   of joints.
-% - Joint friction is considered.
-%
-% References::
-% - Efficient dynamic computer simulation of robotic mechanisms,
-%   M. W. Walker and D. E. Orin,
-%   ASME Journa of Dynamic Systems, Measurement and Control, vol. 104, no. 3, pp. 205-211, 1982.
+% - This form is useful for simulation of manipulator dynamics, in
+%   conjunction with a numerical integration function.
 %
 % See also SerialLink.rne, SerialLink, ode45.
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -47,62 +37,55 @@
 
 function qdd = accel(robot, Q, qd, torque)
 
+    if numcols(Q) ~= robot.n
+        error('q must have %d columns', robot.n);
+    end
+    if numcols(qd) ~= robot.n
+        error('qd must have %d columns', robot.n);
+    end
+    if numcols(torque) ~= robot.n
+        error('torque must have %d columns', robot.n);
+    end
+
+    if numrows(Q) > 1
+        if numrows(Q) ~= numrows(qd)
+            error('for trajectory q and qd must have same number of rows');
+        end
+        if numrows(Q) ~= numrows(torque)
+            error('for trajectory q and torque must have same number of rows');
+        end
+        qdd = [];
+        for i=1:numrows(Q)
+            qdd = cat(1, qdd, robot.accel(Q(i,:), qd(i,:), torque(i,:))');
+        end
+        return
+    end
+
 	n = robot.n;
 
-    if nargin == 2
-        if length(Q) ~= (3*robot.n)
-            error('RTB:accel:badarg', 'Input vector X is length %d, should be %d (q, qd, tau)', length(Q), 3*robot.n);
-        end
+	if nargin == 2
         % accel(X)
-        Q = Q(:)';   % make it a row vector
 	    q = Q(1:n);
 		qd = Q(n+1:2*n);
 		torque = Q(2*n+1:3*n);
-    elseif nargin == 4
+	else
         % accel(Q, qd, torque)
-        
-        if numrows(Q) > 1
-            % handle trajectory by recursion
-            if numrows(Q) ~= numrows(qd)
-                error('for trajectory q and qd must have same number of rows');
-            end
-            if numrows(Q) ~= numrows(torque)
-                error('for trajectory q and torque must have same number of rows');
-            end
-            qdd = [];
-            for i=1:numrows(Q)
-                qdd = cat(1, qdd, robot.accel(Q(i,:), qd(i,:), torque(i,:))');
-            end
-            return
-        else
-            q = Q';
-            if length(q) == n
-                q = q(:)';
-                qd = qd(:)';
-            end
-            if numcols(Q) ~= n
-                error('q must have %d columns', n);
-            end
-            if numcols(qd) ~= robot.n
-                error('qd must have %d columns', n);
-            end
-            if numcols(torque) ~= robot.n
-                error('torque must have %d columns', n);
-            end
-        end
-    else
-        error('RTB:accel:badargs', 'insufficient arguments');
-    end
-
+		q = Q;
+		if length(q) == robot.n,
+			q = q(:);
+			qd = qd(:);
+		end
+	end
 
 	% compute current manipulator inertia
 	%   torques resulting from unit acceleration of each joint with
 	%   no gravity.
-	M = rne(robot, ones(n,1)*q, zeros(n,n), eye(n), [0;0;0]);
+	M = rne(robot, ones(n,1)*q', zeros(n,n), eye(n), [0;0;0]);
 
 	% compute gravity and coriolis torque
 	%    torques resulting from zero acceleration at given velocity &
 	%    with gravity acting.
-	tau = rne(robot, q, qd, zeros(1,n));	
+	tau = rne(robot, q', qd', zeros(1,n));	
 
-	qdd = M \ (torque - tau)';
+	qdd = inv(M) * (torque(:) - tau');
+

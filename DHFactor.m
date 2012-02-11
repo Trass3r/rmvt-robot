@@ -14,12 +14,11 @@
 %
 % Methods::
 %
-% base      the base transform as a Java string
-% tool      the tool transform as a Java string
-% command   a command string that will create a SerialLink() object 
-%           representing the specified kinematics
-% char      convert to string representation
-% display   display in human readable form
+% display   shows the simplified version in terms of Denavit-Hartenberg parameters
+% base      shows the base transform
+% tool      shows the tool transform
+% command   returns a string that could be passed to the SerialLink() object constructor
+%           to generate a robot with these kinematics.
 %
 % Example::
 %
@@ -27,29 +26,18 @@
 %    >> dh = DHFactor(s);
 %    >> dh
 %    DH(q1+90, 0, 0, +90).DH(q2, L1, 0, 0).DH(q3-90, L2, 0, 0).Rz(+90).Rx(-90).Rz(-90)
-%    >> r = eval( dh.command('myrobot') );
+%    >> r = eval( dh.command() );
 %
 % Notes::
-% - Variables starting with q are assumed to be joint coordinates.
+% - Variables starting with q are assumed to be joint coordinates
 % - Variables starting with L are length constants.
-% - Length constants must be defined in the workspace before executing the 
-%   last line above.
-% - Implemented in Java.
-% - Not all sequences can be converted to DH format, if conversion cannot be 
-%   achieved an error is generated.
-%
-% Reference::
-% - A simple and systematic approach to assigning Denavit-Hartenberg parameters,
-%   P.Corke, IEEE Transaction on Robotics, vol. 23, pp. 590-594, June 2007.
-% - Robotics, Vision & Control, Sec 7.5.2, 7.7.1,
-%   Peter Corke, Springer 2011.
+% - implemented in Java
 %
 % See also SerialLink.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -63,6 +51,4 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 % See also SerialLink.

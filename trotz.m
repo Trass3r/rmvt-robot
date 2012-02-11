@@ -1,13 +1,15 @@
 %TROTZ Rotation about Z axis
 %
-%	TR = TROTZ(theta)
+% T = TROTZ(THETA) is a homogeneous transformation (4x4) representing a rotation 
+% of THETA about the z-axis.
 %
-% Returns a homogeneous transformation representing a rotation of theta 
-% about the Z axis.
+% Notes::
+% - Translational component is zero.
 %
-% See also: TROTX, TROTY, ROTVEC.
+% See also ROTZ, TROTX, TROTY.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 

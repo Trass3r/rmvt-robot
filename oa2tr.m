@@ -1,16 +1,20 @@
-%OA2TR Convert O/A vectors to homogeneous transformation
+%OA2TR Convert orientation and approach vectors to homogeneous transformation
 %
-% 	TR = OA2TR(O, A)
+% T = OA2TR(O, A) is a homogeneous tranformation for the specified orientation 
+% and approach vectors (3x1) formed from 3 vectors such that R = [N O A] and 
+% N = O x A.
 %
-% Returns a homogeneous tranformation for the specified orientation and 
-% approach vectors.  The rotation submatrix is formed from 3 vectors such that
-% R = [N O A] and N = O x A.  
-% The submatrix is guaranteed to be orthonormal so long as O and A are 
-% not parallel.
+% Notes::
+% - The rotation submatrix is guaranteed to be orthonormal so long as O and A 
+%   are not parallel.
+% - The translational part is zero.
+% - The vectors O and A are parallel to the Y- and Z-axes of the coordinate
+%   frame.
 %
-% See also: RPY2TR, EUL2TR, OA2R
+% See also RPY2TR, EUL2TR, OA2R.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 

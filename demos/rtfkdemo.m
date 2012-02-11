@@ -1,6 +1,24 @@
 %RTFKDEMO Forward kinematics demo
 
-% Copyright (C) 1993-2002, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 
 % $Log: not supported by cvs2svn $
 % Revision 1.3  2002-04-02 12:26:48  pic
@@ -22,10 +40,9 @@ figure(2)
 % which are defined by qz
     qz
 %
-% The forward kinematics may be computed using fkine() with an appropropriate 
-% kinematic description, in this case, the matrix p560 which defines 
-% kinematics for the 6-axis Puma 560.
-    fkine(p560, qz)
+% The forward kinematics may be computed using fkine() method of the
+% p560 robot object
+    p560.fkine(qz)
 %
 % returns the homogeneous transform corresponding to the last link of the 
 % manipulator
@@ -38,7 +55,7 @@ pause % any key to continue
     q = jtraj(qz, qr, t); % compute the joint coordinate trajectory
 %
 % then the homogeneous transform for each set of joint coordinates is given by
-    T = fkine(p560, q);
+    T = p560.fkine(q);
 
 %
 % where T is a 3-dimensional matrix, the first two dimensions are a 4x4 

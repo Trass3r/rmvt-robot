@@ -1,24 +1,23 @@
-%SerialLink.gravload Gravity load on joints
+%SerialLink.gravload Gravity loading
 %
-% TAUG = R.gravload(Q) is the joint gravity loading (1xN) for the robot R
-% in the joint configuration Q (1xN), where N is the number of robot
-% joints.  Gravitational acceleration is a property of the robot object.
+% TAUG = R.gravload(Q) is the joint gravity loading for the robot in the
+% joint configuration Q.  Gravitational acceleration is a property of the
+% robot object.
 %
-% If Q is a matrix (MxN) each row is interpreted as a joint configuration
-% vector, and the result is a matrix (MxN) each row being the corresponding
-% joint torques.
+% If Q is a row vector, the result is a row vector of joint torques.  If 
+% Q is a matrix, each row is interpreted as a joint configuration vector, 
+% and the result is a matrix each row being the corresponding joint torques.
 %
-% TAUG = R.gravload(Q, GRAV) as above but the gravitational 
+% TAUG = R.gravload(Q, GRAV) is as above but the gravitational 
 % acceleration vector GRAV is given explicitly.
 %
 % See also SerialLink.rne, SerialLink.itorque, SerialLink.coriolis.
 
 
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -43,4 +42,5 @@ function tg = gravload(robot, q, grav)
 		tg = rne(robot, q, zeros(size(q)), zeros(size(q)));
 	elseif nargin == 3
 		tg = rne(robot, q, zeros(size(q)), zeros(size(q)), grav);
-    end
+	end
+	

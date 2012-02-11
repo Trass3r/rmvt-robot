@@ -1,22 +1,19 @@
-%SerialLink.jacob_dot Derivative of Jacobian
+%SerialLink.jacob_dot Hessian in end-effector frame
 %
-% JDQ = R.jacob_dot(Q, QD) is the product (6x1) of the derivative of the
-% Jacobian (in the world frame) and the joint rates.
+% JDQ = R.jacob_dot(Q, QD) is the product of the Hessian, derivative of the
+% Jacobian, and the joint rates.
 %
 % Notes::
-% - Useful for operational space control XDD = J(Q)QDD + JDOT(Q)QD
-% - Written as per the reference and not very efficient.
+% - useful for operational space control
+% - not yet tested/debugged.
 %
-% References::
-% - Fundamentals of Robotics Mechanical Systems (2nd ed)
-%   J. Angleles, Springer 2003.
-%
-% See also SerialLink.jacob0, diff2tr, tr2diff.
+% See also: SerialLink.jacob0, diff2tr, tr2diff.
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -36,65 +33,57 @@
 function Jdot = jacob_dot(robot, q, qd)
 
 	n = robot.n;
-    links = robot.links;
+	L = robot.link;		% get the links
 
-    % Using the notation of Angeles:
-    %   [Q,a] ~ [R,t] the per link transformation
-    %   P ~ R   the cumulative rotation t2r(Tj) in world frame
-    %   e       the last column of P, the local frame z axis in world coordinates
-    %   w       angular velocity in base frame
-    %   ed      deriv of e
-    %   r       is distance from final frame
-    %   rd      deriv of r
-    %   ud      ??
+    Tj = robot.base;     % this is cumulative transform from base
+    w = [0;0;0];
+    v = [0;0;0];
+    for j=1:n,
+        link = robot.links(j);
+        Aj = link.A(q(j));
+        Tj = Tj * Aj;
+        R{j} = t2r(Aj);
+        T{j} = t2r(Tj);
+        p(:,j) = transl(Tj);    % origin of link j
 
-    for i=1:n
-        T = links(i).A(q(i));
-        Q{i} = t2r(T);
-        a{i} = transl(T);
+        if j>1,
+            z(:,j) = T{j-1} * [0 0 1]'; % in world frame
+            w = R{j}*( w + z(:,j) * qd(j));
+            v = v + cross(R{j}*w, R{j-1}*p(:,j));
+            %v = R{j-1}'*v + cross(w, p(:,j));
+            %w = R{j-1}'* w + z(:,j) * qd(j);
+        else
+            z(:,j) = [0 0 1]';
+            v = [0 0 0]';
+            w = z(:,j) * qd(j);
+        end
+
+        vel(:,j) = v;       % velocity of origin of link j
+
+        omega(:,j) = w;         % omega of link j in link j frame
     end
+    omega
+    z
 
-    P{1} = Q{1};
-    e{1} = [0 0 1]';
-    for i=2:n
-        P{i} = P{i-1}*Q{i};
-        e{i} = P{i}(:,3);
-    end
+    J = [];
+    Jdot = [];
+    for j=1:n,
+        if j>1,
+            t = p(:,n) - p(:,j-1);
+            td = vel(:,n) - vel(:,j-1);
+        else
+            t = p(:,n);
+            td = vel(:,n);
+        end
+        if L{j}.RP == 'R',
+            J_col = [cross(z(:,j), t); z(:,j)];
+            Jdot_col = [cross(cross(omega(:,j), z(:,j)), t) + cross(z(:,j), td) ; cross(omega(:,j),  z(:,j))];
+        else
+            J_col = [z(:,j); 0;0;0];
+            Jdot_col = zeros(6,1);
+        end
 
-    % step 1
-    w{1} = qd(1)*e{1};
-    for i=1:(n-1)
-        w{i+1} = qd(i+1)*[0 0 1]' + Q{i}'*w{i};
-    end
+        J = [J J_col];
+        Jdot = [Jdot Jdot_col];
 
-    % step 2
-    ed{1} = [0 0 0]';
-    for i=2:n
-        ed{i} = cross(w{i}, e{i});
-    end
-
-    % step 3
-    rd{n} = cross( w{n}, a{n});
-    for i=(n-1):-1:1
-        rd{i} = cross(w{i}, a{i}) + Q{i}*rd{i+1};
-    end
-
-    r{n} = a{n};
-    for i=(n-1):-1:1
-        r{i} = a{i} + Q{i}*r{i+1};
-    end
-
-    ud{1} = cross(e{1}, rd{1});
-    for i=2:n
-        ud{i} = cross(ed{i}, r{i}) + cross(e{i}, rd{i});
-    end
-
-    % step 4
-    %  swap ud and ed
-    v{n} = qd(n)*[ud{n}; ed{n}];
-    for i=(n-1):-1:1
-        Ui = blkdiag(Q{i}, Q{i});
-        v{i} = qd(i)*[ud{i}; ed{i}] + Ui*v{i+1};
-    end
-
-    Jdot = v{1};
+	end

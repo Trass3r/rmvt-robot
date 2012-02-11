@@ -2,10 +2,10 @@
 %
 % D = DISTANCEXFORM(WORLD, GOAL) is the distance transform of the occupancy 
 % grid WORLD with respect to the specified goal point GOAL = [X,Y].  The
-% cells of the grid have values of 0 for free space and 1 for obstacle.
+% elements of the grid are 0 from free space and 1 for occupied.
 %
 % D = DISTANCEXFORM(WORLD, GOAL, METRIC) as above but specifies the distance
-% metric as  either 'cityblock' or 'Euclidean' (default).
+% metric as  either 'cityblock' or 'Euclidean'
 %
 % D = DISTANCEXFORM(WORLD, GOAL, METRIC, SHOW) as above but shows an animation
 % of the distance transform being formed, with a delay of SHOW seconds between
@@ -13,14 +13,13 @@
 %
 % Notes::
 % - The Machine Vision Toolbox function imorph is required.
-% - The goal is [X,Y] not MATLAB [row,col].
+% - The goal is [X,Y] not MATLAB [row,col]
 %
 % See also IMORPH, DXform.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -34,12 +33,10 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function d = distancexform(world, goal, metric, show)
     
-    if exist('imorph', 'file') ~= 3
+    if ~exist('imorph')
         error('Machine Vision Toolbox is required by this function');
     end
 
@@ -87,7 +84,8 @@ function d = distancexform(world, goal, metric, show)
         world = imorph(world, m, 'plusmin');
         count = count+1;
         if show
-            cmap = [1 0 0; gray(256)];
+            cmap = gray(256);
+            cmap = [1 0 0; cmap];
             colormap(cmap)
             image(world+1, 'CDataMapping', 'direct');
             set(gca, 'Ydir', 'normal');
@@ -96,8 +94,7 @@ function d = distancexform(world, goal, metric, show)
             pause(show);
         end
 
-        if ~any(isinf(world(:)))
-            % stop if no Inf's left in the map
+        if length(find(world(:)==Inf)) == 0
             break;
         end
     end

@@ -1,42 +1,30 @@
-%PRM Probabilistic RoadMap navigation class
+%PRM Probabilistic roadmap navigation class
 %
-% A concrete subclass of the abstract Navigation class that implements the
-% probabilistic roadmap navigation algorithm over an occupancy grid.  This
-% performs goal independent planning of roadmaps, and at the query stage
-% finds paths between specific start and goal points.
+% A concrete subclass of Navigation that implements the probabilistic
+% roadmap navigation algorithm.  This performs goal independent planning of
+% roadmaps, and at the query stage finds paths between specific start and
+% goal points.
 %
 % Methods::
 %
 % plan         Compute the roadmap
 % path         Compute a path to the goal
-% visualize    Display the obstacle map (deprecated)
-% plot         Display the obstacle map
-% display      Display the parameters in human readable form
-% char         Convert to string
+% visualize    Display the obstacle map
+% display      Print the parameters in human readable form
+% char         Convert the parameters to a human readable string
 %
 % Example::
 %
-%        load map1              % load map
-%        goal = [50,30];        % goal point
-%        start = [20, 10];      % start point
-%        prm = PRM(map);        % create navigation object
-%        prm.plan()             % create roadmaps
-%        prm.path(start, goal)  % animate path from this start location
-%
-% References::
-%
-% - Probabilistic roadmaps for path planning in high dimensional configuration spaces,
-%   L. Kavraki, P. Svestka, J. Latombe, and M. Overmars, 
-%   IEEE Transactions on Robotics and Automation, vol. 12, pp. 566-580, Aug 1996.
-% - Robotics, Vision & Control, Section 5.2.4,
-%   P. Corke, Springer 2011.
+%    load map1
+%    prm = PRM(map);
+%    prm.plan()
+%    prm.path(start, goal)
 %
 % See also Navigation, DXform, Dstar, PGraph.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -50,8 +38,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 
 % Peter Corke 8/2009.
@@ -76,7 +62,7 @@ classdef PRM < Navigation
 
         % constructor
         function prm = PRM(varargin)
-            %PRM.PRM Create a PRM navigation object
+            %PRM.PRM Create a PRM navigation object constructor
             %
             % P = PRM(MAP, options) is a probabilistic roadmap navigation
             % object, and MAP is an occupancy grid, a representation of a
@@ -84,11 +70,9 @@ classdef PRM < Navigation
             % (occupied).
             %
             % Options::
-            %  'npoints',N      Number of sample points (default 100)
-            %  'distthresh',D   Distance threshold, edges only connect vertices closer 
-            %                   than D (default 0.3 max(size(occgrid)))
-            %
-            % Other options are supported by the Navigation superclass.
+            %  'npoints', n      Number of sample points (default 100)
+            %  'distthresh', d   Distance threshold, edges only connect vertices closer 
+            %                    than d (default 0.3 max(size(occgrid)))
             %
             % See also Navigation.Navigation.
 
@@ -108,14 +92,14 @@ classdef PRM < Navigation
         end
 
         function plan(prm)
-        %PRM.plan Create a probabilistic roadmap
-        %
-        % P.plan() creates the probabilistic roadmap by randomly
-        % sampling the free space in the map and building a graph with
-        % edges connecting close points.  The resulting graph is kept
-        % within the object.
+            %PRM.plan Create a probabilistic roadmap
+            %
+            % P.plan() creates the probabilistic roadmap by randomly
+            % sampling the free space in the map and building a graph with
+            % edges connecting close points.  The resulting graph is kept
+            % within the object.
 
-        % build a graph over the free space
+            % build a graph over the free space
             prm.message('create the graph');
 
             prm.graph.clear();  % empty the graph
@@ -128,8 +112,9 @@ classdef PRM < Navigation
         % P.path(START, GOAL) finds and displays a path from START to GOAL
         % which is overlaid on the occupancy grid.
         %
-        % X = P.path(START) returns the path (2xM) from START to GOAL.
-        
+        % X = P.PATH(START, GOAL) is the path from START to GOAL as a
+        % 2xN matrix with columns representing points along the path.
+            
             if nargin < 3
                 error('must specify start and goal');
             end
@@ -161,7 +146,7 @@ classdef PRM < Navigation
 
             % are the vertices connected?
             if prm.graph.component(prm.vstart) ~= prm.graph.component(prm.vgoal)
-                error('PRM:plan:nopath', 'PRM: start and goal not connected: rerun the planner');
+                error('Navigation: start and goal not connected');
             end
             
             % find a path through the graph
@@ -174,7 +159,7 @@ classdef PRM < Navigation
             prm.gpath = prm.gpath(2:end);
 
             % start the navigation engine with a path to the nearest vertex
-            prm.graph.highlight_node(prm.vstart);
+            prm.graph.showVertex(prm.vstart);
 
             prm.localPath = bresenham(start, prm.graph.coord(prm.vstart));
             prm.localPath = prm.localPath(2:end,:);
@@ -191,7 +176,7 @@ classdef PRM < Navigation
             % we take the next point from the localPath
             if numrows(prm.localPath) == 0
                 % local path is consumed, move to next vertex
-                if isempty(prm.gpath)
+                if length(prm.gpath) == 0
                     % we have arrived at the goal vertex
                     % make the path from this vertex to the goal coordinate
                     prm.localPath = bresenham(p, prm.goal);
@@ -205,7 +190,7 @@ classdef PRM < Navigation
                     % compute local path to the next vertex
                     prm.localPath = bresenham(p, prm.graph.coord(prm.localGoal));
                     prm.localPath = prm.localPath(2:end,:);
-                    prm.graph.highlight_node(prm.localGoal);
+                    prm.graph.showVertex(prm.localGoal);
                 end
             end
 
@@ -213,59 +198,14 @@ classdef PRM < Navigation
             prm.localPath = prm.localPath(2:end,:); % and remove from the path
         end
 
-        function s = char(prm)
-        %PRM.char  Convert to string
-        %
-        % P.char() is a string representing the state of the PRM
-        % object in human-readable form.
-        %
-        % See also PRM.display.
-
-
-            % invoke the superclass char() method
-            s = char@Navigation(prm);
-
-            % add PRM specific stuff information
-            s = char(s, sprintf('  graph size: %d', prm.npoints));
-            s = char(s, sprintf('  dist thresh: %f', prm.distthresh));
-            s = char(s, char(prm.graph) );
-        end
-        
-        
-        function plot(prm, varargin)
-        %PRM.plot Visualize navigation environment
-        %
-        % P.plot() displays the occupancy grid with an optional distance field.
-        %
-        % Options::
-        %  'goal'            Superimpose the goal position if set
-        %  'nooverlay'       Don't overlay the PRM graph
-            
-            opt.nooverlay = false;
-            [opt,args] = tb_optparse(opt, varargin);
-            
-            % display the occgrid
-            plot@Navigation(prm, args{:});
-            
-            if ~opt.nooverlay
-                hold on
-                prm.graph.plot()%varargin{:});
-                hold off
-            end
-        end
-
-    end % method
-
-    methods (Access='protected')
-    % private methods
         % create the roadmap
         function create_roadmap(prm)
 
             for j=1:prm.npoints
                 % pick a point not in obstacle
                 while true
-                    x = prm.randi(numcols(prm.occgrid));
-                    y = prm.randi(numrows(prm.occgrid));
+                    x = randi(numcols(prm.occgrid));
+                    y = randi(numrows(prm.occgrid));
                     if prm.occgrid(y,x) == 0
                         break;
                     end
@@ -304,7 +244,47 @@ classdef PRM < Navigation
             c = true;
         end
 
+        function s = char(prm)
+        %PRM.char  Convert navigation object to string
+        %
+        % P.char() is a string representing the state of the navigation
+        % object in human-readable form.
+        %
+        % See also PRM.display.
 
-    end % private methods
 
+            % invoke the superclass char() method
+            s = char@Navigation(prm);
+
+            % add PRM specific stuff information
+            s = strvcat(s, sprintf('  graph size: %d', prm.npoints));
+            s = strvcat(s, sprintf('  dist thresh: %f', prm.distthresh));
+            s = strvcat(s, char(prm.graph) );
+        end
+        
+        
+        function visualize(prm, varargin)
+        %PRM.visualize
+        %
+        % P.visualize() displays the occupancy grid with an optional distance field
+        %
+        % Options::
+        %  'goal'            Superimpose the goal position if set
+        %  'nooverlay'       Don't overlay the PRM graph
+            
+            opt.nooverlay = false;
+            [opt,args] = tb_optparse(opt, varargin);
+            
+            % display the occgrid
+            visualize@Navigation(prm, args{:});
+            
+            if ~opt.nooverlay
+                hold on
+                prm.graph.plot()%varargin{:});
+                hold off
+                
+            end
+        end
+
+    end % method
 end % classdef

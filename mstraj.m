@@ -1,18 +1,14 @@
-%MSTRAJ Multi-segment multi-axis trajectory
+%MSTRAJ  Multi-segment multi-axis trajectory
 %
-% TRAJ = MSTRAJ(P, QDMAX, TSEG, Q0, DT, TACC, OPTIONS) is a trajectory
-% (KxN) for N axes moving simultaneously through M segment.  Each segment
-% is linear motion and polynomial blends connect the segments.  The axes
-% start at Q0 (1xN) and pass through M-1 via points defined by the rows of
-% the matrix P (MxN), and finish at the point defined by the last row of P.
-% The  trajectory matrix has one row per time step, and one column per
-% axis.  The number of steps in the trajectory K is a function of the
-% number of via points and the time or velocity limits that apply.
+% TRAJ = MSTRAJ(P, QDMAX, Q0, DT, TACC) is a multi-segment trajectory (KxN)
+% based on via points P (MxN) and axis velocity limits QDMAX (1xN).  The 
+% path comprises linear segments with polynomial blends.  The output 
+% trajectory matrix has one row per time step, and one column per axis.
 %
 % - P (MxN) is a matrix of via points, 1 row per via point, one column 
 %   per axis.  The last via point is the destination.
-% - QDMAX (1xN) are axis speed limits which cannot be exceeded,
-% - TSEG (1xM) are the durations for each of the K segments
+% - QDMAX (1xN) are axis velocity limits which cannot be exceeded, or
+% - QDMAX (Mx1) are the durations for each of the M segments
 % - Q0 (1xN) are the initial axis coordinates
 % - DT is the time step
 % - TACC (1x1) this acceleration time is applied to all segment transitions
@@ -20,32 +16,27 @@
 %   time for the transition from segment i to segment i+1.  TACC(1) is also 
 %   the acceleration time at the start of segment 1.
 %
-% TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC, QD0, QDF, OPTIONS) as above
-% but additionally specifies the initial and final axis velocities (1xN).
-%
-% Options::
-% 'verbose'    Show details.
+% TRAJ = MSTRAJ(SEGMENTS, QDMAX, Q0, DT, TACC, QD0, QDF) as above but 
+% additionally specifies the initial and final axis velocities (1xN).
 %
 % Notes::
-% - Only one of QDMAX or TSEG should be specified, the other is set to [].
 % - If no output arguments are specified the trajectory is plotted.
 % - The path length K is a function of the number of via points, Q0, DT
 %   and TACC.
-% - The final via point P(end,:) is the destination.
-% - The motion has M segments from Q0 to P(1,:) to P(2,:) ... to P(end,:).
+% - The final via point P(M,:) is the destination.
+% - The motion has M segments from Q0 to P(1,:) to P(2,:)  to P(M,:).
 % - All axes reach their via points at the same time.
 % - Can be used to create joint space trajectories where each axis is a joint
 %   coordinate.
-% - Can be used to create Cartesian trajectories where the "axes"
-%   correspond to translation and orientation in RPY or Euler angle form.
+% - Can be used to create Cartesian trajectories with the "axes" assigned
+%   to translation and orientation in RPY or Euler angle form.
 %
-% See also MTRAJ, LSPB, CTRAJ.
+% See also MSTRAJ, LSPB, CTRAJ.
 
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -59,11 +50,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
-function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
-
+function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, qd0, qdf)
 
     ns = numrows(segments);
     nj = numcols(segments);
@@ -75,16 +63,13 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
         error('Must specify one of qdmax or tsegment');
     end
 
-    [opt,args] = tb_optparse([], varargin);
+    debug = false;
+    debug = true;
 
-    if length(args) > 0
-        qd0 = args{1};
-    else
+    if nargin < 7
         qd0 = zeros(1, nj);
     end
-    if length(args) > 1
-        qdf = args{2};
-    else
+    if nargin < 8
         qdf = zeros(1, nj);
     end
 
@@ -99,7 +84,7 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
     taxis = [];
 
     for seg=1:ns
-        if opt.verbose
+        if debug
             fprintf('------------------- segment %d\n', seg);
         end
 
@@ -164,7 +149,7 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
             arrive(seg) = arrive(seg) + tacc2;
         end
 
-        if opt.verbose
+        if debug
             fprintf('seg %d, slowest axis %d, time required %.4g\n', ...
                 seg, slowest, tseg);
         end
@@ -175,13 +160,13 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
         qd = dq / tseg;
 
         % add the blend polynomial
-        qb = jtraj(q, q_prev+tacc2*qd, 0:dt:taccx, qd_prev, qd);
+        qb = jtraj(q, q_prev+tacc2*qd, [0:dt:taccx], qd_prev, qd);
         tg = [tg; qb(2:end,:)];
 
         clock = clock + taccx;     % update the clock
 
         % add the linear part, from tacc/2+dt to tseg-tacc/2
-        for t=tacc2+dt:dt:tseg-tacc2
+        for t=[tacc2+dt:dt:tseg-tacc2]
             s = t/tseg;
             q = (1-s) * q_prev + s * q_next;       % linear step
             tg = [tg; q];
@@ -192,12 +177,12 @@ function [TG, taxis]  = mstraj(segments, qdmax, tsegment, q, dt, Tacc, varargin)
         qd_prev = qd;
     end
     % add the final blend
-    qb = jtraj(q, q_next, 0:dt:tacc2, qd_prev, qdf);
+    qb = jtraj(q, q_next, [0:dt:tacc2], qd_prev, qdf);
     tg = [tg; qb(2:end,:)];
 
     % plot a graph if no output argument
     if nargout == 0
-        t = (0:numrows(tg)-1)'*dt;
+        t = [0:numrows(tg)-1]'*dt;
         clf
         plot(t, tg, '-o');
         hold on

@@ -1,7 +1,7 @@
 %MTRAJ Multi-axis trajectory between two points
 %
 % [Q,QD,QDD] = MTRAJ(TFUNC, Q0, QF, M) is a multi-axis trajectory (MxN) varying
-% from configuration Q0 (1xN) to QF (1xN) according to the scalar trajectory function 
+% from state Q0 (1xN) to QF (1xN) according to the scalar trajectory function 
 % TFUNC in M steps. Joint velocity and acceleration can be optionally returned as 
 % QD (MxN) and QDD (MxN) respectively.  The trajectory outputs have one row per 
 % time step, and one column per axis.
@@ -11,8 +11,8 @@
 % and possible values of TFUNC include @lspb for a trapezoidal trajectory, or
 % @tpoly for a polynomial trajectory.
 %
-% [Q,QD,QDD] = MTRAJ(TFUNC, Q0, QF, T) as above but T (Mx1) is a time
-% vector which dictates the number of points on the trajectory.
+% [Q,QD,QDD] = MTRAJ(TFUNC, Q0, QF, T) as above but specifies the trajectory 
+% length in terms of the length of the time vector T (Mx1).
 %
 % Notes::
 % - If no output arguments are specified Q, QD, and QDD are plotted.
@@ -22,10 +22,9 @@
 %
 % See also JTRAJ, MSTRAJ, LSPB, TPOLY.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -39,8 +38,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function [S,Sd,Sdd] = mtraj(tfunc, q0, qf, M)
 

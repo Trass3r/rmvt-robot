@@ -1,14 +1,24 @@
 %RTJADEMO Jacobian demo
 
-% Copyright (C) 1993-2002, by Peter I. Corke
-echo off
-% 6/99	change arg to maniplty() to 'yoshikawa'
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2002-04-01 11:47:17  pic
-% General cleanup of code: help comments, see also, copyright, remnant dh/dyn
-% references, clarification of functions.
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% $Revision: 1.1 $
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
 echo on
 %
 % Jacobian and differential motion demonstration
@@ -26,7 +36,7 @@ echo on
 % but a more direct approach is to use the function diff2tr()
 %
     D = [.1 .2 0 -.2 .1 .1]';
-    diff2tr(D)
+    delta2tr(D)
 pause % any key to continue
 %
 % More commonly it is useful to know how a differential motion in one 
@@ -57,11 +67,11 @@ pause % any key to continue
 % the world coordinate frame,
 
     q = [0.1 0.75 -2.25 0 .75 0]
-    J = jacob0(p560, q)
+    J = p560.jacob0(q)
 %
 % or the T6 coordinate frame
 
-    J = jacobn(p560, q)
+    J = p560.jacobn(q)
 %
 % Note the top right 3x3 block is all zero.  This indicates, correctly, that
 % motion of joints 4-6 does not cause any translational motion of the robot's
@@ -103,7 +113,7 @@ pause % any key to continue
 % is, d0X.  We can write
 % 	d6X = Jac(T6) d0X
 %
-    T6 = fkine(p560, q); % compute the end-effector transform
+    T6 = p560.fkine(q); % compute the end-effector transform
     d6X = tr2jac(T6) * vel; % translate world frame velocity to T6 frame
     qvel = Ji * d6X; % compute required joint velocity as before
     qvel'
@@ -116,7 +126,7 @@ pause % any key to continue
 % At the Puma's `ready' position for instance, two of the wrist joints are
 % aligned resulting in the loss of one degree of freedom.  This is revealed by
 % the rank of the Jacobian
-    rank( jacobn(p560, qr) )
+    rank( p560.jacobn(qr) )
 %
 % and the singular values are
     svd( jacobn(p560, qr) )
@@ -128,7 +138,7 @@ pause % any key to continue
 %
 % A number of scalar manipulability measures have been proposed.  One by
 % Yoshikawa
-    maniplty(p560, q, 'yoshikawa')
+    p560.maniplty(q, 'yoshikawa')
 %
 % is based purely on kinematic parameters of the manipulator.
 %
@@ -136,7 +146,7 @@ pause % any key to continue
 % affects the acceleration achievable in different directions.  This measure 
 % varies from 0 to 1, where 1 indicates uniformity of acceleration in all 
 % directions
-    maniplty(p560, q, 'asada')
+    p560.maniplty(q, 'asada')
 %
 % Both of these measures would indicate that this particular pose is not well
 % conditioned.

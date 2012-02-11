@@ -10,9 +10,10 @@
 %    r2 = p560.perturb(0.1);
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -31,19 +32,18 @@
 
 function  r2 = perturb(r, p)
 
-	if nargin == 1
+	if nargin == 1,
 		p = 0.1;	% 10 percent disturb by default
 	end
 
-    r2 = SerialLink(r);
 
-    links = r2.links;
-	for i=1:r.n
+	for i=1:r.n,
+		l2{i} = r.link{i};
 		s = (2*rand-1)*p + 1;
-		links(i).m = links(i).m * s;
-
+		l2{i}.m = l2{i}.m * s;
 		s = (2*rand-1)*p + 1;
-		links(i).I = links(i).I * s;
+		l2{i}.I = l2{i}.I * s;
 	end
 
+	r2 = robot(r, l2);		% clone the robot
 	r2.name = ['P/' r.name];

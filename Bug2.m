@@ -1,35 +1,26 @@
 %BUG2 Bug navigation class
 %
-% A concrete subclass of the abstract Navigation class that implements the bug2 
-% navigation algorithm.  This is a simple automaton that performs local 
-% planning, that is, it can only sense the immediate presence of an obstacle.
+% A concrete subclass of Navigation that implements the bug2 navigation 
+% algorithm.  This is a simple automaton that performs local planning, that
+% is, it can only sense the immediate presence of an obstacle.
 %
 % Methods::
 %   path        Compute a path from start to goal
-%   visualize    Display the obstacle map (deprecated)
-%   plot         Display the obstacle map
-%   display     Display state/parameters in human readable form
-%   char        Convert to string
+%   visualize   Display the occupancy grid
+%   display     Display the state/parameters in human readable form
+%   char        Convert  the state/parameters to human readable form
 %
 % Example::
-%         load map1             % load the map
-%         bug = Bug2(map);      % create navigation object
-%         bug.goal = [50, 35];  % set the goal
-%         bug.path([20, 10]);   % animate path to (20,10)
+%    load map1
+%    bug = Bug2(map);
+%    bug.goal = [50; 35];
+%    bug.path([20; 10]);
 %
-% Reference::
-% -  Dynamic path planning for a mobile automaton with limited information on the environment,,
-%    V. Lumelsky and A. Stepanov, 
-%    IEEE Transactions on Automatic Control, vol. 31, pp. 1058-1063, Nov. 1986.
-% -  Robotics, Vision & Control, Sec 5.1.2,
-%    Peter Corke, Springer, 2011.
-%  
 % See also Navigation, DXform, Dstar, PRM.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -43,8 +34,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 classdef Bug2 < Navigation
 
@@ -67,9 +56,7 @@ classdef Bug2 < Navigation
             % planar world as a matrix whose elements are 0 (free space) or 1
             % (occupied).
             %
-            % Options::
-            % 'goal',G      Specify the goal point (1x2)
-            % 'inflate',K   Inflate all obstacles by K cells.
+            % B = Bug2(MAP, GOAL) as above but specify the goal point.
             %
             % See also Navigation.Navigation.
 
@@ -79,6 +66,10 @@ classdef Bug2 < Navigation
             bug.H = [];
             bug.j = 1;
             bug.step = 1;
+
+            if nargin > 1
+                bug.goal = goal;
+            end
         end
 
         % null planning for the bug!
@@ -88,9 +79,6 @@ classdef Bug2 < Navigation
 
         function navigate_init(bug, robot)
 
-            if isempty(bug.goal)
-                error('RTB:bug2:nogoal', 'no goal set, cant compute path');
-            end
             % parameters of the M-line, direct from initial position to goal
             % as a vector mline, such that [robot 1]*mline = 0
             dims = axis;
@@ -124,7 +112,7 @@ classdef Bug2 < Navigation
             if bug.step == 1
                 % Step 1.  Move along the M-line toward the goal
 
-                if colnorm(bug.goal - robot) == 0 % are we there yet?
+                if norm2(bug.goal - robot) == 0 % are we there yet?
                     return
                 end
 
@@ -149,7 +137,7 @@ classdef Bug2 < Navigation
             if bug.step == 2
                 % Step 2.  Move around the obstacle until we reach a point
                 % on the M-line closer than when we started.
-                if colnorm(bug.goal-robot) == 0 % are we there yet?
+                if norm2(bug.goal-robot) == 0 % are we there yet?
                     return
                 end
 
@@ -166,7 +154,7 @@ classdef Bug2 < Navigation
                 if abs( [robot' 1]*bug.mline') <= 0.5
                     bug.message('(%d,%d) moving along the M-line', n);
                     % are closer than when we encountered the obstacle?
-                    if colnorm(robot-bug.goal) < colnorm(bug.H(bug.j,:)'-bug.goal)
+                    if norm2(robot-bug.goal) < norm2(bug.H(bug.j,:)'-bug.goal)
                         % back to moving along the M-line
                         bug.j = bug.j + 1;
                         bug.step = 1;

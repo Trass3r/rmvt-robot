@@ -1,10 +1,8 @@
 %TRPRINT Compact display of homogeneous transformation
 %
-% TRPRINT(T, OPTIONS) displays the homogoneous transform in a compact 
+% TRPRINT(T, options) displays the homogoneous transform in a compact 
 % single-line format.  If T is a homogeneous transform sequence then each 
 % element is printed on a separate line.
-%
-% S = TRPRINT(T, OPTIONS) as above but returns the string.
 %
 % TRPRINT T  is the command line form of above, and displays in RPY format.
 %
@@ -16,19 +14,11 @@
 % 'fmt', f     use format string f for all numbers, (default %g)
 % 'label',l    display the text before the transform
 %
-% Examples::
-%        >> trprint(T2)
-%        t = (0,0,0), RPY = (-122.704,65.4084,-8.11266) deg
-%
-%        >> trprint(T1, 'label', 'A')
-%               A:t = (0,0,0), RPY = (-0,0,-0) deg
-%
 % See also TR2EUL, TR2RPY, TR2ANGVEC.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -42,12 +32,10 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function out = trprint(T, varargin)
     
-    if ischar(T)
+    if isstr(T)
         % command form: trprint T
         trprint( evalin('base', T) );
         return;
@@ -74,7 +62,7 @@ function out = trprint(T, varargin)
         
         for i=1:size(T,3)
             % for each 4x4 transform in a possible 3D matrix
-            s = char(s, tr2s(T(:,:,i), opt) );
+            s = strvcat(s, tr2s(T(:,:,i), opt) );
         end
     end
 
@@ -89,9 +77,7 @@ end
 function s = tr2s(T, opt)
     % print the translational part if it exists
     if ~isempty(opt.label)
-        s = sprintf('%8s: ', opt.label);
-    else
-        s = '';
+        s = sprintf('-8s: ', opt.label);
     end
     if ~isrot(T)
         s = strcat(s, sprintf('t = (%s),', vec2s(opt.fmt, transl(T)')));

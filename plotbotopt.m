@@ -1,8 +1,12 @@
-%PLOTBOTOPT Define options for robot plotting
+%PLOTBOTOPT Define default options for robot plotting
 %
-% Default options for robot/plot function.
+% A user provided function that returns a cell array of default
+% plot options for the SerialLink.plot method.
+%
+% See also SerialLink.plot.
 
-% Copyright (C) 2001-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -19,5 +23,5 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function o = plotbotopt
-	o = {'base' 'perspective' };
+function options = plotbotopt
+	options = {'base' 'perspective'};

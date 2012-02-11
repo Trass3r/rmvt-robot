@@ -18,26 +18,7 @@
 % e               erase map
 % q               leave editing mode and return map
 %
-% See also DXForm, PRM, RRT.
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
+% See also: DXForm, PRM, RRT.
 
 function world = makemap(Nw)
 
@@ -45,26 +26,23 @@ function world = makemap(Nw)
         Nw = 128;
     end
 
-    if isscalar(Nw)
-        % initialize a new map
-        world = zeros(Nw, Nw);
-    else
+    if numel(size(Nw)) == 2
         % we were passed a map
         world = Nw;
+    else
+        % initialize a new map
+        world = zeros(Nw, Nw);
     end
 
     imagesc(world);
-    set(gca, 'Ydir', 'normal');
     grid
     binary_cmap = [1 1 1; 1 0 0];
     colormap(binary_cmap);
     caxis([0 1]);
     figure(gcf)
-    set(gcf, 'Name', 'makemap');
 
     fprintf('makemap:\n');
     fprintf('  left button, click and drag to create a rectangle\n');
-    fprintf('  or type the following letters in the figure window:\n');
     fprintf('  p - draw polygon\n');
     fprintf('  c - draw circle\n');
     fprintf('  e - erase map\n');
@@ -72,7 +50,7 @@ function world = makemap(Nw)
     fprintf('  q - leave editing mode\n');
 
 
-    while 1
+    while 1,
         drawnow
 
         k = waitforbuttonpress;
@@ -93,7 +71,7 @@ function world = makemap(Nw)
                     [X,Y] = meshgrid(1:Nw, 1:Nw);
                     world = world + inpolygon(X, Y, xy(:,1), xy(:,2));
                     
-                case 'c'
+                case 'c',
                     fprintf('click a centre point')
                     title('click a centre point')
                     waitforbuttonpress;
@@ -115,7 +93,7 @@ function world = makemap(Nw)
                     drawnow
                     hold off
 
-                    r = round(colnorm(point1-point2));
+                    r = round(norm2(point1-point2));
                     c = kcircle(r);
 
                     world_prev = world;
@@ -141,6 +119,7 @@ function world = makemap(Nw)
         else
             % button pressed
             point1 = get(gca,'CurrentPoint');    % button down detected
+            finalRect = rbbox;                   % return figure units
             point2 = get(gca,'CurrentPoint');    % button up detected
 
             point1 = round(point1(1,1:2));       % extract x and y
@@ -150,13 +129,6 @@ function world = makemap(Nw)
             x2 = min(Nw, point2(1));
             y1 = max(1, point1(2));
             y2 = min(Nw, point2(2));
-            
-            if x1 > x2
-                t = x1; x1 = x2; x2 = t;
-            end
-            if y1 > y2
-                t = y1; y1 = y2; y2 = t;
-            end
 
             world_prev = world;
             world(y1:y2, x1:x2) = 1;

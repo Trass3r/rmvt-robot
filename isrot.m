@@ -1,10 +1,14 @@
-%ISHOMOG Test if argument is a homogeneous transformation
+%ISROT Test if argument is a rotation matrix
 %
-%	H = ISHOMOG(TR)
+% ISROT(R) is true (1) if the argument is of dimension 3x3 or 3x3xN, else false (0).
 %
-%  Returns true (1) if the argument tr is of dimension 4x4.
+% ISROT(R, 'valid') as above, but also checks the validity of the rotation
+% matrix.
+%
+% See also ISHOMOG, ISVEC.
 
-% Copyright (C) 2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -21,9 +25,16 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function h = isrot(r)
-	if ndims(r) == 2,
-		h =  all(size(r) == [3 3]);
-	else
-		h = 0;
-	end
+function h = isrot(r, dtest)
+
+    d = size(r);
+    if ndims(r) >= 2
+        h =  all(d(1:2) == [3 3]);
+
+        if h && nargin > 1
+            h = abs(det(r) - 1) < eps;
+        end
+
+    else
+        h = false;
+    end

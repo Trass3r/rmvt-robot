@@ -1,14 +1,13 @@
 %JSINGU Show the linearly dependent joints in a Jacobian matrix
 %
 % JSINGU(J) displays the linear dependency of joints in a Jacobian matrix.
-% This dependency indicates joint axes that are aligned and causes singularity.
+% This dependency indicated joint axes that are aligned and causes singularity.
 %
 % See also SerialLink.jacobn.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -22,15 +21,13 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 function jsingu(J)
 
     % convert to row-echelon form
     [R, jb] = rref(J);
 
-    depcols = setdiff( 1:numcols(J), jb);
+    depcols = setdiff( [1:numcols(J)], jb);
 
     fprintf('%d linearly dependent joints:\n', length(depcols));
     for d=depcols

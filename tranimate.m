@@ -1,15 +1,15 @@
 %TRANIMATE Animate a coordinate frame
 %
-% TRANIMATE(P1, P2, OPTIONS) animates a 3D coordinate frame moving from pose X1
-% to pose X2.  Poses X1 and X2 can be represented by:
+% TRANIMATE(P1, P2, OPTIONS) animates a 3D coordinate frame moving from pose P1
+% to pose P2.  Poses P1 and P2 can be represented by:
 %   - homogeneous transformation matrices (4x4)
 %   - orthonormal rotation matrices (3x3)
 %   - Quaternion
 %
-% TRANIMATE(X, OPTIONS) animates a coordinate frame moving from the identity pose
-% to the pose X represented by any of the types listed above.
+% TRANIMATE(P, OPTIONS) animates a coordinate frame moving from the identity pose
+% to the pose P represented by any of the types listed above.
 %
-% TRANIMATE(XSEQ, OPTIONS) animates a trajectory, where XSEQ is any of
+% TRANIMATE(PSEQ, OPTIONS) animates a trajectory, where PSEQ is any of
 %   - homogeneous transformation matrix sequence (4x4xN)
 %   - orthonormal rotation matrix sequence (3x3xN)
 %   - Quaternion vector (Nx1)
@@ -17,24 +17,12 @@
 % Options::
 %  'fps', fps    Number of frames per second to display (default 10)
 %  'nsteps', n   The number of steps along the path (default 50)
-%  'axis',A      Axis bounds [xmin, xmax, ymin, ymax, zmin, zmax]
-%  'movie',M     Save frames as files in the folder M
 %
-%  Additional options are passed through to TRPLOT.
-%
-% Notes::
-% - Uses the Animate helper class to record the frames.
-% - Poses X1 and X2 must both be of the same type
-% - The 'movie' options saves frames as files NNNN.png.
-% - To convert frames to a movie use a command like:
-%        ffmpeg -r 10 -i %04d.png out.avi
-%
-% See also TRPLOT, Animate.
+% See also TRPLOT.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -48,8 +36,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 % TODO
 %  auto detect the axis scaling
@@ -57,21 +43,16 @@ function tranimate(P2, varargin)
 
     opt.fps = 10;
     opt.nsteps = 50;
-    opt.axis = [];
-    opt.movie = [];
 
     [opt, args] = tb_optparse(opt, varargin);
-    
-    if ~isempty(opt.movie)
-        anim = Animate(opt.movie);
-    end
+
     P1 = [];
 
     % convert quaternion and rotation matrix to hom transform
     if isa(P2, 'Quaternion')
         T2 = P2.T;   % convert quaternion to transform
         if ~isempty(args) && isa(args{1},'Quaternion')
-            T1 = T2;
+            P1 = T2;
             Q2 = args{1};
             T2 = Q2.T;
             args = args(2:end);
@@ -81,7 +62,7 @@ function tranimate(P2, varargin)
     elseif isrot(P2)
         T2 = r2t(P2);
         if ~isempty(args) && isrot(args{1})
-            T1 = T2;
+            P1 = T2;
             T2 = r2t(args{1});
             args = args(2:end);
         else
@@ -90,7 +71,7 @@ function tranimate(P2, varargin)
     elseif ishomog(P2)
         T2 = P2;
         if ~isempty(args) && ishomog(args{1})
-            T1 = T2;
+            P1 = T2;
             T2 = args{1};
             args = args(2:end);
         else
@@ -116,27 +97,21 @@ function tranimate(P2, varargin)
         % create a path between them
         Ttraj = ctraj(T1, T2, opt.nsteps);
     end
-    
-    if isempty(opt.axis)
-        % create axis limits automatically based on motion of frame origin
-        t = transl(Ttraj);
-        mn = min(t) - 1.5;  % min value + length of axis + some
-        mx = max(t) + 1.5;  % max value + length of axis + some
-        axlim = [mn; mx];
-        axlim = axlim(:)';
-        args = [args 'axis' axlim];
-    end
-    
-    hg = trplot(eye(4,4), args{:});  % create a frame at the origin
 
-    % animate it for all poses in the sequence
+    % do axis checking in here
+    %compute coords of origin and ends of axes for start and end pose.
+    %T0 = Ttraj(:,:,1)
+    %T1 = Ttraj(:,:,end)
+    %pts = [0 0 0; 1 0 0; 0 1 0; 0 0 1]';
+    %ptsx = [transformp(T0, pts) transformp(T1, pts)];
+    %mn = min(ptsx');
+    %mx = max(ptsx');
+    %axis([mn(1) mx(1) mn(2) mx(2) mn(3) mx(3)]);
+
+    hg = trplot(Ttraj(:,:,1), args{:});
+
     for i=1:size(Ttraj,3)
         T = Ttraj(:,:,i);
-        trplot(hg, T);
-        
-        if ~isempty(opt.movie)
-            anim.add();
-        end
-        
+        set(hg, 'Matrix', T);
         pause(1/opt.fps);
     end

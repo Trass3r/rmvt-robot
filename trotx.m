@@ -1,13 +1,15 @@
 %TROTX Rotation about X axis
 %
-%	TR = TROTX(theta)
+% T = TROTX(THETA) is a homogeneous transformation (4x4) representing a rotation 
+% of THETA about the x-axis.
 %
-% Returns a homogeneous transformation representing a rotation of theta 
-% about the X axis.
+% Notes::
+% - Translational component is zero.
 %
-% See also: TROTY, TROTZ, ROTVEC.
+% See also ROTX, TROTY, TROTZ.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -25,4 +27,4 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
 function T = trotx(t)
-	T =    [rotx(t) [0 0 0]'; 0 0 0 1];
+	T = [rotx(t) [0 0 0]'; 0 0 0 1];

@@ -1,22 +1,19 @@
-%CTRAJ Compute a Cartesian trajectory between two points
+%CTRAJ Cartesian trajectory between two points
 %
-% 	TC = CTRAJ(T0, T1, N)
-%	TC = CTRAJ(T0, T1, R)
+% TC = CTRAJ(T0, T1, N) is a Cartesian trajectory (4x4xN) from pose T0 to T1
+% with N points that follow a trapezoidal velocity profile along the path.
+% The Cartesian trajectory is a homogeneous transform sequence and the last 
+% subscript being the point index, that is, T(:,:,i) is the i'th point along
+% the path.
 %
-% Returns a Cartesian trajectory TC from point T0 to T1.  The number
-% of points is N or the length of the given path distance vector R.
+% TC = CTRAJ(T0, T1, S) as above but the elements of S (Nx1) specify the 
+% fractional distance  along the path, and these values are in the range [0 1].
+% The i'th point corresponds to a distance S(i) along the path.
 %
-% In the first case the points are equally spaced between T0 and T1.
-% In the second case R gives the distance along the path, and the 
-% elements of R must be in the range [0 1].
-%
-% Each trajectory is a 4x4xn matrix, with the last subscript being the
-% point index.
-%
-% SEE ALSO: TRINTERP, QINTERP, TRANSL.
-%
+% See also LSPB, MSTRAJ, TRINTERP, Quaternion.interp, TRANSL.
 
-% Copyright (C) 1993-2008, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
@@ -33,22 +30,23 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-function tt = ctraj(t0, t1, n)
-	if length(n) == 1,
-		i = 1:n;
-		r = (i-1)/(n-1);
-	else
-		r = n(:)';
-		n = length(r);
-	end
+function traj = ctraj(T0, T1, t)
 
-	if any(r> 1) | any(r<0),
-		error('path position values (R) must 0<=R<=1)')
-	end
-	tt = zeros(4,4,0);
+    if ~ishomog(T0) || ~ishomog(T1)
+        error('arguments must be homogeneous transformations');
+    end
+    
+    % distance along path is a smooth function of time
+    if isscalar(t)
+        s = lspb(0, 1, t);
+    else
+        s = t(:);
+    end
 
-	for R=r,
-		tt = cat(3, tt, trinterp(t0, t1, R));
-	end
+    traj = [];
 
-	
+    for S=s'
+        traj = cat(3, traj, trinterp(T0, T1, S));
+    end
+
+    
