@@ -1,9 +1,8 @@
 %TRPRINT Compact display of homogeneous transformation
 %
-% TRPRINT(T, options) displays the homogoneous transform in a 
-% compact single-line format.  If T is a homogeneous 
-% transform sequence then print each element is printed on
-% a separate line.
+% TRPRINT(T, options) displays the homogoneous transform in a compact 
+% single-line format.  If T is a homogeneous transform sequence then each 
+% element is printed on a separate line.
 %
 % TRPRINT T  is the command line form of above, and displays in RPY format.
 %
@@ -49,7 +48,7 @@ function out = trprint(T, varargin)
 
     opt = tb_optparse(opt, varargin);
 
-    s = opt.label;
+    s = '';
 
     if size(T,3) == 1
         if isempty(opt.fmt)
@@ -77,10 +76,11 @@ end
 
 function s = tr2s(T, opt)
     % print the translational part if it exists
+    if ~isempty(opt.label)
+        s = sprintf('-8s: ', opt.label);
+    end
     if ~isrot(T)
-        s = sprintf('t = (%s),', vec2s(opt.fmt, transl(T)'));
-    else
-        s = '';
+        s = strcat(s, sprintf('t = (%s),', vec2s(opt.fmt, transl(T)')));
     end
 
     % print the angular part in various representations
