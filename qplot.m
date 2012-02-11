@@ -1,13 +1,14 @@
 %QPLOT Plot joint angles
 %
-% QPLOT(Q) is a convenience function to plot joint angle trajectories for a
-% 6-axis robot.  Q is Nx6, and the first three joints are shown as solid lines,
-% the last three joints are shown as dashed lines.  A legend is also
-% displayed.
+% QPLOT(Q) is a convenience function to plot joint angle trajectories (Mx6) for 
+% a 6-axis robot, where each row represents one time step.
 %
-% QPLOT(T, Q) displays the joint angle trajectory versus time T. 
+% The first three joints are shown as solid lines, the last three joints (wrist)
+% are shown as dashed lines.  A legend is also displayed.
 %
-% See also JTRAJ.
+% QPLOT(T, Q) as above but displays the joint angle trajectory versus time T (Mx1). 
+%
+% See also JTRAJ, PLOT.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
@@ -38,7 +39,7 @@ function qplot(t, q)
     grid on
     xlabel('time')
     ylabel('q')
-    legend('1', '2', '3', '4', '5', '6');
+    legend('q1', 'q2', 'q3', 'q4', 'q5', 'q6');
     hold off
 
     xlim([t(1), t(end)]);
