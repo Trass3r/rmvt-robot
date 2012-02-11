@@ -1,6 +1,6 @@
 %SerialLink.accel Manipulator forward dynamics
 %
-% QDD = R.accel(Q, QD, TORQUE) is a vector of joint accelerations that result 
+% QDD = R.accel(Q, QD, TORQUE) is a vector (Nx1) of joint accelerations that result 
 % from applying the actuator force/torque to the manipulator robot in state Q and QD.
 % If Q, QD, TORQUE are matrices with M rows, then QDD is a matrix with M rows
 % of acceleration corresponding to the equivalent rows of Q, QD, TORQUE.
@@ -13,7 +13,6 @@
 %   conjunction with a numerical integration function.
 %
 % See also SerialLink.rne, SerialLink, ode45.
-
 
 
 % Copyright (C) 1993-2011, by Peter I. Corke
@@ -37,6 +36,31 @@
 
 
 function qdd = accel(robot, Q, qd, torque)
+
+    if numcols(Q) ~= robot.n
+        error('q must have %d columns', robot.n);
+    end
+    if numcols(qd) ~= robot.n
+        error('qd must have %d columns', robot.n);
+    end
+    if numcols(torque) ~= robot.n
+        error('torque must have %d columns', robot.n);
+    end
+
+    if numrows(Q) > 1
+        if numrows(Q) ~= numrows(qd)
+            error('for trajectory q and qd must have same number of rows');
+        end
+        if numrows(Q) ~= numrows(torque)
+            error('for trajectory q and torque must have same number of rows');
+        end
+        qdd = [];
+        for i=1:numrows(Q)
+            qdd = cat(1, qdd, robot.accel(Q(i,:), qd(i,:), torque(i,:))');
+        end
+        return
+    end
+
 	n = robot.n;
 
 	if nargin == 2

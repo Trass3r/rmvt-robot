@@ -6,6 +6,10 @@
 % The off-diagonal elements are coupling inertias that relate acceleration
 % on joint i to force/torque on joint j.
 %
+% If Q is a matrix (DxN), each row is interpretted as a joint state 
+% vector, and the result (NxNxD) is a 3d-matrix where each plane corresponds
+% to the inertia for the corresponding row of Q.
+%
 % See also SerialLink.RNE, SerialLink.CINERTIA, SerialLink.ITORQUE.
 
 
@@ -30,6 +34,18 @@
 % http://www.petercorke.com
 
 function M = inertia(robot, q)
+    if numcols(q) ~= robot.n
+        error('q must have %d columns', robot.n);
+    end
+
+    if numrows(q) > 1
+        M = [];
+        for i=1:numrows(q)
+            M = cat(3, M, robot.inertia(q(i,:)));
+        end
+        return
+    end
+
 	n = robot.n;
 
 	if numel(q) == robot.n,

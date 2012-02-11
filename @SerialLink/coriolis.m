@@ -8,14 +8,14 @@
 % known as the velocity coupling matrix, since gives the disturbance forces
 % on all joints due to velocity of any joint.
 %
-% If Q and QD are row vectors, the result is a row-vector of joint torques.
-% If Q and QD are matrices, each row is interpretted as a joint state 
-% vector, and the result is a matrix each row being the  corresponding joint 
-% torques.
+% If Q and QD are matrices (DxN), each row is interpretted as a joint state 
+% vector, and the result (NxNxD) is a 3d-matrix where each plane corresponds
+% to a row of Q and QD.
 %
 % Notes::
 % - joint friction is also a joint force proportional to velocity but it is
 %   eliminated in the computation of this value.
+% - computationally slow, involves N^2/2 invocations of RNE.
 %
 % See also SerialLink.rne.
 
@@ -43,9 +43,27 @@
 
 function C = coriolis(robot, q, qd)
 
+    if numcols(q) ~= robot.n
+        error('q must have %d columns', robot.n);
+    end
+    if numcols(qd) ~= robot.n
+        error('qd must have %d columns', robot.n);
+    end
+
     % we need to create a clone robot with no friciton, since friction
     % is also proportional to joint velocity
     robot2 = robot.nofriction('all');
+
+    if numrows(q) > 1
+        if numrows(q) ~= numrows(qd)
+            error('for trajectory q and qd must have same number of rows');
+        end
+        C = [];
+        for i=1:numrows(q)
+            C = cat(3, C, robot2.coriolis(q(i,:), qd(i,:)));
+        end
+        return
+    end
 
     N = robot2.n;
     C = zeros(N,N);

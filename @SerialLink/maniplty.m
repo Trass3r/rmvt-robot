@@ -51,55 +51,50 @@
 % http://www.petercorke.com
 
 function [w,mx] = maniplty(robot, q, varargin)
-	n = robot.n;
+    n = robot.n;
 
-    opt.yoshikawa = true;
-    opt.asada = false;
+    opt.method = {'yoshikawa', 'asada'};
     opt.axes = {'all', 'T', 'R'};
 
     opt = tb_optparse(opt, varargin);
 
-	if length(q) == robot.n,
-		q = q(:)';
-	end
-
-	w = [];
+    w = [];
     MX = [];
 
-    if opt.yoshikawa
-		for Q = q',
-			w = [w; yoshi(robot, Q, opt)];
-		end
-	elseif opt.asada
-		for Q = q',
+    if strcmp(opt.method, 'yoshikawa')
+        for Q = q'
+            w = [w; yoshi(robot, Q', opt)];
+        end
+    elseif strcmp(opt.method, 'asada')
+        for Q = q'
             if nargout > 1
-                [ww,mm] = asada(robot, Q);
+                [ww,mm] = asada(robot, Q');
                 w = [w; ww];
                 MX = cat(3, MX, mm);
             else
-                w = [w; asada(robot, Q, opt)];
+                w = [w; asada(robot, Q', opt)];
             end
-		end
-	end
+        end
+    end
 
     if nargout > 1
         mx = MX;
     end
 
 function m = yoshi(robot, q, opt)
-	J = jacob0(robot, q);
+    J = robot.jacob0(q);
     switch opt.axes
     case 'T'
         J = J(1:3,:);
     case 'R'
         J = J(4:6,:);
     end
-	m = sqrt(det(J * J'));
+    m = sqrt(det(J * J'));
 
 function [m, mx] = asada(robot, q, opt)
-	J = jacob0(robot, q);
+    J = robot.jacob0(q);
     
-    if rank(J) < 6,
+    if rank(J) < 6
         warning('robot is in degenerate configuration')
         m = 0;
         return;
@@ -111,11 +106,11 @@ function [m, mx] = asada(robot, q, opt)
     case 'R'
         J = J(4:6,:);
     end
-	Ji = inv(J);
-	M = inertia(robot, q);
-	Mx = Ji' * M * Ji;
-	e = eig(Mx(1:3,1:3));
-	m = min(e) / max(e);
+    Ji = inv(J);
+    M = robot.inertia(q);
+    Mx = Ji' * M * Ji;
+    e = eig(Mx(1:3,1:3));
+    m = min(e) / max(e);
 
     if nargout > 1
         mx = Mx;
