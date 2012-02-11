@@ -3,10 +3,10 @@
 % Q = R.ikine(T) is the joint coordinates corresponding to the robot 
 % end-effector pose T which is a homogenenous transform.
 %
-% Q = R.ikine(T, Q0) specifies the initial estimate of the joint 
+% Q = R.ikine(T, Q0, OPTIONS) specifies the initial estimate of the joint 
 % coordinates.
 %
-% Q = R.ikine(T, Q0, M) specifies the initial estimate of the joint 
+% Q = R.ikine(T, Q0, M, OPTIONS) specifies the initial estimate of the joint 
 % coordinates and a mask matrix.  For the case where the manipulator 
 % has fewer than 6 DOF the solution space has more dimensions than can
 % be spanned by the manipulator joint coordinates.  In this case
@@ -24,6 +24,8 @@
 % transforms in the sequence.  Q is MxN where N is the number of robot joints.
 % The initial estimate of Q for each time step is taken as the solution 
 % from the previous time step.
+%
+% Options::
 %
 % Notes::
 % - Solution is computed iteratively using the pseudo-inverse of the
@@ -58,97 +60,72 @@
 %
 % http://www.petercorke.com
 
-function qt = ikine(robot, tr, q, m, newopt)
-	%  set default parameters for solution
-	opt.ilimit = 1000;
-	opt.tol = 1e-6;
-    opt.debug = false;
-    opt.lambda = 0.4;
-    % 0.4 for Puma
-    % 10 for leg
-    opt.useInverse = false;
+function qt = ikine(robot, tr, varargin)
+    %  set default parameters for solution
+    opt.ilimit = 100;
+    opt.tol = 1e-6;
+    opt.alpha = 1;
+    opt.plot = false;
+    opt.pinv = false;
 
-    % with no arguments, return the default parameters as a struct
-    if nargin == 0
-        qt = opt;
-        return
-    end
+    [opt,args] = tb_optparse(opt, varargin);
 
-    % if a parameter struct is provided, use it instead
-    if nargin == 5
-        opt = newopt;
-    end
+    n = robot.n;
 
-    % OK, looks like we are doing real stuff
-	n = robot.n;
-
-    % check sanity of arguments
-	if nargin < 3,
-		q = zeros(n, 1);
-	else
+    % robot.ikine(tr, q)
+    if length(args) > 0
+        q = args{1};
         if isempty(q)
-            q = zeros(n, 1);
+            q = zeros(1, n);
         else
-            q = q(:);
+            q = q(:)';
         end
-	end
-	if nargin == 4,
-		m = m(:);
-		if length(m) ~= 6,
-			error('Mask matrix should have 6 elements');
-		end
-		if length(find(m)) ~= robot.n 
-			error('Mask matrix must have same number of 1s as robot DOF')
-		end
-	else
-		if n < 6,
-			error('For a manipulator with fewer than 6DOF a mask matrix argument must be specified');
-		end
-		m = ones(6, 1);
-	end
-		
+    else
+        q = zeros(1, n);
+    end
+
+    % robot.ikine(tr, q, m)
+    if length(args) > 1
+        m = args{2};
+        m = m(:);
+        if numel(m) ~= 6
+            error('Mask matrix should have 6 elements');
+        end
+        if numel(find(m)) ~= robot.n 
+            error('Mask matrix must have same number of 1s as robot DOF')
+        end
+    else
+        if n < 6
+            error('For a manipulator with fewer than 6DOF a mask matrix argument must be specified');
+        end
+        m = ones(6, 1);
+    end
     % make this a logical array so we can index with it
     m = logical(m);
 
     npoints = size(tr,3);    % number of points
     qt = zeros(npoints, n);  % preallocate space for results
     tcount = 0;              % total iteration count
+    eprev = Inf;
 
+    save.e = Inf;
+    save.q = [];
+
+    history = [];
     for i=1:npoints
         T = tr(:,:,i);
         nm = Inf;
         count = 0;
-        while nm > opt.tol,
-            e = tr2delta(fkine(robot, q'), T);
 
-            % compute the Jacobian
-            J = jacob0(robot, q);
-
-            % error is based on the square sub-Jacobian
-            if opt.useInverse
-                dq = opt.lambda * pinv( J(m,:) ) * e(m);
-            else
-                dq = opt.lambda *  J(m,:)' * e(m);
-            end
-
-            if opt.debug
-                fprintf('%d/%d: e =  ', i, count); disp(e')
-                fprintf('      dq = '); disp(dq');
-            end
-
-            % update the estimated solution
-            q = q + dq;
-            nm = norm(dq);
-            count = count+1;
-            if count > opt.ilimit,
-                fprintf('i=%d, nm=%f\n', i, nm);
-                warning( sprintf('Solution wouldn''t converge, final error %.4g', nm) )
-                break
-            end
-        end
-        qt(i,:) = q';
-        tcount = tcount + count;
+        optim = optimset('Display', 'iter', 'TolX', 0, 'TolFun', opt.tol, 'MaxIter', opt.ilimit);
+        optim
+        q = fminsearch(@(x) ikinefunc(x, T, robot, m), q, optim);
+    
     end
+    qt = q;
 end
 
-
+function E = ikinefunc(q, T, robot, m)
+        e = tr2delta(fkine(robot, q'), T);
+        E = norm(e(m));
+end
