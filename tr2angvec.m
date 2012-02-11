@@ -1,10 +1,14 @@
 %TR2ANGVEC Convert rotation matrix to angle-vector form
 %
-% [THETA,V] = TR2ANGVEC(R) is a rotation of THETA about the vector V 
-% equivalent to the orthonormal rotation matrix R.
+% [THETA,V] = TR2ANGVEC(R) converts an orthonormal rotation matrix R into a 
+% rotation of THETA (1x1) about the axis V (1x3).
 %
-% [THETA,V] = TR2ANGVEC(T) is a rotation of THETA about the vector V 
-% equivalent to the rotational component of the homogeneous transform T.
+% [THETA,V] = TR2ANGVEC(T) as above but uses the rotational part of the
+% homogeneous transform T.
+%
+% If R (3x3xK) or T (4x4xK) represent a sequence then THETA (Kx1)is a vector 
+% of angles for corresponding elements of the sequence and V (Kx3) are the 
+% corresponding axes, one per row.
 %
 % Notes::
 % - If no output arguments are specified the result is displayed.
@@ -33,6 +37,15 @@ function [theta, v] = tr2angvec(R)
 
     if ~isrot(R)
         R = t2r(R);
+    end
+
+    if size(R,3) > 1
+        for i=1:size(R,3)
+            [t,a] = tr2angvec(R(:,:,i));
+            theta(i) = t;
+            v(i,:) = a;
+        end
+        return
     end
     
 	qs = sqrt(trace(R)+1)/2.0;
