@@ -1,25 +1,23 @@
 %LSPB  Linear segment with parabolic blend
 %
-% [S,SD,SDD] = LSPB(S0, SF, N) is a scalar trajectory that varies 
-% smoothly from S0 to SF in N steps using a constant velocity segment and 
+% [S,SD,SDD] = LSPB(S0, SF, M) is a scalar trajectory (Mx1) that varies 
+% smoothly from S0 to SF in M steps using a constant velocity segment and 
 % parabolic blends (a trapezoidal path).  Velocity and acceleration can be
-% optionally returned as SD and SDD.  The trajectory S, SD and SDD 
-% are N-vectors.
+% optionally returned as SD (Mx1) and SDD (Mx1).
+%
+% [S,SD,SDD] = LSPB(S0, SF, M, V) as above but specifies the velocity of 
+% the linear segment which is normally computed automatically.
 %
 % [S,SD,SDD] = LSPB(S0, SF, T) as above but specifies the trajectory in 
-% terms of the length of the time vector T.
-%
-% [S,SD,SDD] = LSPB(S0, SF, N, V) as above but specifies the velocity of 
-% the linear segment which is normally computed automatically.
+% terms of the length of the time vector T (Mx1).
 %
 % [S,SD,SDD] = LSPB(S0, SF, T, V) as above but specifies the velocity of 
 % the linear segment which is normally computed automatically and a time
 % vector.
 %
 % Notes::
-% - in all cases if no output arguments are specified S, SD, and SDD are plotted 
-%   against time.
-% - for some values of V no solution is possible and an error is flagged.
+% - If no output arguments are specified S, SD, and SDD are plotted.
+% - For some values of V no solution is possible and an error is flagged.
 %
 % See also TPOLY, JTRAJ.
 
@@ -42,9 +40,12 @@
 
 function [s,sd,sdd] = lspb(q0, q1, t, V)
 
-	if size(t) == [1 1]
+    t0 = t;
+    if isscalar(t)
 		t = [0:t-1]';
-	end
+    else
+        t = t(:);
+    end
 
 	tf = max(t(:));
 
@@ -96,24 +97,40 @@ function [s,sd,sdd] = lspb(q0, q1, t, V)
 
     switch nargout
         case 0
+            if isscalar(t0)
+                % for scalar time steps, axis is labeled 1 .. M
+                xt = t+1;
+            else
+                % for vector time steps, axis is labeled by vector M
+                xt = t;
+            end
+
             clf
             subplot(311)
+            % highlight the accel, coast, decel phases with different
+            % colored markers
             hold on
             k = t<= tb;
-            plot(t(k), p(k), 'r-o');
+            plot(xt(k), p(k), 'r-o');
             k = (t>=tb) & (t<= (tf-tb));
-            plot(t(k), p(k), 'b-o');
+            plot(xt(k), p(k), 'b-o');
             k = t>= (tf-tb);
-            plot(t(k), p(k), 'g-o');
+            h = plot(xt(k), p(k), 'g-o');
             grid; ylabel('s');
             hold off
 
             subplot(312)
-            plot(t, pd); grid; ylabel('sd');
+            plot(xt, pd); grid; ylabel('sd');
             
             subplot(313)
-            plot(t, pdd); grid; ylabel('sdd');
-            xlabel('time')
+            plot(xt, pdd); grid; ylabel('sdd');
+            if ~isscalar(t0)
+                xlabel('time')
+            else
+                for c=get(gcf, 'Children');
+                    set(c, 'XLim', [1 t0]);
+                end
+            end
             shg
         case 1
             s = p;

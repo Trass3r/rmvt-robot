@@ -1,12 +1,14 @@
 %TPOLY Generate scalar polynomial trajectory
 %
-% [S,SD,SDD] = TPOLY(S0, SF, N) is a trajectory of a scalar that varies 
-% smoothly from S0 to SF in N steps using a quintic (5th order) polynomial.
-% Velocity and acceleration can be optionally returned as SD and SDD.  The 
-% trajectory S, SD and SDD are N-vectors.
+% [S,SD,SDD] = TPOLY(S0, SF, M) is a scalar trajectory (Mx1) that varies 
+% smoothly from S0 to SF in M steps using a quintic (5th order) polynomial.
+% Velocity and acceleration can be optionally returned as SD (Mx1) and SDD (Mx1).
 %
 % [S,SD,SDD] = TPOLY(S0, SF, T) as above but specifies the trajectory in 
-% terms of the length of the time vector T.
+% terms of the length of the time vector T (Mx1).
+%
+% Notes::
+% - If no output arguments are specified S, SD, and SDD are plotted.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
 %
@@ -39,8 +41,9 @@
 
 function [s,sd,sdd] = tpoly(q0, qf, t, qd0, qdf)
 
+    t0 = t;
     if isscalar(t)
-        t = [0:(t-1)]';
+		t = [0:t-1]';
     else
         t = t(:);
     end
@@ -75,19 +78,36 @@ function [s,sd,sdd] = tpoly(q0, qf, t, qd0, qdf)
 
     switch nargout
         case 0
+            if isscalar(t0)
+                % for scalar time steps, axis is labeled 1 .. M
+                xt = t+1;
+            else
+                % for vector time steps, axis is labeled by vector M
+                xt = t;
+            end
+
+            clf
             subplot(311)
-            plot(t, p); grid; ylabel('s');
+            plot(xt, p); grid; ylabel('s');
+
             subplot(312)
-            plot(t, pd); grid; ylabel('sd');
+            plot(xt, pd); grid; ylabel('sd');
+            
             subplot(313)
-            plot(t, pdd); grid;  ylabel('sdd');
-            xlabel('time')
+            plot(xt, pdd); grid; ylabel('sdd');
+            if ~isscalar(t0)
+                xlabel('time')
+            else
+                for c=get(gcf, 'Children');
+                    set(c, 'XLim', [1 t0]);
+                end
+            end
             shg
         case 1
             s = p;
         case 2
             s = p;
-            sd = pd
+            sd = pd;
         case 3
             s = p;
             sd = pd;
