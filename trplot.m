@@ -1,22 +1,31 @@
 %TRPLOT Draw a coordinate frame
 %
 % TRPLOT(T, OPTIONS) draws a 3D coordinate frame represented by the homogeneous 
-% transform T.
+% transform T (4x4).
 %
 % TRPLOT(R, OPTIONS) draws a 3D coordinate frame represented by the orthonormal
-% rotation matrix R.
+% rotation matrix R (3x3).
 %
 % Options::
-% 'color', c         The color to draw the axes, MATLAB colorspec.
-% 'axis'             Set dimensions of the Matlab axes
-% 'noaxes'           Don't display the MATLAB axes
-% 'frame', f         The name which appears on the axis labels and the frame itself
+% 'color', c         The color to draw the axes, MATLAB colorspec
+% 'noaxes'           Don't display axes on the plot
+% 'axis',A           Set dimensions of the MATLAB axes to A=[xmin xmax ymin ymax]
+% 'frame',F          The frame is named {F} and the subscript on the axis labels is F.
 % 'text_opts', opt   A cell array of Matlab text properties
-% 'arrow'            Use arrows rather than line segments for the axes
-% 'width', w         Width of arrow tips
 % 'handle', h        Draw in the MATLAB axes specified by h
 % 'view',V           Set plot view parameters V=[az el] angles, or 'auto' 
 %                    for view toward origin of coordinate frame
+% 'arrow'            Use arrows rather than line segments for the axes
+% 'width', w         Width of arrow tips
+%
+% Examples::
+%
+%       trplot(T, 'frame', 'A')
+%       trplot(T, 'frame', 'A', 'color', 'b')
+%       trplot(T1, 'frame', 'A', 'text_opts', {'FontSize', 10, 'FontWeight', 'bold'})
+%
+% Notes::
+% - The arrow option requires the third party package arrow3.
 %
 % See also TRPLOT2, TRANIMATE.
 
@@ -61,9 +70,10 @@ function hout = trplot(T, varargin)
     end
     if isempty(opt.axis)
         if all(size(T) == [3 3]) || norm(transl(T)) < eps
-            opt.axis = [-1 1 -1 1 -1 1]*1.2';
+            c = transl(T);
+            d = 1.2;
+            opt.axis = [c(1)-d c(1)+d c(2)-d c(2)+d c(3)-d c(3)+d];
         end
-            
     end
     
     % TODO: should do the 2D case as well
