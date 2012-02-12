@@ -17,6 +17,7 @@
 % Options::
 %  'fps', fps    Number of frames per second to display (default 10)
 %  'nsteps', n   The number of steps along the path (default 50)
+%  'axis',A      Axis bounds [xmin, xmax, ymin, ymax, zmin, zmax]
 %
 % See also TRPLOT.
 
@@ -43,6 +44,7 @@ function tranimate(P2, varargin)
 
     opt.fps = 10;
     opt.nsteps = 50;
+    opt.axis = [];
 
     [opt, args] = tb_optparse(opt, varargin);
 
@@ -97,19 +99,20 @@ function tranimate(P2, varargin)
         % create a path between them
         Ttraj = ctraj(T1, T2, opt.nsteps);
     end
+    
+    if isempty(opt.axis)
+        % create axis limits automatically based on motion of frame origin
+        t = transl(Ttraj);
+        mn = min(t) - 1.5;  % min value + length of axis + some
+        mx = max(t) + 1.5;  % max value + length of axis + some
+        axlim = [mn; mx];
+        axlim = axlim(:)';
+        args = [args 'axis' axlim];
+    end
+    
+    hg = trplot(eye(4,4), args{:});  % create a frame at the origin
 
-    % do axis checking in here
-    %compute coords of origin and ends of axes for start and end pose.
-    %T0 = Ttraj(:,:,1)
-    %T1 = Ttraj(:,:,end)
-    %pts = [0 0 0; 1 0 0; 0 1 0; 0 0 1]';
-    %ptsx = [transformp(T0, pts) transformp(T1, pts)];
-    %mn = min(ptsx');
-    %mx = max(ptsx');
-    %axis([mn(1) mx(1) mn(2) mx(2) mn(3) mx(3)]);
-
-    hg = trplot(Ttraj(:,:,1), args{:});
-
+    % animate it for all poses in the sequence
     for i=1:size(Ttraj,3)
         T = Ttraj(:,:,i);
         set(hg, 'Matrix', T);
