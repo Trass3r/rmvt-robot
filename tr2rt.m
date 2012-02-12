@@ -42,7 +42,7 @@ function [R,t] = tr2rt(T)
     if size(T,3) > 1
         for i=1:size(T,3)
             R(:,:,i) = T(1:n-1,1:n-1,i);
-            t(i,:) = T(1:n-1,n,i);
+            t(i,:) = T(1:n-1,n,i)';
         end
     else
         R = T(1:n-1,1:n-1);
