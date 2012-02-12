@@ -14,6 +14,13 @@
 % 'fmt', f     use format string f for all numbers, (default %g)
 % 'label',l    display the text before the transform
 %
+% Examples::
+%        >> trprint(T2)
+%        t = (0,0,0), RPY = (-122.704,65.4084,-8.11266) deg
+%
+%        >> trprint(T1, 'label', 'A')
+%               A:t = (0,0,0), RPY = (-0,0,-0) deg
+%
 % See also TR2EUL, TR2RPY, TR2ANGVEC.
 
 % Copyright (C) 1993-2011, by Peter I. Corke
@@ -77,7 +84,9 @@ end
 function s = tr2s(T, opt)
     % print the translational part if it exists
     if ~isempty(opt.label)
-        s = sprintf('-8s: ', opt.label);
+        s = sprintf('%8s: ', opt.label);
+    else
+        s = '';
     end
     if ~isrot(T)
         s = strcat(s, sprintf('t = (%s),', vec2s(opt.fmt, transl(T)')));
