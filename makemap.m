@@ -26,23 +26,26 @@ function world = makemap(Nw)
         Nw = 128;
     end
 
-    if numel(size(Nw)) == 2
-        % we were passed a map
-        world = Nw;
-    else
+    if isscalar(Nw)
         % initialize a new map
         world = zeros(Nw, Nw);
+    else
+        % we were passed a map
+        world = Nw;
     end
 
     imagesc(world);
+    set(gca, 'Ydir', 'normal');
     grid
     binary_cmap = [1 1 1; 1 0 0];
     colormap(binary_cmap);
     caxis([0 1]);
     figure(gcf)
+    set(gcf, 'Name', 'makemap');
 
     fprintf('makemap:\n');
     fprintf('  left button, click and drag to create a rectangle\n');
+    fprintf('  or type the following letters in the figure window:\n');
     fprintf('  p - draw polygon\n');
     fprintf('  c - draw circle\n');
     fprintf('  e - erase map\n');
@@ -50,7 +53,7 @@ function world = makemap(Nw)
     fprintf('  q - leave editing mode\n');
 
 
-    while 1,
+    while 1
         drawnow
 
         k = waitforbuttonpress;
@@ -71,7 +74,7 @@ function world = makemap(Nw)
                     [X,Y] = meshgrid(1:Nw, 1:Nw);
                     world = world + inpolygon(X, Y, xy(:,1), xy(:,2));
                     
-                case 'c',
+                case 'c'
                     fprintf('click a centre point')
                     title('click a centre point')
                     waitforbuttonpress;
@@ -129,6 +132,13 @@ function world = makemap(Nw)
             x2 = min(Nw, point2(1));
             y1 = max(1, point1(2));
             y2 = min(Nw, point2(2));
+            
+            if x1 > x2
+                t = x1; x1 = x2; x2 = t;
+            end
+            if y1 > y2
+                t = y1; y1 = y2; y2 = t;
+            end
 
             world_prev = world;
             world(y1:y2, x1:x2) = 1;
