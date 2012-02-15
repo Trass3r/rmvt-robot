@@ -1,12 +1,7 @@
 %TRPLOT2 Plot a planar transformation
 %
-% TRPLOT2(T, OPTIONS) draws a 2D coordinate frame represented by the SE(2)
-% homogeneous transform T (3x3).
-%
-% H = TRPLOT2(T, OPTIONS) as above but returns a handle.
-%
-% TRPLOT2(H, T) moves the coordinate frame described by the handle H to
-% the SE(2) pose T (3x3).
+% TRPLOT2(T, options) draws a 2D coordinate frame represented by the homogeneous 
+% transform T (3x3).
 %
 % Options::
 % 'axis',A           Set dimensions of the MATLAB axes to A=[xmin xmax ymin ymax]
@@ -17,29 +12,25 @@
 % 'handle', h        Draw in the MATLAB axes specified by h
 % 'view',V           Set plot view parameters V=[az el] angles, or 'auto' 
 %                    for view toward origin of coordinate frame
-% 'length',s         Length of the coordinate frame arms (default 1)
 % 'arrow'            Use arrows rather than line segments for the axes
 % 'width', w         Width of arrow tips
 %
 % Examples::
 %
-%       trplot2(T, 'frame', 'A')
-%       trplot2(T, 'frame', 'A', 'color', 'b')
-%       trplot2(T1, 'frame', 'A', 'text_opts', {'FontSize', 10, 'FontWeight', 'bold'})
+%       trplot(T, 'frame', 'A')
+%       trplot(T, 'frame', 'A', 'color', 'b')
+%       trplot(T1, 'frame', 'A', 'text_opts', {'FontSize', 10, 'FontWeight', 'bold'})
 %
 % Notes::
-% - The arrow option requires the third party package arrow3 from File
-%   Exchange.
-% - When using the form TRPLOT(H, ...) to animate a frame it is best to set 
-%   the axis bounds.
+% - The arrow option requires the third party package arrow3.
+% - Generally it is best to set the axis bounds
 %
 % See also TRPLOT.
 
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -53,8 +44,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 %   'frame', name   name of the frame, used for axis subscripts and origin
 %   'color', color  Matlab color specificication for the frame and annotations
@@ -64,17 +53,6 @@
 
 function hout = trplot2(T, varargin)
 
-    if isscalar(T) && ishandle(T)
-        % trplot(H, T)
-        H = T; T = varargin{1};
-        set(H, 'Matrix', se2t3(T));
-        return;
-    end
-
-    % convert rotation matrix to homog transform
-    if all(size(T) == [2 2])
-        T = [T [0; 0]; 0 0 1];
-    end
     opt.color = 'b';
     opt.axes = true;
     opt.axis = [];
@@ -84,8 +62,6 @@ function hout = trplot2(T, varargin)
     opt.width = 1;
     opt.arrow = false;
     opt.handle = [];
-    opt.length = 1;
-    opt.lefty = false;
 
     opt = tb_optparse(opt, varargin);
 
@@ -94,7 +70,7 @@ function hout = trplot2(T, varargin)
     end
     if isempty(opt.axis)
         if all(size(T) == [3 3]) || norm(transl(T)) < eps
-            c = transl2(T);
+            c = transl(T);
             d = 1.2;
             opt.axis = [c(1)-d c(1)+d c(2)-d c(2)+d];
         end
@@ -103,6 +79,7 @@ function hout = trplot2(T, varargin)
     if ~isempty(opt.handle)
         hax = opt.handle;
         hold(hax);
+        hax
     else
         ih = ishold;
         if ~ih
@@ -111,45 +88,42 @@ function hout = trplot2(T, varargin)
             if ~isempty(opt.axis)
                 axis(opt.axis);
             end
-            %axis equal
+            axis equal
             
             if opt.axes
                 xlabel( 'X');
                 ylabel( 'Y');
             end
+            new_plot = true;
+        else
+            %set(gca, 'XLimMode', 'auto');
+            %set(gca, 'YLimMode', 'auto');
         end
         hax = gca;
         hold on
     end
 
-    % create unit vectors
-    o =  opt.length*[0 0 1]'; o = o(1:2);
-    x1 = opt.length*[1 0 1]'; x1 = x1(1:2);
-    
-    if opt.lefty
-        y1 = opt.length*[0 -1 1]'; y1 = y1(1:2);
-    else
-        y1 = opt.length*[0 1 1]'; y1 = y1(1:2);
-    end
-   
+	% create unit vectors
+	o =  T*[0 0 1]'; o = o(1:2);
+	x1 = T*[1 0 1]'; x1 = x1(1:2);
+	y1 = T*[0 1 1]'; y1 = y1(1:2);
     
     % draw the axes
     
     mstart = [o o]';
     mend = [x1 y1]';
     
-    hg = hgtransform('Parent', hax);
+    hg = hgtransform;
     if opt.arrow
         % draw the 2 arrows
         S = [opt.color num2str(opt.width)];
-        daspect([1 1 1]);
         ha = arrow3(mstart, mend, S);
         for h=ha'
             set(h, 'Parent', hg);
         end
     else
         for i=1:2
-            plot2([mstart(i,1:2); mend(i,1:2)], 'Color', opt.color, 'Parent', hg);
+            plot2([mstart(i,1:2); mend(i,1:2)], 'Color', opt.color);
         end
     end
 
@@ -157,11 +131,17 @@ function hout = trplot2(T, varargin)
     if isempty(opt.frame)
         fmt = '%c';
     else
+%             if opt.axlabel(1) == '$'
+%                 fmt = axlabel;
+%                 opt.text_opts = {opt.text_opts{:}, 'Interpreter', 'latex'};
+%             else
+%                 fmt = sprintf('%%c%s', axlabel);
+%             end
         fmt = sprintf('%%c_{%s}', opt.frame);
     end
     
     % add the labels to each axis
-    h = text(x1(1), x1(2), sprintf(fmt, 'X'), 'Parent', hg);
+	h = text(x1(1), x1(2), sprintf(fmt, 'X'));
     if ~isempty(opt.text_opts)
         set(h, opt.text_opts{:});
     end
@@ -169,7 +149,7 @@ function hout = trplot2(T, varargin)
         set(h, 'Parent', hg);
     end
 
-    h = text(y1(1), y1(2), sprintf(fmt, 'Y'), 'Parent', hg);
+	h = text(y1(1), y1(2), sprintf(fmt, 'Y'));
     if ~isempty(opt.text_opts)
         set(h, opt.text_opts{:});
     end
@@ -180,7 +160,7 @@ function hout = trplot2(T, varargin)
     % label the frame
     if ~isempty(opt.frame)
         h = text(o(1)-0.04*x1(1), o(2)-0.04*y1(2), ...
-            ['\{' opt.frame '\}'], 'Parent', hg);
+            ['\{' opt.frame '\}']);
         set(h, 'VerticalAlignment', 'middle', ...
             'HorizontalAlignment', 'center', opt.text_opts{:});
     end
@@ -188,18 +168,11 @@ function hout = trplot2(T, varargin)
     if ~opt.axes
         set(gca, 'visible', 'off');
     end
-    if ~ih
-        hold off
+	grid on
+	if ~ih
+		hold off
     end
     
-    % now place the frame in the desired pose
-    set(hg, 'Matrix', se2t3(T));
-
     if nargout > 0
         hout = hg;
     end
-end
-
-function T3 = se2t3(T2)
-    T3 = [T2(1:2,1:2) zeros(2,1) T2(1:2,3); 0 0 1 0; 0 0 0 1];
-end
