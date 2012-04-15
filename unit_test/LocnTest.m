@@ -1,8 +1,7 @@
-function tests = LocnTest
-  tests = functiontests(localfunctions);
-end
+function test_suite = TestLocalizationClasses
+  initTestSuite;
 
-function Vehicle_test(testCase)
+function VehicleTest
     randinit
     V = diag([0.005, 0.5*pi/180].^2);
 
@@ -15,9 +14,8 @@ function Vehicle_test(testCase)
 
     J = v.Fx(v.x, [.1 .2]);
     J = v.Fv(v.x, [.1 .2]);
-end
 
-function DeadReckoning_test(testCase)
+function DeadReckoningTest
     randinit
     V = diag([0.005, 0.5*pi/180].^2);
     P0 = diag([0.005, 0.005, 0.001].^2);
@@ -38,9 +36,8 @@ function DeadReckoning_test(testCase)
 
     ekf.plot_ellipse([], 'g')
     ekf.plot_P()
-end
 
-function MapLocalization_test(testCase)
+function MapLocalizationTest
     randinit
     W = diag([0.1, 1*pi/180].^2);
     P0 = diag([0.005, 0.005, 0.001].^2);
@@ -56,7 +53,7 @@ function MapLocalization_test(testCase)
     veh.add_driver( RandomPath(10) );
     sensor = RangeBearingSensor(veh, map, W);
     sensor.interval = 5;
-    ekf = EKF(veh, W, P0, sensor, W, map);
+    ekf = EKF(veh, W, P0, sensor, W);
 
     ekf.run(1000);
 
@@ -70,9 +67,8 @@ function MapLocalization_test(testCase)
 
     clf
     ekf.plot_P()
-end
 
-function Mapping_test(testCase)
+function MappingTest
     randinit
     W = diag([0.1, 1*pi/180].^2);
     V = diag([0.005, 0.5*pi/180].^2);
@@ -87,8 +83,6 @@ function Mapping_test(testCase)
 
     ekf = EKF(veh, [], [], sensor, W, []);
     ekf.run(1000);
-    
-    verifyEqual(testCase, numcols(ekf.features), 20);
 
     clf
     map.plot()
@@ -96,9 +90,8 @@ function Mapping_test(testCase)
     ekf.plot_map('g');
     grid on
     xyzlabel
-end
 
-function SLAM_test(testCase)
+function SLAMTest
     randinit
     W = diag([0.1, 1*pi/180].^2);
     P0 = diag([0.005, 0.005, 0.001].^2);
@@ -116,8 +109,6 @@ function SLAM_test(testCase)
     ekf.verbose = false;
     ekf.run(1000);
 
-    verifyEqual(testCase, numcols(ekf.features), 20);
-
     clf
     map.plot()
     veh.plot_xy('b');
@@ -132,9 +123,8 @@ function SLAM_test(testCase)
     clf
     map.plot();
     ekf.plot_map(5,'g');
-end
 
-function ParticleFilter_test(testCase)
+function ParticleFilterTest
 
     randinit
     map = Map(20);
@@ -160,9 +150,8 @@ function ParticleFilter_test(testCase)
     pf.plot_pdf();
     clf
     pf.plot_xy();
-end
 
-function RRT_test(testCase)
+function RRTTest
 
     randinit
     veh = Vehicle([], 'stlim', 1.2);
@@ -174,4 +163,3 @@ function RRT_test(testCase)
 
     p = rrt.path([0 0 0], [0 2 0]);
     rrt.path([0 0 0], [0 2 0]);
-end
