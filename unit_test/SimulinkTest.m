@@ -1,119 +1,104 @@
 %% Test all the Simulink models
-end
-function test_suite(testCase) = SimulinkTest
+function test_suite = SimulinkTest
   initTestSuite;
 
-end
-function braitenberg_test(testCase)
+function braitenberg_test
     sim('sl_braitenberg');
 	close all
 
-end
-function lanechange_test(testCase)
+function bicycle_test
+    sim('sl_bicycle');
+	close all
+
+function lanechange_test
     sim('sl_lanechange');
 	close all
 
-end
-function pursuit_test(testCase)
+function pursuit_test
     sim('sl_pursuit');
 	close all
 
-end
-function drivepoint_test(testCase)
+function drivepoint_test
     assignin('base', 'xg', [5 5]);
     assignin('base', 'x0', [8 5 pi/2]);
     sim('sl_drivepoint');
 	close all
 
-end
-function driveline_test(testCase)
+function driveline_test
     assignin('base', 'L', [1 -2 4]);
     assignin('base', 'x0', [8 5 pi/2]);
     sim('sl_driveline');
 	close all
 
-end
-function drivepose_test(testCase)
+function drivepose_test
     assignin('base', 'xg', [5 5 pi/2]);
     assignin('base', 'x0', [8 5 pi/2]);
     r = sim('sl_drivepose');
 	close all
 
-end
-function jspace_test(testCase)
+function jspace_test
     mdl_puma560
     assignin('base', 'p560', p560);
     sim('sl_jspace');
 	close all
 
-end
-function rrmc_test(testCase)
+function rrmc_test
     mdl_puma560
     assignin('base', 'p560', p560);
     assignin('base', 'qn', qn);
     sim('sl_rrmc');
 	close all
 
-end
-function rrmc2_test(testCase)
+function rrmc2_test
     mdl_puma560
     assignin('base', 'p560', p560);
     assignin('base', 'qn', qn);
     sim('sl_rrmc2');
 	close all
 
-end
-function ztorque_test(testCase)
+function ztorque_test
     mdl_puma560
     p560 = p560.nofriction();
     assignin('base', 'p560', p560);
     sim('sl_ztorque');
 	close all
 
-end
-function vlooptest_test(testCase)
+function vlooptest_test
     sim('vloop_test');
 	close all
 
-end
-function vloop_test2_test(testCase)
+function vloop_test2_test
     sim('vloop_test2');
 	close all
 
-end
-function plooptest_test(testCase)
+function plooptest_test
     sim('ploop_test');
 	close all
 
-end
-function ctorque_test(testCase)
+function ctorque_test
     mdl_puma560
     p560 = p560.nofriction();
     assignin('base', 'p560', p560);
     sim('sl_ctorque');
 	close all
 
-end
-function feedforward_test(testCase)
+function feedforward_test
     mdl_puma560
     p560 = p560.nofriction();
     assignin('base', 'p560', p560);
     sim('sl_fforward');
 	close all
 
-end
-function flexlink_test(testCase)
+function flexlink_test
     mdl_twolink
     assignin('base', 'twolink', twolink);
     sim('sl_flex');
 	close all
 
-end
-function quadcopter_test(testCase)
-    sim('sl_quadrotor');
+function quadcopter_test
+    sim('sl_quadcopter');
 	close all
 
-end
-function quadcopter_vs_test(testCase)
-    sim('sl_quadrotor_vs');
+function quadcopter_vs_test
+    sim('sl_quadcopter_vs');
 	close all
