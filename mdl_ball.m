@@ -1,8 +1,8 @@
 %MDL_BALL Create model of a ball manipulator
 %
-% MDL_BALL creates the workspace variable ball which describes the
-% kinematic characteristics of a serial link manipulator with 50 joints
-% that folds into a ball shape.
+% MDL_BALL  creates the workspace variable ball which describes the 
+% kinematic characteristics of a serial link manipulator that folds into
+% a ball shape.  By default has 50 joints.
 %
 % MDL_BALL(N) as above but creates a manipulator with N joints.
 %
@@ -18,30 +18,9 @@
 % - Unlike most other mdl_xxx scripts this one is actually a function that
 %   behaves like a script and writes to the global workspace.
 %
-% See also SerialLink, mdl_coil.
+% See also SerialLink, mdl_puma560akb, mdl_stanford, mdl_twolink, mdl_coil.
 
-% MODEL: generic, ball shape, hyper redundant, 50DOF, standard_DH
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
-function r = mdl_ball(N)
+function mdl_ball(N)
     
     if nargin == 0
         N = 50;
@@ -54,13 +33,11 @@ function r = mdl_ball(N)
     end
     
     % and build a serial link manipulator
-    robot = SerialLink(links, 'name', 'ball');
+    r = SerialLink(links, 'name', 'ball');
     
     % place the variables into the global workspace
-    if nargin == 1
-        r = robot;
-    elseif nargin == 0
-        assignin('base', 'ball', robot);
+    if nargin == 0
+        assignin('base', 'coil', r);
         assignin('base', 'q', q);     
     end
     
