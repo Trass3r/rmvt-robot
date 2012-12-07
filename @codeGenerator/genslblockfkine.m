@@ -7,14 +7,25 @@ function genslblockfkine(CGen)
 %        http://www.rst.e-technik.tu-dortmund.de
 %
 
-%% Preparation
-% Output to logfile?
-if ~isempty(CGen.logfile)
-    logfid = fopen(CGen.logfile,'a');
-else
-    logfid = [];
-end
-
+% Copyright (C) 1993-2012, by Peter I. Corke
+%
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+% 
+% RTB is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Lesser General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% RTB is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU Lesser General Public License for more details.
+% 
+% You should have received a copy of the GNU Leser General Public License
+% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
+%
+% http://www.petercorke.com
+ 
 %% Open or create block library
 bdclose('all')                                                              % avoid problems with previously loaded libraries
 load_system('simulink');
@@ -28,15 +39,14 @@ end
 set_param(CGen.slib,'lock','off');
 
 %% Forward kinematics up to tool center point
-multidfprintf([CGen.verbose, logfid],...
-    [datestr(now),'\tGenerating forward kinematics Embedded Matlab Function Block up to the end-effector frame: ']);
+CGen.logmsg([datestr(now),'\tGenerating forward kinematics Embedded Matlab Function Block up to the end-effector frame: ']);
 symname = 'fkine';
 fname = fullfile(CGen.sympath,[symname,'.mat']);
 
 if exist(fname,'file')
     tmpStruct = load(fname);
 else
-    error ('genSLBlockFkine:SymbolicsNotFound','Save symbolic expressions to disk first!')
+    error ('genslblockfkine:SymbolicsNotFound','Save symbolic expressions to disk first!')
 end
 
 blockaddress = [CGen.slib,'/',symname];          % treat intermediate transformations separately
@@ -47,14 +57,13 @@ end
 
 symexpr2slblock(blockaddress,tmpStruct.(symname));
 
-multidfprintf([CGen.verbose, logfid],'\t%s\n',' done!');
+CGen.logmsg('\t%s\n',' done!');
 
 %% Individual joint forward kinematics
-multidfprintf([CGen.verbose, logfid],...
-    [datestr(now),'\tGenerating forward kinematics Embedded Matlab Function Block up to joint: ']);
+CGen.logmsg([datestr(now),'\tGenerating forward kinematics Embedded Matlab Function Block up to joint: ']);
 for iJoints=1:CGen.rob.n
     
-    multidfprintf([CGen.verbose, logfid],' %i ',iJoints);
+    CGen.logmsg(' %i ',iJoints);
     symname = ['T0_',num2str(iJoints)];
     fname = fullfile(CGen.sympath,[symname,'.mat']);
     
@@ -74,7 +83,7 @@ for iJoints=1:CGen.rob.n
     symexpr2slblock(blockaddress,tmpStruct.(symname));
     
 end
-multidfprintf([CGen.verbose, logfid],'\t%s\n',' done!');
+CGen.logmsg('\t%s\n',' done!');
 
 %% Cleanup
 % Arrange blocks
@@ -84,10 +93,5 @@ distributeBlocks(CGen.slib);
 set_param(CGen.slib,'lock','on');
 save_system(CGen.slib,CGen.slibpath);
 close_system(CGen.slib);
-
-% Logfile to close?
-if ~isempty(CGen.logfile)
-    logfid = fclose(logfid);
-end
 
 end
