@@ -1,5 +1,5 @@
 function genslblockinertia(CGen)
-%% genslblockinertia Generates the robot specific Embedded Matlab Function Block for the robot inertia matrix.
+%% GENSLBLOCKINERTIA Generates the robot specific Embedded Matlab Function Block for the robot inertia matrix.
 %
 %  Authors::
 %        Jörn Malzahn
@@ -38,6 +38,8 @@ else
 end
 set_param(CGen.slib,'lock','off');
 
+q = CGen.rob.gencoords;
+
 %% Generate Inertia Block
 CGen.logmsg([datestr(now),'\tGenerating Simulink Block for the robot inertia matrix: \n']);
 nJoints = CGen.rob.n;
@@ -55,8 +57,6 @@ add_block('Simulink/Math Operations/Matrix Concatenate'...
     , 'ConcatenateDimension','1');
 add_block('Simulink/Sinks/Out1',[InertiaBlock,'/out']);
 add_block('Simulink/Sources/In1',[InertiaBlock,'/q']);
-add_block('built-in/Demux',[InertiaBlock,'/Demux'],'outputs',num2str(nJoints));
-add_line(InertiaBlock,'q/1','Demux/1');
 add_line(InertiaBlock,'inertia/1','out/1');
 CGen.logmsg('\t%s\n',' done!');
 
@@ -70,7 +70,7 @@ for kJoints = 1:nJoints
     if exist(fname,'file')
         tmpStruct = load(fname);
     else
-        error ('genslblockgravload:SymbolicsNotFound','Save symbolic expressions to disk first!')
+        error ('genslblockinertia:SymbolicsNotFound','Save symbolic expressions to disk first!')
     end
     
     blockaddress = [InertiaBlock,'/',symname];
@@ -80,12 +80,12 @@ for kJoints = 1:nJoints
     end
     
     CGen.logmsg('%s',' block creation');
-    symexpr2slblock(blockaddress,tmpStruct.(symname));
+    symexpr2slblock(blockaddress,tmpStruct.(symname),'vars',{q});
     
     
     % connect output
     CGen.logmsg('%s',', output wiring');
-    if ( verLessThan('matlab','7.11.0.584') ) && ( isequal(Inertia,zeros(1,nJoints)) )
+    if ( verLessThan('matlab','7.11.0.584') ) && ( isequal(tmpStruct.(symname),zeros(1,nJoints)) )
         % There is a bug in earlier Matlab versions. If the symbolic
         % vector is a zero vector, then the Simulink Embedded Matlab
         % Function block outputs a scalar zero. We need to concatenate
@@ -112,24 +112,7 @@ for kJoints = 1:nJoints
     
     % Connect inputs
     CGen.logmsg('%s',', input wiring');
-    iCount = 1;
-    % Determine inputs: generalized joint values
-    symVariables = findsym(tmpStruct.(symname));                           % Determine the symbolic variables present in the matrix ...
-    cellTMP = {};                                                       % ... separate them in a cell array
-    while ~isempty(symVariables)
-        [cellTMP{iCount}, symVariables ] = strtok(symVariables,',');
-        iCount = iCount+1;
-    end
-    
-    % Demux: vector generalized joint values
-    for iJoints = 1:nJoints
-        joint = strcmp(cellTMP,['q',num2str(iJoints)]);
-        position = find(joint,1);
-        if ~isempty(position)
-            add_line(InertiaBlock,['Demux/',num2str(iJoints)]...            Do the wiring with the matrix
-                , [symname,'/',num2str(position)]);
-        end
-    end
+    add_line(InertiaBlock,'q/1',[symname,'/1']);
     CGen.logmsg('\t%s\n','row complete!');
 end
 addterms(InertiaBlock); % Add terminators where needed

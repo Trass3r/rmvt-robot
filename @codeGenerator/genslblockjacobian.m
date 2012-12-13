@@ -38,6 +38,7 @@ else
 end
 set_param(CGen.slib,'lock','off');
 
+q = CGen.rob.gencoords;
 %% Jacobian0
 CGen.logmsg([datestr(now),'\tGenerating jacobian Embedded Matlab Function Block with respect to the robot base frame']);
 %     [datestr(now),'\tGenerating jacobian Embedded Matlab Function Block with respect to the end-effector frame']);
@@ -56,7 +57,7 @@ if doesblockexist(CGen.slib,symname)
     save_system;
 end
 
-symexpr2slblock(blockaddress,tmpStruct.(symname));
+symexpr2slblock(blockaddress,tmpStruct.(symname),'vars',{q});
 
 CGen.logmsg('\t%s\n',' done!');
 
@@ -77,7 +78,7 @@ if doesblockexist(CGen.slib,symname)
     save_system;
 end
 
-symexpr2slblock(blockaddress,tmpStruct.(symname));
+symexpr2slblock(blockaddress,tmpStruct.(symname),'vars',{q});
 CGen.logmsg('\t%s\n',' done!');
 
 %% Cleanup

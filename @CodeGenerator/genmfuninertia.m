@@ -63,8 +63,8 @@ CGen.logmsg([datestr(now),'\tGenerating full inertia matrix m-function: ']);
     fid = fopen(funfilename,'w+');
     
     fprintf(fid, '%s\n', ['function I = inertia(rob,q)']);                 % Function definition
-    fprintf(fid, '%s\n',constructHeaderString(hStruct));                   % Header
-    
+    fprintf(fid, '%s\n',constructheaderstring(CGen,hStruct));                   % Header
+   
     fprintf(fid, '%s \n', 'I = zeros(length(q));');                        % Code
     for iJoints = 1:nJoints
         funcCall = ['I(',num2str(iJoints),',:) = ','rob.inertia_row_',num2str(iJoints),'(q);'];
@@ -77,9 +77,9 @@ CGen.logmsg([datestr(now),'\tGenerating full inertia matrix m-function: ']);
 end
 
 function hStruct = createHeaderStructRow(rob,curJointIdx,fName)
-hStruct.funName = fName;
+[~,hStruct.funName] = fileparts(fName);
 hStruct.shortDescription = ['Computation of the robot specific inertia matrix row for corresponding to joint ', num2str(curJointIdx), ' of ',num2str(rob.n),'.'];
-hStruct.calls = {['Irow = ',fName,'(q)']};
+hStruct.calls = {['Irow = ',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables this function computes the',...
                                ['inertia matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'.']};
 hStruct.inputs = {['q:  ',int2str(rob.n),'-element vector of generalized'],...
@@ -98,9 +98,9 @@ hStruct.seeAlso = {'SerialLink\inertia'};
 end
 
 function hStruct = createHeaderStructFullInertia(rob,fName)
-hStruct.funName = fName;
+[~,hStruct.funName] = fileparts(fName);
 hStruct.shortDescription = ['Configuration dependent inertia matrix for the ',rob.name,' arm.'];
-hStruct.calls = {['I = ',fName,'(q)']};
+hStruct.calls = {['I = ',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables the function computes the',...
                                'inertia Matrix of the robot.'};
 hStruct.inputs = {['q:  ',int2str(rob.n),'-element vector of generalized'],...

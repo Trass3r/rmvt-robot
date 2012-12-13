@@ -1,4 +1,4 @@
-function [] = gengravload(CGen)
+function [gravload] = gengravload(CGen)
 %% GENJACOBIAN Generates code from the symbolic robot specific gravitational load expression.
 %
 %  Authors::
