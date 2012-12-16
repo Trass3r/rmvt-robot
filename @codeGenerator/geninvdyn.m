@@ -1,11 +1,32 @@
 function [ tau ] = geninvdyn( CGen )
 %% GENINVDYN Generates code from the symbolic robot specific inverse dynamics.
 %
+%  tau = geninvdyn(cGen)
+%  tau = cGen.geninvdyn
+%
+%  Inputs::
+%       cGen:  a codeGenerator class object
+%
+%       If cGen has the active flag:
+%           - saveresult: the symbolic expressions are saved to
+%           disk in the directory specified by cGen.sympath
+%
+%           - genmfun: ready to use m-functions are generated and
+%           provided via a subclass of SerialLink stored in cGen.robjpath
+%
+%           - genslblock: a Simulink block is generated and stored in a
+%           robot specific block library cGen.slib in the directory
+%           cGen.basepath
+%
+%  Outputs::
+%       tau: 1xn symbolic vector of joint forces/torques
+%
 %  Authors::
 %        Jörn Malzahn
 %        2012 RST, Technische Universität Dortmund, Germany
 %        http://www.rst.e-technik.tu-dortmund.de
 %
+%  See also codeGenerator, genfdyn, genfkine
 
 % Copyright (C) 1993-2012, by Peter I. Corke
 %
@@ -30,7 +51,7 @@ function [ tau ] = geninvdyn( CGen )
 nJoints = CGen.rob.n;
 
 %% Inertia matrix
-CGen.logmsg([datestr(now),'\tLoading inertia matrix by row']);
+CGen.logmsg([datestr(now),'\tLoading inertia matrix row by row']);
 
 I = sym(zeros(nJoints));
 for kJoints = 1:nJoints
@@ -49,7 +70,7 @@ end
 CGen.logmsg('\t%s\n',' done!');
 
 %% Matrix of centrifugal and Coriolis forces/torques matrix
-CGen.logmsg([datestr(now),'\tLoading Coriolis matrix by row ']);
+CGen.logmsg([datestr(now),'\tLoading Coriolis matrix row by row']);
 
 C = sym(zeros(nJoints));
 for kJoints = 1:nJoints
@@ -101,7 +122,7 @@ tau = I*qdd.'+C*qd.'+ G.' + F.';
 
 %% Save symbolic expressions
 if CGen.saveresult
-    CGen.logmsg([datestr(now),'\tSaving symbolic inverse dynamics ']);
+    CGen.logmsg([datestr(now),'\tSaving symbolic inverse dynamics']);
     
     CGen.savesym(tau,'invdyn','invdyn.mat')
     
