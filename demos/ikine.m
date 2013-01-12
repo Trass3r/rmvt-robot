@@ -1,7 +1,9 @@
+%RIKNDEMO Inverse kinematics demo
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -19,8 +21,6 @@
 % http://www.petercorke.com
 
 %%begin
-
-% DO VARIOUS ROBOTS: 2 LINK, HYPER2D, HYPER3D
 
 % Inverse kinematics is the problem of finding the robot joint coordinates,
 % given a homogeneous transform representing the last link of the manipulator.

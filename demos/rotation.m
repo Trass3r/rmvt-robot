@@ -1,7 +1,8 @@
+%RTB_DEMO_ROTATION Rotation demo
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -60,12 +61,6 @@ eul = tr2eul(R)
 rpy = tr2rpy(R)
 % which are three angles such that R = rotx(r)*roty(p)*rotz(y), ie. the rotations
 % required about the X, then then the Y, then the Z axis.
-
-% We can investigate the effects of rotations about different axes
-% using this GUI based demonstration.  The menu buttons allow the rotation
-% axes to be varied
-%  *** close the window when you are done.
-tripleangle('rpy', 'wait')
 
 % The final useful form is the quaternion which comprises 4 numbers.  We can create
 % a quaternion from an orthonormal matrix
