@@ -1,22 +1,3 @@
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 function varargout = tripleangle(varargin)
 % TRIPLEANGLE Visualize triple angle rotations
 %
@@ -40,16 +21,14 @@ function varargout = tripleangle(varargin)
 % See also trplot.
 
 
-
 % Last Modified by GUIDE v2.5 26-Jan-2013 15:28:14
-
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @tripleangle_OpeningFcn, ...
-                   'gui_OutputFcn',  @tripleangle_OutputFcn, ...
+                   'gui_OpeningFcn', @tripleang_OpeningFcn, ...
+                   'gui_OutputFcn',  @tripleang_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -65,7 +44,7 @@ end
 
 
 % --- Executes just before tripleang is made visible.
-function tripleangle_OpeningFcn(hObject, eventdata, handles, varargin)
+function tripleang_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -77,30 +56,26 @@ handles.output = hObject;
 
 figure(handles.figure1);
 
-opt.wait = false;
-opt.which = {'rpy', 'euler'};
+handles.h1 = trplot(eye(3,3), 'color', 'r', varargin{2:end});
+hold on
+handles.h2 = trplot(eye(3,3), 'color', 'g', varargin{2:end});
+handles.h3 = trplot(eye(3,3), 'color', 'b', 'thick', 2, varargin{2:end});
 
-[opt,args] = tb_optparse(opt, varargin);
+% Update handles structure
+guidata(hObject, handles);
 
-if length(args) > 0 && ischar(args{1})
-    s = args{1};
-    try
-        set(handles.popupmenu1, 'Value', strfind('xyz', s(1)));
-        set(handles.popupmenu2, 'Value', strfind('xyz', s(2)));
-        set(handles.popupmenu3, 'Value', strfind('xyz', s(3)));
-        if length(args) > 1
-            args = args{2:end};
-        else
-            args = {};
-        end
-        opt.which = 'none';
-    catch me
-        % doesnt match a rotation string, go with 'rpy'
-        opt.which = 'rpy';
-        
-    end
+% UIWAIT makes tripleang wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+set(handles.text1, 'String', sprintf('%.1f', get(handles.slider1, 'Value')));
+set(handles.text2, 'String', sprintf('%.1f', get(handles.slider2, 'Value')));
+set(handles.text3, 'String', sprintf('%.1f', get(handles.slider3, 'Value')));
+
+if length(varargin) == 0
+    varargin = {'rpy'}
 end
-switch opt.which
+
+switch varargin{1}
     case 'rpy'
         set(handles.popupmenu1, 'Value', 1);
         set(handles.popupmenu2, 'Value', 2);
@@ -109,37 +84,27 @@ switch opt.which
         set(handles.popupmenu1, 'Value', 3);
         set(handles.popupmenu2, 'Value', 2);
         set(handles.popupmenu3, 'Value', 3);
+    otherwise
+        s = varargin{1};
+        set(handles.popupmenu1, 'Value', strfind('xyz', s(1)));
+        set(handles.popupmenu2, 'Value', strfind('xyz', s(2)));
+        set(handles.popupmenu3, 'Value', strfind('xyz', s(3)));
+
 end
                 
-% draw the axes
-handles.h1 = trplot(eye(3,3), 'color', 'r', args{:});
-hold on
-handles.h2 = trplot(eye(3,3), 'color', 'g', args{:});
-handles.h3 = trplot(eye(3,3), 'color', 'b', 'thick', 2, args{:});
 
-% Update handles structure
-guidata(hObject, handles);
-
-% set the initial value of text fields
-set(handles.text1, 'String', sprintf('%.1f', get(handles.slider1, 'Value')));
-set(handles.text2, 'String', sprintf('%.1f', get(handles.slider2, 'Value')));
-set(handles.text3, 'String', sprintf('%.1f', get(handles.slider3, 'Value')));
-
-% UIWAIT makes tripleang wait for user response (see UIRESUME)
-if opt.wait
-    uiwait(handles.figure1);
-end
+        
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = tripleangle_OutputFcn(hObject, eventdata, handles) 
+function varargout = tripleang_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-%varargout{1} = handles.output;
+varargout{1} = handles.output;
 
 
 % --- Executes on selection change in popupmenu1.
