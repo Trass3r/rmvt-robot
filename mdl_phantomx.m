@@ -1,43 +1,23 @@
 %MDL_PHANTOMX Create model of PhantomX pincher manipulator
 %
-% MDL_PHANTOMX is a script that creates the workspace variable px which
-% describes the kinematic characteristics of a PhantomX Pincher Robot, a 4
-% joint hobby class  manipulator by Trossen Robotics.
+%      mdl_phantomx
+%
+% Script creates the workspace variable px which describes the 
+% kinematic characteristics of a PhantomX Pincher Robot, a 4 joint hobby
+% class  manipulator by Trossen Robotics.
 %
 % Also define the workspace vectors:
 %   qz         zero joint angle configuration
 %
 % Notes::
-% - Uses standard DH conventions.
-% - Tool centrepoint is middle of the fingertips.
-% - All translational units in mm.
+% - uses standard DH conventions.
+% - Tool centrepoint is middle of the fingertips
+% - all translational units in mm
 %
 % Reference::
 %
 % - http://www.trossenrobotics.com/productdocs/assemblyguides/phantomx-basic-robot-arm.html
 
-% MODEL: Trossen Robotics, PhantomX Pincher, 4DOF, standard_DH
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
-clear L
 L(1) = Revolute('d', 40, 'alpha', -pi/2);
 L(2) = Revolute('a', -105, 'alpha', pi, 'offset', pi/2);
 L(3) = Revolute('a', -105);
