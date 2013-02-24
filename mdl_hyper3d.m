@@ -1,8 +1,10 @@
 %MDL_HYPER3D Create model of a hyper redundant 3D manipulator
 %
-% MDL_HYPER3D is a script that creates the workspace variable h3d which
-% describes the kinematic characteristics of a serial link manipulator with
-% 10 joints which at zero angles is a straight line in the XY plane.
+%
+% MDL_HYPER3D  creates the workspace variable h3d which describes the 
+% kinematic characteristics of a serial link manipulator which at zero angles
+% is a straight line in the XY plane.  By default has 10 joints.
+%
 %
 % MDL_HYPER3D(N) as above but creates a manipulator with N joints.
 %
@@ -13,35 +15,15 @@
 %
 % [R,QZ] = MDL_HYPER3D(N) as above but also returns a vector of zero joint angles.
 %
+%
 % Notes::
 % - The manipulator in default pose is a straight line 1m long.
 % - Unlike most other mdl_xxx scripts this one is actually a function that
 %   behaves like a script and writes to the global workspace.
 %
-% See also SerialLink, mdl_hyper2d, mdl_ball, mdl_coil.
+% See also SerialLink, mdl_hyper2d, mdl_puma560akb, mdl_stanford, mdl_twolink, mdl_coil.
 
-% MODEL: hyper redundant, 10DOF, standard_DH
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
-function [r,qq] = mdl_hyper3d(N)
+function [r_,q_] = mdl_hyper3d(N)
     
     if nargin == 0
         N = 10;
@@ -59,18 +41,17 @@ function [r,qq] = mdl_hyper3d(N)
     end
     
     % and build a serial link manipulator
-    robot = SerialLink(links, 'name', 'hyper3d', ...
-        'plotopt', {'nojoints'});
+    r = SerialLink(links, 'name', 'hyper2d');
     
     % place the variables into the global workspace
     if nargout == 0
-        assignin('base', 'h3d', robot);
+        assignin('base', 'h3d', r);
         assignin('base', 'qz', q);
     elseif nargout == 1
-        r = robot;
+        r_ = r;
     elseif nargout == 2
-        r = robot;
-        qq = q;
+        r_ = r;
+        q_ = q;
     end
     
     
