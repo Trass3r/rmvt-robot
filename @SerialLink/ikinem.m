@@ -1,4 +1,4 @@
-%SerialLink.IKINEM Numerical inverse kinematics by minimization
+%SerialLink.IKINEM Inverse manipulator kinematics by minimization
 %
 % Q = R.ikinem(T) is the joint coordinates corresponding to the robot
 % end-effector pose T which is a homogenenous transform.
@@ -22,8 +22,6 @@
 % 'nolm'           Disable Levenberg-Marquadt
 %
 % Notes::
-% - PROTOTYPE CODE UNDER DEVELOPMENT, intended to do numerical inverse kinematics
-%   with joint limits
 % - The inverse kinematic solution is generally not unique, and
 %   depends on the initial guess Q0 (defaults to 0).
 % - The function to be minimized is highly nonlinear and the solution is
@@ -48,21 +46,20 @@
 % See also fminsearch, fmincon, SerialLink.fkine, SerialLink.ikine, tr2angvec.
 
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
+% This file is part of The Robotics Toolbox for Matlab (RTB).
+%
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
 % the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
-% 
+%
 % RTB is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU Lesser General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
@@ -75,7 +72,6 @@ function qt = ikinem(robot, tr, varargin)
     opt.qlimits = false;
     opt.ilimit = 1000;
     opt.lm = true;
-    opt.col = 2;
     
     [opt,args] = tb_optparse(opt, varargin);
     
@@ -126,28 +122,20 @@ function qt = ikinem(robot, tr, varargin)
         
         qt(i,:) = q;
     end
-    
-    if opt.verbose
-        robot.fkine(qt)
-    end
 end
 
 % The cost function, this is the value to be minimized
 function E = costfun(q, robot, T, opt)
     
-    Tq = robot.fkine(q);
     % find the pose error in SE(3)
-    dT = transl(T) - transl(Tq);
+    dT = T * inv( robot.fkine(q) );
     
     % translation error
-    E = norm(dT) * opt.pweight;
+    E = sum(transl(dT).^2) * opt.pweight;
     
     % rotation error
-    %  find dot product of 
-    dd = dot(T(1:3,opt.col), Tq(1:3,opt.col));
-    %E = E + (1 - dd)^2*100000 ;
-    E = E + acos(dd)^2*1000 ;
-    
+    [theta,n] = tr2angvec(dT);
+    E = E + theta^2;
     
     if opt.stiffness > 0
         % enforce a continuity constraint on joints, minimum bend
