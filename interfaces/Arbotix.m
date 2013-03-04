@@ -1,59 +1,26 @@
-%Arbotix  Interface to Arbotix robot-arm controller
-%
-%  A concrete subclass of the abstract Machine class that implements a
-%  connection over a serial port to an Arbotix robot-arm controller.
+%Arbotix  Interface to Arbotix robot controller
 %
 % Methods::
 %  Arbotix      Constructor, establishes serial communications
 %  delete       Destructor, closes serial connection
 %  getpos       Get joint angles
 %  setpos       Set joint angles and optionally speed
-%  setpath      Load a trajectory into Arbotix RAM
 %  relax        Control relax (zero torque) state
 %  setled       Control LEDs on servos
 %  gettemp      Temperature of motors
-%-
+%
 %  writedata1   Write byte data to servo control table
 %  writedata2   Write word data to servo control table
 %  readdata     Read servo control table
-%-
+%
 %  command      Execute command on servo
 %  flush        Flushes serial data buffer
-%  receive      Receive data
 %
 % Example::
 %         arb=Arbotix('port', '/dev/tty.usbserial-A800JDPN', 'nservos', 5);
-%         q = arb.getpos();
-%         arb.setpos(q + 0.1);
 %
 % Notes::
-% - This is experimental code.
-% - Considers the robot as a string of motors, and the last joint is
-%   assumed to be the gripper.  This should be abstracted, at the moment this
-%   is done in RobotArm.
-% - Connects via serial port to an Arbotix controller running the pypose
-%   sketch.
-%
-% See also Machine, RobotArm.
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
+% - interface is via serial to an Arbotix controller running the pypose sketch
 
 % Copyright (c) 2013 Peter Corke
 
@@ -63,9 +30,10 @@
 
 % Should subclass an abstract superclass Machine
 
-classdef Arbotix < Machine
+classdef Arbotix < handle
 
     properties
+        debug;
         serPort;
         nservos;
         
@@ -138,7 +106,7 @@ classdef Arbotix < Machine
         function arb = Arbotix(varargin)
             %Arbotix.Arbotix Create Arbotix interface object
             %
-            % ARB = Arbotix(OPTIONS) is an object that represents a connection to a chain
+            % DM = Arbotix(OPTIONS) is an object that represents a connection to a chain
             % of Arbotix servos connected via an Arbotix controller and serial link to the
             % host computer.
             %
@@ -159,21 +127,6 @@ classdef Arbotix < Machine
             arb.debug = opt.debug;
             arb.nservos = opt.nservos;
             
-            arb.connect(opt);
-                       
-            % open and closed amount
-            arb.gripper = [0 2.6];
-            
-        end
-        
-        function connect(arb, opt)
-            %Arbotix.connect  Connect to the physical robot controller
-            %
-            % ARB.connect() establish a serial connection to the physical robot
-            % controller.
-            %
-            % See also Arbotix.disconnect.
-            
             % clean up any previous instances of the port, can happen...
             for tty = instrfind('port', opt.port)
                 if ~isempty(tty)
@@ -191,7 +144,7 @@ classdef Arbotix < Machine
             set(arb.serPort,'InputBufferSize',1000)
             set(arb.serPort, 'Timeout', 1)
             set(arb.serPort, 'Tag', 'Arbotix')
-            
+                        
             if opt.verbose
                 disp('Opening connection to Arbotix chain...');
             end
@@ -206,19 +159,22 @@ classdef Arbotix < Machine
             end
             
             arb.flush();
+            
+            % open and closed amount
+            arb.gripper = [0 2.6];
+            
         end
         
-        function disconnect(arb)
-            %Arbotix.disconnect  Disconnect from the physical robot controller
+        function delete(arb)
+            %Arbotix.delete  Close the serial connection
             %
-            % ARB.disconnect() closes the serial connection.
-            %
-            % See also Arbotix.connect.
+            % delete(DM) closes the serial connection and removes the DM object
+            % from the workspace.
             
             tty = instrfind('port', arb.serPort.port);
             fclose(tty);
             delete(tty);
-        end
+        end 
         
         function s = char(arb)
             %Arbotix.char  Convert Arbotix status to string
@@ -259,23 +215,17 @@ classdef Arbotix < Machine
             %
             % P = ARB.GETPOS(ID) is the position (0-1023) of servo ID.
             %
-            % P = ARB.GETPOS([]) is a vector (1xN) of positions of servos 1 to N.
+            % P = ARB.GETPOS() is a vector (1xN) of positions of servos 1 to N.
             %
             % Notes::
             % - N is defined at construction time by the 'nservos' option.
-            %
-            % See also Arbotix.e2a.
             
             arb.flush();
             
-            if nargin < 2
-                id = [];
-            end
-            
-            if ~isempty(id)
+            if nargin == 2
                 retval = arb.readdata(id, Arbotix.ADDR_POS, 2);
                 p = Arbotix.e2a( retval.params*[1; 256] );
-            else
+            elseif nargin < 2
                 if isempty(arb.nservos)
                     error('RTB:Arbotix:notspec', 'Number of servos not specified');
                 end
@@ -301,9 +251,6 @@ classdef Arbotix < Machine
             % - ID is in the range 1 to N
             % - N is defined at construction time by the 'nservos' option.
             % - SPEED varies from 0 to 1023, 0 means largest possible speed.
-            %
-            % See also Arbotix.a2e.
-
             
             if length(varargin{1}) > 1
                 % vector mode
@@ -337,7 +284,7 @@ classdef Arbotix < Machine
                 
                 if nargin == 4
                     speed = varargin{3};
-                    arb.writedata2(id, Arbotix.ADDR_SPEED, speed);
+                    arb.writedata2(jid, Arbotix.ADDR_SPEED, speed);
                 end
             end
         end
@@ -348,9 +295,7 @@ classdef Arbotix < Machine
             %
             % ARB.setpath(JT) stores the path JT (PxN) in the Arbotix controller
             % where P is the number of points on the path and N is the number of
-            % robot joints.  Allows for smooth multi-axis motion.
-            %
-            % See also Arbotix.a2e.            
+            % robot joints.
             
             % will the path fit in Arbotix memory?
             if numrows(jt) > 30
@@ -700,38 +645,40 @@ classdef Arbotix < Machine
             end
         end
         
-%        % Low-level Dynamixel bus functions not supported by pypose sketch
-%        % Need to create better code for the Arbotix board
-%
-%        function setpos_sync(arb, pos, speed)
-%            % pos, speed are vectors
-%        end
-%        function discover(arb)
-%            % find how many servos in the chain
-%        end
-%        function ping(arb, id)
-%            arb.command(id, 1);
-%            
-%            retval = arb.receive();
-%            retval
-%        end
-%        
-%        function regwrite(arb, id, addr, data)
-%            arb.command(id, 4, [addr data]);
-%        end
-%        
-%        function action(arb)
-%            arb.command(id, 5);
-%        end
-%        
-%        function reset(arb, id)
-%            arb.command(id, 6);
-%        end
-%        
-%        function syncwrite(arb, addr, matrix)
-%            % one column per actuator
-%            arb.command(id, hex2dec('83'));
-%        end
+       %{
+        % Low-level Dynamixel bus functions not supported by pypose sketch
+        % Need to create better code for the Arbotix board
+
+        function setpos_sync(arb, pos, speed)
+            % pos, speed are vectors
+        end
+        function discover(arb)
+            % find how many servos in the chain
+        end
+        function ping(arb, id)
+            arb.command(id, 1);
+            
+            retval = arb.receive();
+            retval
+        end
+        
+        function regwrite(arb, id, addr, data)
+            arb.command(id, 4, [addr data]);
+        end
+        
+        function action(arb)
+            arb.command(id, 5);
+        end
+        
+        function reset(arb, id)
+            arb.command(id, 6);
+        end
+        
+        function syncwrite(arb, addr, matrix)
+            % one column per actuator
+            arb.command(id, hex2dec('83'));
+        end
+        %}
     end
     
     methods(Static)
@@ -740,9 +687,6 @@ classdef Arbotix < Machine
             %
             % A = ARB.E2A(E) is a vector of joint angles A corresponding to the
             % vector of encoder values E.
-            %
-            % TODO:
-            % - Scale factor is constant, should be a parameter to constructor.
             a = (e - 512) / 512 * 150 / 180 * pi;
             
         end
@@ -752,8 +696,6 @@ classdef Arbotix < Machine
             %
             % E = ARB.A2E(A) is a vector of encoder values E corresponding to the
             % vector of joint angles A.
-            % TODO:
-            % - Scale factor is constant, should be a parameter to constructor.
             e = a / pi * 180 / 150 * 512  + 512;
         end
         
