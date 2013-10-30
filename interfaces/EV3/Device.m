@@ -1,12 +1,7 @@
-%Device Device enumeration for the brick
-%
-% Notes::
-% - Collection of enumeration constants used for the brick
-
 classdef Device < uint8
     enumeration
          % motor definitions (found in c_output.c => NOS DATA8)
-         MotorA (1)
+		 MotorA (1)
          MotorB (2)
          MotorC (4)
          MotorD (8)
@@ -30,19 +25,16 @@ classdef Device < uint8
          LedRedPulse (8)
          LedOrangePulse (9)
          % colors (found in bytecodes.h)
-         NoColor (0)
          BlackColor (1)
          BlueColor (2)
          GreenColor (3)
          YellowColor (4)
          RedColor (5)
          WhiteColor (6)
-         BrownColor (7)
          % ultrasonic sensor definitions (found in types.html)
          Ultrasonic (30)
          USDistCM (0)
          USDistIN (1)
-         USListen (2)
          % gyro sensor definitions (found in types.html)
          Gyro (32)
          GyroAng (0)

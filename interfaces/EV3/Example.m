@@ -1,7 +1,7 @@
 % init the connection
 disp('Connecting ... ')
-% brick usb init
-b = Brick('ioType','usb');
+% brick bluetooth init
+b = Brick('serConn','bt','btDevice','EV3','btChannel',1,'debug',0);
 % beep to indicate connection
 b.beep();
 % print information
@@ -34,7 +34,11 @@ while(~strcmp(userIn,'f'))
         if motorPower >= 100
             motorPower = 100;
         end
-        b.outputPower(0,Device.MotorA,motorPower)
+        if motorPower >= 0
+            b.outputPower(0,Device.MotorA,motorPower)
+        else
+            b.outputPower(0,Device.MotorA,255-motorPower)
+        end
         disp(['> Motor Power: ' num2str(motorPower)]);
     end
      % decrease speed
@@ -43,7 +47,11 @@ while(~strcmp(userIn,'f'))
         if motorPower <= -100
             motorPower = -100;
         end
-        b.outputPower(0,Device.MotorA,motorPower)
+        if motorPower >= 0
+            b.outputPower(0,Device.MotorA,motorPower)
+        else
+            b.outputPower(0,Device.MotorA,255-motorPower)
+        end
         disp(['> Motor Power: ' num2str(motorPower)]);
     end
     % start the motor
@@ -74,7 +82,7 @@ while(~strcmp(userIn,'f'))
     % voltage output
     if (userIn == 'v')
         v = b.uiReadVbatt;
-        disp(['> Brick voltage: ' num2str(v) 'V']);
+        disp(['> Brick voltage: ' num2str(v)]);
     end
 end
 % delete the brick object
