@@ -78,38 +78,23 @@ classdef hidapi < handle
                 hid.nReadBuffer = nReadBuffer;
                 hid.nWriteBuffer = nWriteBuffer;
             end
-            % disable the type not found for structure warning
-            warning('off','MATLAB:loadlibrary:TypeNotFoundForStructure');
+            % check the operating system type and load slib accoridnginly
+            if (ispc == 1)
+                hid.slib = 'hidapi.dll';
+            else if (ismac == 1)
+                    hid.slib = 'hidapi.dylib';
+                 else if (isunix == 1)
+                        hid.slib = 'hidapi.so';
+                      end
+                 end
+            end
             % check if the library is loaded
-            if ~libisloaded('hidapiusb')
-                % check the operating system type and load slib 
-                if (ispc == 1)
-                    % check the bit version
-                    if (strcmp(mexext,'mexw32'))
-                        hid.slib = 'hidapi32';
-                        % load the library via the proto file
-                        loadlibrary(hid.slib,@hidapi32_proto,'alias','hidapiusb')
-                    end
-                    
-                    if (strcmp(mexext,'mexw64'))
-                        hid.slib = 'hidapi64';
-                        % load the library via the proto file
-                        loadlibrary(hid.slib,@hidapi64_proto,'alias','hidapiusb')
-                    end                    
-                else if (ismac == 1)
-                        hid.slib = 'hidapi64';
-                        % load the library via the proto file
-                        loadlibrary(hid.slib,@hidapi64mac_proto,'alias','hidapiusb');
-                     else if (isunix == 1)
-                            hid.slib = 'hidapi.so';
-                            % load the shared library
-                            loadlibrary(hid.slib,hid.sheader,'alias','hidapiusb');
-                         end
-                    end
-                end
+            if ~libisloaded('hidapi')
+                % load the shared library
+                loadlibrary(hid.slib,hid.sheader);
             end
             % remove the library extension
-            hid.slib = 'hidapiusb';
+            hid.slib = 'hidapi';
         end
         
         function delete(hid)

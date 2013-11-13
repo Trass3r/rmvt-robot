@@ -61,9 +61,7 @@ classdef instrBrickIO < BrickIO
             if nargin > 0
                 brickIO.debug = varargin{1};
                 brickIO.serConn = varargin{2};
-                if brickIO.debug > 0
-                    fprintf('instrBrickIO init\n');
-                end
+                fprintf('instrBrickIO init\n');
             end
             % bluetooth
             % brickIO = instrBrickIO(1,'bt','EV3',1)
