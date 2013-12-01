@@ -1,7 +1,9 @@
 %MDL_JACO Create model of Kinova Jaco manipulator
 %
-% MDL_JACO is a script that creates the workspace variable jaco which
-% describes the kinematic characteristics of a Kinova Jaco manipulator
+%      mdl_jaco
+%
+% Script creates the workspace variable jaco which describes the 
+% kinematic characteristics of a Kinova Jaco manipulator
 % using standard DH conventions.
 %
 % Also define the workspace vectors:
@@ -12,18 +14,15 @@
 % - "DH Parameters of Jaco" Version 1.0.8, July 25, 2013.
 %
 % Notes::
-% - SI units of metres are used.
 % - Unlike most other mdl_xxx scripts this one is actually a function that
 %   behaves like a script and writes to the global workspace.
 %
-% See also SerialLink, mdl_mico, mdl_puma560.
-
-% MODEL: Kinova, Jaco, 6DOF, standard_DH
+% See also SerialLink, Revolute, mdl_mico, mdl_puma560, mdl_twolink.
 
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -37,10 +36,8 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
-function r = mdl_jaco()
+function mdl_jaco()
     
     deg = pi/180;
     
@@ -63,29 +60,24 @@ function r = mdl_jaco()
     d5b = sa/s2a*D4 + sa/s2a*D5;
     d6b = sa/s2a*D5 + D6;
     
+    % DH parameter table
+    %     theta d a alpha
+    dh = [0 D1   0  pi/2
+          0 0    D2 pi
+          0 -e2  0  pi/2
+          0 -d4b 0  2*aa
+          0 -d5b 0  2*aa
+          0 -d6b 0  pi];
+    
     % and build a serial link manipulator
     
-    % offsets from the table on page 4, "Mico" angles are the passed joint
-    % angles.  "DH Algo" are the result after adding the joint angle offset.
-
-    robot = SerialLink([
-        Revolute('alpha', pi/2,  'a', 0,  'd', D1,   'flip')
-        Revolute('alpha', pi,    'a', D2, 'd', 0,    'offset', -pi/2)
-        Revolute('alpha', pi/2,  'a', 0,  'd', -e2,  'offset', pi/2)
-        Revolute('alpha', 2*aa,  'a', 0,  'd', -d4b)
-        Revolute('alpha', 2*aa,  'a', 0,  'd', -d5b, 'offset', -pi)
-        Revolute('alpha', pi,    'a', 0,  'd', -d6b, 'offset', 100*deg)
-        ], ...
-        'name', 'Jaco', 'manufacturer', 'Kinova');
-
- 
+    robot = SerialLink(dh, 'name', 'Jaco', ...
+        'manufacturer', 'Kinova'); 
     
     % place the variables into the global workspace
-    if nargin == 1
-        r = robot;
-    elseif nargin == 0
+    if nargout == 0
         assignin('base', 'jaco', robot);
         assignin('base', 'qz', [0 0 0 0 0 0]); % zero angles
-        assignin('base', 'qr', [270 180 180 0 0 0]*deg); % vertical pose as per Fig 2
+        assignin('base', 'qr', -[180 270 90 180 180 0]*deg); % ready pose, arm up
     end
 end
