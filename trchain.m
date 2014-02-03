@@ -4,7 +4,7 @@
 % compounding a number of elementary transformations defined by the string
 % S.  The string S comprises a number of tokens of the form X(ARG) where
 % X is one of Tx, Ty, Tz, Rx, Ry, or Rz.  ARG is the name of a variable in
-% MATLAB workspace or qJ where J is an integer in the range 1 to N that
+% main workspace or qJ where J is an integer in the range 1 to N that
 % selects the variable from the Jth column of the vector Q (1xN).
 %
 % For example:
@@ -15,42 +15,15 @@
 %
 % Notes::
 % - The string can contain spaces between elements or on either side of ARG.
-% - Works for symbolic variables in the workspace and/or passed in via the 
-%   vector Q.
-% - For symbolic operations that involve use of the value pi, make sure you
-%   define it first in the workspace: pi = sym('pi');
 %
-%
-% See also trchain2, trotx, troty, trotz, transl, SerialLink.trchain, ETS.
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
+% See also trchain2, trotx, troty, trotz, transl.
 
 
 function T = trchain(s, q)
     
-    if isa(q, 'symfun')
-        q = formula(q);
-    end
     % s = 'Rx(q1)Tx(a1)Ry(q2)Tx(a3)Rz(q3)Tx(a3)';
     
-    tokens = regexp(s, '\s*(?<op>R.?|T.)\(\s*(?<arg>[A-Za-z\-][A-Za-z0-9+\-\*/]*)\s*\)\s*', 'names');
+    tokens = regexp(s, '\s*(?<op>R.?|T.)\(\s*(?<arg>[A-Za-z][A-Za-z0-9]*)\s*\)\s*', 'names');
     
     T = eye(4,4);
     joint = 1;
@@ -96,6 +69,3 @@ function T = trchain(s, q)
         end
     end
     
-    if isa(q, 'symfun')
-        T = formula(T);
-    end
