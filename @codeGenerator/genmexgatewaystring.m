@@ -50,7 +50,7 @@
 % http://www.petercorke.com
 
 
-function [ gwstring ] = genmexgatewaystring(f, varargin )
+function [ gwstring ] = genmexgatewaystring(CGen, f, varargin )
 
 %% Read parameters
 % option defaults
@@ -61,12 +61,12 @@ opt.vars = {};
 % tb_optparse is not applicable here,
 % since handling cell inputs and extracting input variable names is
 % required. Thus, scan varargin manually:
-if mod(nargin,2)==0
+if mod(nargin,2)~=0
     error('CodeGenerator:genmexgatewaystring:wrongArgumentList',...
         'Wrong number of elements in the argument list.');
 end
 
-for iArg = 1:2:nargin-1
+for iArg = 1:2:nargin-2
     switch lower(varargin{iArg})
         case 'funname'
             if ~isempty(varargin{iArg+1})
