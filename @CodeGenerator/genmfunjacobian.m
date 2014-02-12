@@ -47,8 +47,6 @@ if ~exist(fullfile(CGen.robjpath,[CGen.getrobfname,'.m']),'file')
     CGen.logmsg('\t%s\n',' done!');
 end
 
-%%
-
 %% Forward kinematics up to tool center point
 symname = 'jacob0';
 fname = fullfile(CGen.sympath,[symname,'.mat']);

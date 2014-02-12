@@ -1,23 +1,19 @@
-%CODEGENERATION.GENMEXINERTIA Generate C-MEX-function for robot inertia matrix
+%CODEGENERATION.GENMEXINERTIA Generate MEX-function for robot inertia matrix
 %
 % cGen.genmexinertia() generates robot-specific MEX-functions to compute
 % robot inertia matrix.
 %
 % Notes::
 % - Is called by CodeGenerator.geninertia if cGen has active flag genmex
-% - The MEX file uses the .c and .h files generated in the directory 
-%   specified by the ccodepath property of the CodeGenerator object.
-% - Access to generated functions is provided via subclass of SerialLink
+% - The inertia matrix is stored row by row to avoid memory issues.
+% - The generated M-function recombines the individual MEX-functions for each row.
+% - Access to generated functions is provided via subclass of SerialLink 
 %   whose class definition is stored in cGen.robjpath.
-% - You will need a C compiler to use the generated MEX-functions. See the 
-%   MATLAB documentation on how to setup the compiler in MATLAB. 
-%   Nevertheless the basic C-MEX-code as such may be generated without a
-%   compiler. In this case switch the cGen flag compilemex to false.
 %
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.geninertia.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.gencoriolis.
 
 % Copyright (C) 2012-2014, by Joern Malzahn
 %
@@ -39,12 +35,12 @@
 % http://www.petercorke.com
 %
 % The code generation module emerged during the work on a project funded by
-% the German Research Foundation (DFG, BE1569/7-1). The authors gratefully
+% the German Research Foundation (DFG, BE1569/7-1). The authors gratefully 
 % acknowledge the financial support.
 
 function [] = genmexinertia(CGen)
 
-%% Individual inertia matrix rows
+%%
 CGen.logmsg([datestr(now),'\tGenerating MEX-function for the robot inertia matrix row' ]);
 
 Q = CGen.rob.gencoords;
@@ -62,75 +58,80 @@ for kJoints = 1:nJoints
     end
     
     funfilename = fullfile(CGen.robjpath,[symname,'.c']);
-    
-    % Function description header
+
     hStruct = createHeaderStructRow(CGen.rob,kJoints,symname);   %generate header
-    
-    % Generate and compile MEX function
-    CGen.mexfunction(tmpStruct.(symname), ...
-        'funfilename',funfilename,...
-        'funname',[CGen.getrobfname,'_',symname],...
-        'vars',{Q},...
-        'output',['I_row',num2str(kJoints)],...
-        'header',hStruct);
+
+    CGen.mexfunction(tmpStruct.(symname), 'funfilename',funfilename,'funname',[CGen.rob.name,'_',symname],'vars',{Q},'output','I','header',hStruct)
     
 end
 CGen.logmsg('\t%s\n',' done!');
 
-%% Full inertia matrix
+
 CGen.logmsg([datestr(now),'\tGenerating full inertia matrix m-function']);
-
-symname = 'inertia';
-f = sym(zeros(nJoints)); % dummy symbolic expression
-funfilename = fullfile(CGen.robjpath,[symname,'.c']);
-
-funname = [CGen.getrobfname,'_',symname];
-
-hStruct = createHeaderStructFull(CGen.rob,symname); % create header
-hFString = CGen.constructheaderstringc(hStruct);
-
-% Generate and compile MEX function 
-CGen.mexfunctionrowwise(f,...
-    'funfilename',funfilename,...
-    'funname',[CGen.getrobfname,'_',symname],...
-    'vars',{Q},...
-    'output','I',...
-    'header',hStruct);
+    
+    funfilename = fullfile(CGen.robjpath,'inertia.m');
+    hStruct = createHeaderStructFullInertia(CGen.rob,funfilename);
+    
+    fid = fopen(funfilename,'w+');
+    
+    fprintf(fid, '%s\n', ['function I = inertia(rob,q)']);                 % Function definition
+    fprintf(fid, '%s\n',constructheaderstring(CGen,hStruct));                   % Header
+   
+    fprintf(fid, '%s \n', 'I = zeros(length(q));');                        % Code
+    for iJoints = 1:nJoints
+        funcCall = ['I(',num2str(iJoints),',:) = ','rob.inertia_row_',num2str(iJoints),'(q);'];
+        fprintf(fid, '%s \n', funcCall);
+    end
+    
+    fclose(fid);
+    
+    CGen.logmsg('\t%s\n',' done!');           
 end
 
-%% Definition of the header contents for each generated file
 function hStruct = createHeaderStructRow(rob,curJointIdx,fName)
 [~,hStruct.funName] = fileparts(fName);
-hStruct.calls = '';
 hStruct.shortDescription = ['Computation of the robot specific inertia matrix row for corresponding to joint ', num2str(curJointIdx), ' of ',num2str(rob.n),'.'];
+hStruct.calls = {['Irow = ',hStruct.funName,'(rob,q)'],...
+    ['Irow = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables this function computes the',...
-    ['inertia matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'. Angles have to be given in radians!']};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
-hStruct.outputs = {['I_row_',int2str(curJointIdx),':  [1x',int2str(rob.n),'] output row of the robot inertia matrix.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+                               ['inertia matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'.']};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+                   ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     coordinates',...
+                   'Angles have to be given in radians!'};
+hStruct.outputs = {['Irow:  [1x',int2str(rob.n),'] row of the robot inertia matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end
 
-function hStruct = createHeaderStructFull(rob,fname)
+function hStruct = createHeaderStructFullInertia(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
-hStruct.calls = '';
 hStruct.shortDescription = ['Inertia matrix for the ',rob.name,' arm.'];
+hStruct.calls = {['I = ',hStruct.funName,'(rob,q)'],...
+    ['I = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables the function computes the',...
-    'inertia Matrix of the robot. Angles have to be given in radians!'};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
-hStruct.outputs = {['I:  [',int2str(rob.n),'x',int2str(rob.n),']output inertia matrix.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+                               'inertia Matrix of the robot.'};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+                   ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     coordinates',...
+                   'Angles have to be given in radians!'};
+hStruct.outputs = {['I:  [',int2str(rob.n),'x',int2str(rob.n),'] inertia matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end
