@@ -1,18 +1,20 @@
-%CODEGENERATOR.GENCCODEJACOBIAN Generate C-functions for robot jacobians
+%CODEGENERATOR.GENCCODEFKINE Generate C-function for forward kinematics
 %
-% cGen.genccodejacobian() generates a robot-specific C-function to compute
-% the jacobians with respect to the robot base as well as the end effector.
+% cGen.genccodefkine() generates a robot-specific C-function to compute
+% forward kinematics.
 %
 % Notes::
-% - Is called by CodeGenerator.genjacobian if cGen has active flag genccode or
-%   genmex.
-% - The generated .c and .h files are generated in the directory specified
-%   by the ccodepath property of the CodeGenerator object.
+% - Is called by CodeGenerator.genfkine if cGen has active flag genccode or
+%   genmex
+% - The generated .c and .h files are wirtten to the directory specified in
+%   the ccodepath property of the CodeGenerator object.
 %
 % Author::
-%  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
+%  Joern Malzahn
+%  2012 RST, Technische Universitaet Dortmund, Germany.
+%  http://www.rst.e-technik.tu-dortmund.de
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.genccodefkine, CodeGenerator.genjacobian.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.genfkine, CodeGenerator.genmexfkine.
 
 % Copyright (C) 2012-2014, by Joern Malzahn
 %
@@ -49,7 +51,7 @@ end
 %% Jacobian w.r.t. the robot base
 CGen.logmsg([datestr(now),'\tGenerating jacobian C-code with respect to the robot base frame']);
 
-% Prerequesites
+%% Prerequesites
 % check for existance of C-code directories
 srcDir = fullfile(CGen.ccodepath,'src');
 hdrDir = fullfile(CGen.ccodepath,'include');
@@ -60,37 +62,35 @@ if ~exist(hdrDir,'dir')
     mkdir(hdrDir);
 end
 
-funname = [CGen.getrobfname,'_',symname];
+funname = [CGen.rob.name,'_',symname];
 funfilename = [funname,'.c'];
 hfilename = [funname,'.h'];
 Q = CGen.rob.gencoords;
+
+% Create the function description header
+hStruct = createHeaderStructJacob0(CGen.rob,symname); % create header
+if ~isempty(hStruct)
+    hFString = CGen.constructheaderstringc(hStruct);
+end
 
 % Convert symbolic expression into C-code
 [funstr hstring] = ccodefunctionstring(tmpStruct.(symname),...
     'funname',funname,...
     'vars',{Q},'output','J0');
 
-% Create the function description header
-hStruct = createHeaderStructJacob0(CGen.rob,funname); % create header
-hStruct.calls = hstring;
-hFString = CGen.constructheaderstringc(hStruct);
-
 %% Generate C implementation file
 fid = fopen(fullfile(srcDir,funfilename),'w+');
-
+% Header
+fprintf(fid,'%s\n\n',hFString);
 % Includes
 fprintf(fid,'%s\n\n',...
     ['#include "', hfilename,'"']);
-
 % Function
 fprintf(fid,'%s\n\n',funstr);
 fclose(fid);
 
 %% Generate C header file
 fid = fopen(fullfile(hdrDir,hfilename),'w+');
-
-% Function description header
-fprintf(fid,'%s\n\n',hFString);
 
 % Include guard
 fprintf(fid,'%s\n%s\n\n',...
@@ -101,7 +101,7 @@ fprintf(fid,'%s\n%s\n\n',...
 fprintf(fid,'%s\n\n',...
     '#include "math.h"');
 
-% Function signature
+% Function prototype
 fprintf(fid,'%s\n\n',hstring);
 
 % Include guard
@@ -124,30 +124,29 @@ else
     error ('genMFunJacobian:SymbolicsNotFound','Save symbolic expressions to disk first!')
 end
 
-funname = [CGen.getrobfname,'_',symname];
+funname = [CGen.rob.name,'_',symname];
 funfilename = [funname,'.c'];
 hfilename = [funname,'.h'];
+
+% Create the function description header
+hStruct = createHeaderStructJacobn(CGen.rob,symname); % create header
+if ~isempty(hStruct)
+    hFString = CGen.constructheaderstringc(hStruct);
+end
 
 % Convert symbolic expression into C-code
 [funstr hstring] = ccodefunctionstring(tmpStruct.(symname),...
     'funname',funname,...
     'vars',{Q},'output','Jn');
 
-% Create the function description header
-hStruct = createHeaderStructJacobn(CGen.rob,funname); % create header
-hStruct.calls = hstring;
-hFString = CGen.constructheaderstringc(hStruct);
 
 %% Generate C implementation file
 fid = fopen(fullfile(srcDir,funfilename),'w+');
-
-% Function description header
+% Header
 fprintf(fid,'%s\n\n',hFString);
-
 % Includes
 fprintf(fid,'%s\n\n',...
     ['#include "', hfilename,'"']);
-
 % Function
 fprintf(fid,'%s\n\n',funstr);
 fclose(fid);
@@ -164,7 +163,7 @@ fprintf(fid,'%s\n%s\n\n',...
 fprintf(fid,'%s\n\n',...
     '#include "math.h"');
 
-% Function signature
+% Function prototype
 fprintf(fid,'%s\n\n',hstring);
 
 % Include guard
@@ -177,18 +176,21 @@ CGen.logmsg('\t%s\n',' done!');
 
 end
 
-%% Definition of the function description header contents for each generated file
+%% Definition of the header contents for each generated file
 function hStruct = createHeaderStructJacob0(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
 hStruct.shortDescription = ['C code for the Jacobian with respect to the base coordinate frame of the ',rob.name,' arm.'];
+hStruct.calls = {['J0 = ',hStruct.funName,'(rob,q)'],...
+    ['J0 = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {['Given a full set of joint variables the function'],...
-    'computes the robot jacobian with respect to the base frame. Angles have to be given in radians!'};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
+    'computes the robot jacobian with respect to the base frame.'};
+hStruct.inputs = {['q:  ',int2str(rob.n),'-element vector of generalized coordinates.'],...
+    'Angles have to be given in radians!'};
 hStruct.outputs = {['J0:  [6x',num2str(rob.n),'] Jacobian matrix']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
     'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
@@ -199,14 +201,17 @@ end
 function hStruct = createHeaderStructJacobn(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
 hStruct.shortDescription = ['C code for the Jacobian with respect to the end-effector coordinate frame of the ',rob.name,' arm.'];
+hStruct.calls = {['Jn = ',hStruct.funName,'(rob,q)'],...
+    ['Jn = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {['Given a full set of joint variables the function'],...
-    'computes the robot jacobian with respect to the end-effector frame. Angles have to be given in radians!'};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
+    'computes the robot jacobian with respect to the end-effector frame.'};
+hStruct.inputs = {['q:  ',int2str(rob.n),'-element vector of generalized coordinates.'],...
+    'Angles have to be given in radians!'};
 hStruct.outputs = {['Jn:  [6x',num2str(rob.n),'] Jacobian matrix']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
     'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};

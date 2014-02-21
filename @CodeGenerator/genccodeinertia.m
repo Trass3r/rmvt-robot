@@ -1,18 +1,20 @@
-%CODEGENERATOR.GENCCODEINERTIA Generate C-function for robot inertia matrix
+%CODEGENERATOR.GENCCODEFKINE Generate C-function for forward kinematics
 %
-% cGen.genccodeinertia() generates robot-specific C-functions to compute
-% the robot inertia matrix.
+% cGen.genccodefkine() generates a robot-specific C-function to compute
+% forward kinematics.
 %
 % Notes::
-% - Is called by CodeGenerator.geninertia if cGen has active flag genccode or
-%   genmex.
-% - The generated .c and .h files are generated in the directory specified
-%   by the ccodepath property of the CodeGenerator object.
+% - Is called by CodeGenerator.genfkine if cGen has active flag genccode or
+%   genmex
+% - The generated .c and .h files are wirtten to the directory specified in
+%   the ccodepath property of the CodeGenerator object.
 %
 % Author::
-%  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
+%  Joern Malzahn
+%  2012 RST, Technische Universitaet Dortmund, Germany.
+%  http://www.rst.e-technik.tu-dortmund.de
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.geninertia, CodeGenerator.genmexinertia.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.genfkine, CodeGenerator.genmexfkine.
 
 % Copyright (C) 2012-2014, by Joern Malzahn
 %
@@ -65,23 +67,25 @@ for kJoints = 1:nJoints
         error ('genmfuninertia:SymbolicsNotFound','Save symbolic expressions to disk first!')
     end
     
-    funname = [CGen.getrobfname,'_',symname];
+    funname = [CGen.rob.name,'_',symname];
     funfilename = [funname,'.c'];
     hfilename = [funname,'.h'];
+    
+    % Create the function description header
+    hStruct = createHeaderStructRow(CGen.rob,kJoints,symname); % create header
+    if ~isempty(hStruct)
+        hFString = CGen.constructheaderstringc(hStruct);
+    end
     
     % Convert symbolic expression into C-code
     [funstr hstring] = ccodefunctionstring(tmpStruct.(symname),...
         'funname',funname,...
         'vars',{Q},'output',['I_row_',num2str(kJoints)]);
     
-    % Create the function description header
-    hStruct = createHeaderStructRow(CGen.rob,kJoints,funname); % create header
-    hStruct.calls = hstring;
-    hFString = CGen.constructheaderstringc(hStruct);
-   
     %% Generate C implementation file
     fid = fopen(fullfile(srcDir,funfilename),'w+');
-
+    % Header
+    fprintf(fid,'%s\n\n',hFString);
     % Includes
     fprintf(fid,'%s\n\n',...
         ['#include "', hfilename,'"']);
@@ -92,9 +96,6 @@ for kJoints = 1:nJoints
     
     %% Generate C header file
     fid = fopen(fullfile(hdrDir,hfilename),'w+');
-    
-    % Header
-    fprintf(fid,'%s\n\n',hFString);
     
     % Include guard
     fprintf(fid,'%s\n%s\n\n',...
@@ -123,29 +124,30 @@ CGen.logmsg([datestr(now),'\tGenerating full inertia matrix C-code']);
 
 symname = 'inertia';
 
-funname = [CGen.getrobfname,'_',symname];
+funname = [CGen.rob.name,'_',symname];
 funfilename = [funname,'.c'];
 hfilename = [funname,'.h'];
 outname = 'I';
 
-% Generate function prototype
-[hstring] = ccodefunctionstring(sym(zeros(nJoints)),...
-    'funname',funname,...
-    'vars',{Q},'output',outname,'flag',1);
-
 % Create the function description header
-hStruct = createHeaderStructFull(CGen.rob,funname); % create header
-hStruct.calls = hstring;
-hFString = CGen.constructheaderstringc(hStruct);
-
+hStruct = createHeaderStructFullInertia(CGen.rob,symname); % create header
+if ~isempty(hStruct)
+    hFString = CGen.constructheaderstringc(hStruct);
+end
 
 %% Generate C implementation file
 fid = fopen(fullfile(srcDir,funfilename),'w+');
-
+% Header
+fprintf(fid,'%s\n\n',hFString);
 % Includes
 fprintf(fid,'%s\n\n',...
     ['#include "', hfilename,'"']);
 
+% Generate function prototype
+
+[hstring] = ccodefunctionstring(sym(zeros(nJoints)),...
+    'funname',funname,...
+    'vars',{Q},'output',outname,'flag',1);
 fprintf(fid,'%s{\n\n',hstring);
 
 fprintf(fid,'\t%s\n','/* allocate memory for individual rows */');
@@ -156,7 +158,7 @@ fprintf(fid,'%s\n',' '); % empty line
 
 fprintf(fid,'\t%s\n','/* call the row routines */');
 for kJoints = 1:nJoints
-    fprintf(fid,'\t%s_inertia_row_%d(row%d, input1);\n',CGen.getrobfname,kJoints,kJoints);
+    fprintf(fid,'\t%s_inertia_row_%d(row%d, input1);\n',CGen.rob.name,kJoints,kJoints);
 end
 fprintf(fid,'%s\n',' '); % empty line\n
 
@@ -175,9 +177,6 @@ fclose(fid);
 %% Generate C header file
 fid = fopen(fullfile(hdrDir,hfilename),'w+');
 
-% Header
-fprintf(fid,'%s\n\n',hFString);
-
 % Include guard
 fprintf(fid,'%s\n%s\n\n',...
     ['#ifndef ', upper([funname,'_h'])],...
@@ -187,7 +186,7 @@ fprintf(fid,'%s\n%s\n\n',...
 fprintf(fid,'%s\n\n',...
     '#include "math.h"');
 for kJoints = 1:nJoints
-    rowstring = [CGen.getrobfname,'_inertia_row_',num2str(kJoints)];
+    rowstring = [CGen.rob.name,'_inertia_row_',num2str(kJoints)];
     fprintf(fid,'%s\n',...
         ['#include "',rowstring,'.h"']);
 end
@@ -210,33 +209,47 @@ end
 function hStruct = createHeaderStructRow(rob,curJointIdx,fName)
 [~,hStruct.funName] = fileparts(fName);
 hStruct.shortDescription = ['Computation of the robot specific inertia matrix row for corresponding to joint ', num2str(curJointIdx), ' of ',num2str(rob.n),'.'];
+hStruct.calls = {['Irow = ',hStruct.funName,'(rob,q)'],...
+    ['Irow = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables this function computes the',...
-    ['inertia matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'. Angles have to be given in radians!']};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
-hStruct.outputs = {['I_row_',int2str(curJointIdx),':  [1x',int2str(rob.n),'] output row of the robot inertia matrix.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+    ['inertia matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'.']};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+    ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+    '     coordinates',...
+    'Angles have to be given in radians!'};
+hStruct.outputs = {['Irow:  [1x',int2str(rob.n),'] row of the robot inertia matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end
 
-function hStruct = createHeaderStructFull(rob,fname)
+function hStruct = createHeaderStructFullInertia(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
 hStruct.shortDescription = ['Inertia matrix for the ',rob.name,' arm.'];
+hStruct.calls = {['I = ',hStruct.funName,'(rob,q)'],...
+    ['I = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables the function computes the',...
-    'inertia Matrix of the robot. Angles have to be given in radians!'};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates.']};
-hStruct.outputs = {['I:  [',int2str(rob.n),'x',int2str(rob.n),']output inertia matrix.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+    'inertia Matrix of the robot.'};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+    ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+    '     coordinates',...
+    'Angles have to be given in radians!'};
+hStruct.outputs = {['I:  [',int2str(rob.n),'x',int2str(rob.n),'] inertia matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end

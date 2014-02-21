@@ -48,7 +48,8 @@ end
 funfilename = fullfile(CGen.robjpath,[symname,'.c']);
 Q = CGen.rob.gencoords;
 
-hStruct = createHeaderStructFkine(CGen.rob,symname); % create header
+% Description header
+hStruct = createHeaderStructFkine(CGen.rob,symname); 
 
 CGen.mexfunction(tmpStruct.(symname), 'funfilename',funfilename,'funname',[CGen.rob.name,'_',symname],'vars',{Q},'output','T','header',hStruct)
 
