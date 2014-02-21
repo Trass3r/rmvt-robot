@@ -113,10 +113,13 @@ fid = fopen(opt.funfilename,'w+');
 
 % Insert description header
 fprintf(fid,'%s\n',hFString);    
+
 % Includes
 fprintf(fid,'%s\n%s\n\n',...
     '#include "mex.h"',...
     ['#include "',[opt.funname,'.h'],'"']);
+
+
 
 % Generate the mex gateway routine
 funstr = CGen.genmexgatewaystring(f,'funname',opt.funname, 'vars',opt.vars);

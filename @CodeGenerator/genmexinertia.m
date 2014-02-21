@@ -1,19 +1,19 @@
-%CODEGENERATION.GENMEXINERTIA Generate MEX-function for robot inertia matrix
+%CODEGENERATION.GENMEXINERTIA Generate C-MEX-function for robot inertia matrix
 %
 % cGen.genmexinertia() generates robot-specific MEX-functions to compute
 % robot inertia matrix.
 %
 % Notes::
 % - Is called by CodeGenerator.geninertia if cGen has active flag genmex
-% - The inertia matrix is stored row by row to avoid memory issues.
-% - The generated M-function recombines the individual MEX-functions for each row.
+% - The MEX file uses the .c and .h files generated in the directory 
+%   specified by the ccodepath property of the CodeGenerator object.
 % - Access to generated functions is provided via subclass of SerialLink
 %   whose class definition is stored in cGen.robjpath.
 %
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.gencoriolis.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.geninertia.
 
 % Copyright (C) 2012-2014, by Joern Malzahn
 %
@@ -59,8 +59,10 @@ for kJoints = 1:nJoints
     
     funfilename = fullfile(CGen.robjpath,[symname,'.c']);
     
+    % Function description header
     hStruct = createHeaderStructRow(CGen.rob,kJoints,symname);   %generate header
     
+    % Generate and compile MEX function
     CGen.mexfunction(tmpStruct.(symname), ...
         'funfilename',funfilename,...
         'funname',[CGen.rob.name,'_',symname],...
@@ -83,37 +85,13 @@ funname = [CGen.rob.name,'_',symname];
 hStruct = createHeaderStructFullInertia(CGen.rob,symname); % create header
 hFString = CGen.constructheaderstringc(hStruct);
 
-fid = fopen(funfilename,'w+');
-
-% Insert description header
-fprintf(fid,'%s\n',hFString);
-% Includes
-fprintf(fid,'%s\n%s\n\n',...
-    '#include "mex.h"',...
-    ['#include "',funname,'.h','"']);
-
-% Generate the mex gateway routine
-funstr = CGen.genmexgatewaystring(f,'funname',funname, 'vars',{Q});
-fprintf(fid,'%s',sprintf(funstr));
-
-fclose(fid);
-
-%% Compile the MEX file
-srcDir = fullfile(CGen.ccodepath,'src');
-hdrDir = fullfile(CGen.ccodepath,'include');
-
-cfilelist = fullfile(srcDir,[funname,'.c']);
-for kJoints = 1:nJoints
-    cfilelist = [cfilelist, ' ',fullfile(srcDir,[CGen.rob.name,'_inertia_row_',num2str(kJoints),'.c'])];
-end
-
-if CGen.verbose
-    eval(['mex ',funfilename, ' ',cfilelist,' -I',hdrDir, ' -v -outdir ',CGen.robjpath]);   
-else
-    eval(['mex ',funfilename, ' ',cfilelist,' -I',hdrDir,' -outdir ',CGen.robjpath]);
-end
-
-CGen.logmsg('\t%s\n',' done!');
+% Generate and compile MEX function 
+CGen.mexfunctionrowwise(f,...
+    'funfilename',funfilename,...
+    'funname',[CGen.rob.name,'_',symname],...
+    'vars',{Q},...
+    'output','I',...
+    'header',hStruct);
 end
 
 function hStruct = createHeaderStructRow(rob,curJointIdx,fName)

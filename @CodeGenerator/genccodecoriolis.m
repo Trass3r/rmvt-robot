@@ -6,8 +6,8 @@
 % Notes::
 % - Is called by CodeGenerator.gencoriolis if cGen has active flag genccode or
 %   genmex.
-% - The .c and .h files are generated in the directory specified by the 
-%   ccodepath property of the CodeGenerator object.
+% - The generated .c and .h files are generated in the directory specified
+%   by the ccodepath property of the CodeGenerator object.
 %
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
@@ -65,23 +65,25 @@ for kJoints = 1:nJoints
         error ('genmfuncoriolis:SymbolicsNotFound','Save symbolic expressions to disk first!')
     end
     
-    funname = [CGen.getrobfname,'_',symname];
+    funname = [CGen.rob.name,'_',symname];
     funfilename = [funname,'.c'];
     hfilename = [funname,'.h'];
+    
+    % Create the function description header
+    hStruct = createHeaderStructRow(CGen.rob,kJoints,symname); % create header
+    if ~isempty(hStruct)
+        hFString = CGen.constructheaderstringc(hStruct);
+    end
     
     % Convert symbolic expression into C-code
     [funstr hstring] = ccodefunctionstring(tmpStruct.(symname),...
         'funname',funname,...
         'vars',{Q,QD},'output',['C_row_',num2str(kJoints)]);
     
-    % Create the function description header
-    hStruct = createHeaderStructRow(CGen.rob,kJoints,funname); % create header
-    hStruct.calls = hstring;
-    hFString = CGen.constructheaderstringc(hStruct);
-    
     %% Generate C implementation file
     fid = fopen(fullfile(srcDir,funfilename),'w+');
-
+    % Header
+    fprintf(fid,'%s\n\n',hFString);
     % Includes
     fprintf(fid,'%s\n\n',...
         ['#include "', hfilename,'"']);
@@ -92,9 +94,6 @@ for kJoints = 1:nJoints
     
     %% Generate C header file
     fid = fopen(fullfile(hdrDir,hfilename),'w+');
-    
-    % Header
-    fprintf(fid,'%s\n\n',hFString);
     
     % Include guard
     fprintf(fid,'%s\n%s\n\n',...
@@ -118,34 +117,35 @@ end
 CGen.logmsg('\t%s\n',' done!');
 
 
-%% Full Coriolis matrix
+%% Full coriolis matrix
 CGen.logmsg([datestr(now),'\tGenerating full coriolis matrix C-code']);
 
 symname = 'coriolis';
 
-funname = [CGen.getrobfname,'_',symname];
+funname = [CGen.rob.name,'_',symname];
 funfilename = [funname,'.c'];
 hfilename = [funname,'.h'];
 outname = 'C';
 
-% Generate function prototype
-[hstring] = ccodefunctionstring(sym(zeros(nJoints)),...
-    'funname',funname,...
-    'vars',{Q,QD},'output',outname,'flag',1);
-
 % Create the function description header
-hStruct = createHeaderStructFull(CGen.rob,funname); % create header
-hStruct.calls = hstring;
-hFString = CGen.constructheaderstringc(hStruct);
-
+hStruct = createHeaderStructFull(CGen.rob,symname); % create header
+if ~isempty(hStruct)
+    hFString = CGen.constructheaderstringc(hStruct);
+end
 
 %% Generate C implementation file
 fid = fopen(fullfile(srcDir,funfilename),'w+');
-
+% Header
+fprintf(fid,'%s\n\n',hFString);
 % Includes
 fprintf(fid,'%s\n\n',...
     ['#include "', hfilename,'"']);
 
+% Generate function prototype
+
+[hstring] = ccodefunctionstring(sym(zeros(nJoints)),...
+    'funname',funname,...
+    'vars',{Q,QD},'output',outname,'flag',1);
 fprintf(fid,'%s{\n\n',hstring);
 
 fprintf(fid,'\t%s\n','/* allocate memory for individual rows */');
@@ -156,7 +156,7 @@ fprintf(fid,'%s\n',' '); % empty line
 
 fprintf(fid,'\t%s\n','/* call the row routines */');
 for kJoints = 1:nJoints
-    fprintf(fid,'\t%s_coriolis_row_%d(row%d, input1, input2);\n',CGen.getrobfname,kJoints,kJoints);
+    fprintf(fid,'\t%s_coriolis_row_%d(row%d, input1, input2);\n',CGen.rob.name,kJoints,kJoints);
 end
 fprintf(fid,'%s\n',' '); % empty line\n
 
@@ -175,9 +175,6 @@ fclose(fid);
 %% Generate C header file
 fid = fopen(fullfile(hdrDir,hfilename),'w+');
 
-% Header
-fprintf(fid,'%s\n\n',hFString);
-
 % Include guard
 fprintf(fid,'%s\n%s\n\n',...
     ['#ifndef ', upper([funname,'_h'])],...
@@ -187,7 +184,7 @@ fprintf(fid,'%s\n%s\n\n',...
 fprintf(fid,'%s\n\n',...
     '#include "math.h"');
 for kJoints = 1:nJoints
-    rowstring = [CGen.getrobfname,'_coriolis_row_',num2str(kJoints)];
+    rowstring = [CGen.rob.name,'_coriolis_row_',num2str(kJoints)];
     fprintf(fid,'%s\n',...
         ['#include "',rowstring,'.h"']);
 end
@@ -209,36 +206,48 @@ end
 %% Definition of the header contents for each generated file
 function hStruct = createHeaderStructRow(rob,curJointIdx,fName)
 [~,hStruct.funName] = fileparts(fName);
-hStruct.shortDescription = ['Computation of the robot specific Coriolis matrix row for corresponding to joint ', num2str(curJointIdx), ' of ',num2str(rob.n),'.'];
+hStruct.shortDescription = ['Computation of the robot specific coriolis matrix row for corresponding to joint ', num2str(curJointIdx), ' of ',num2str(rob.n),'.'];
+hStruct.calls = {['Crow = ',hStruct.funName,'(rob,q)'],...
+    ['Crow = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables this function computes the',...
-    ['Coriolis matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'. Angles have to be given in radians!']};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates'],...
-                   ['input2: ',int2str(rob.n),'-element vector of generalized velocities']};
-hStruct.outputs = {['C_row_',int2str(curJointIdx),':  [1x',int2str(rob.n),'] row of the robot Coriolis matrix']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+    ['coriolis matrix row number ', num2str(curJointIdx),' of ',num2str(rob.n),' for ',rob.name,'.']};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+    ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+    '     coordinates',...
+    'Angles have to be given in radians!'};
+hStruct.outputs = {['Crow:  [1x',int2str(rob.n),'] row of the robot coriolis matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end
- 
+
 function hStruct = createHeaderStructFull(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
 hStruct.shortDescription = ['Coriolis matrix for the ',rob.name,' arm.'];
+hStruct.calls = {['C = ',hStruct.funName,'(rob,q)'],...
+    ['C = rob.',hStruct.funName,'(q)']};
 hStruct.detailedDescription = {'Given a full set of joint variables the function computes the',...
-    'Coriolis matrix of the robot. Angles have to be given in radians!'};
-hStruct.inputs = {['input1:  ',int2str(rob.n),'-element vector of generalized coordinates'],...
-                   ['input2: ',int2str(rob.n),'-element vector of generalized velocities']};
-hStruct.outputs = {['C:  [',int2str(rob.n),'x',int2str(rob.n),'] Coriolis matrix']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+    'coriolis Matrix of the robot.'};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+    ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+    '     coordinates',...
+    'Angles have to be given in radians!'};
+hStruct.outputs = {['C:  [',int2str(rob.n),'x',int2str(rob.n),'] coriolis matrix']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
-    'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
+    'Joern Malzahn',...
+    '2012 RST, Technische Universitaet Dortmund, Germany',...
+    'http://www.rst.e-technik.tu-dortmund.de'};
 hStruct.seeAlso = {'coriolis'};
 end

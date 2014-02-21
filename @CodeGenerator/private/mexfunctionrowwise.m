@@ -1,6 +1,6 @@
 %MEXFUNCTION Converts a symbolic expression into a MEX-function
 %
-% [] = cGen.mexfunction(SYMEXPR, ARGLIST) translates a symbolic expression
+% [] = CGEN.MEXFUNCTION(SYMEXPR, ARGLIST) translates a symbolic expression
 % into C-code and joins it with a MEX gateway routine. The resulting C-file
 % is ready to be compiled using the matlab built-in mex command.
 %
@@ -101,38 +101,18 @@ for iArg = 1:2:nargin-2
     end
 end
 
-%% Copyright Note
-cprNote = CGen.generatecopyrightnote;
-cprNote = regexprep(cprNote, '%', '//');
-
-%% Create compilation command
-srcDir = fullfile(CGen.ccodepath,'src');
-hdrDir = fullfile(CGen.ccodepath,'include');
-cfilelist = fullfile(srcDir,[opt.funname,'.c']);
-for kJoints = 1:CGen.rob.n
-    cfilelist = [cfilelist, ' ',fullfile(srcDir,[opt.funname,'_row_',num2str(kJoints),'.c'])];
-end
-if CGen.verbose
-    mexCompCmnd = ['mex ',opt.funfilename, ' ',cfilelist,' -I',hdrDir, ' -v -outdir ',CGen.robjpath];   
+% Generate function description header
+if ~isempty(opt.hStruct)
+    hFString = CGen.constructheaderstringc(opt.hStruct);
 else
-    mexCompCmnd = ['mex ',opt.funfilename, ' ',cfilelist,' -I',hdrDir,' -outdir ',CGen.robjpath];
+    hFString = [];
 end
 
 %% Generate C code
 fid = fopen(opt.funfilename,'w+');
 
-% Add compilation note
-fprintf(fid,'/* %s\n',[upper(opt.funname) ,' - This file contains auto generated C-code for a MATLAB MEX function.']);    
-fprintf(fid,'// %s\n',['For details on how to use the complied MEX function see the documentation provided in ',opt.funname,'.m']);    
-fprintf(fid,'// %s\n//\n',['The compiled MEX function replaces this .m-function with identical usage but substantial execution speedup.']);    
-fprintf(fid,'// %s\n//\n',['For compilation of this C-code using MATLAB please run:']);    
-fprintf(fid,'// \t\t%s\n//\n',['''',mexCompCmnd,'''']);    
-fprintf(fid,'// %s\n',['Make sure you have a C-compiler installed and your MATLAB MEX environment readily configured.']);
-fprintf(fid,'// %s\n//\n',['Type ''doc mex'' for additional help.']); 
-
-% Insert Copyright Note 
-fprintf(fid,'// %s\n','__Copyright Note__:');
-fprintf(fid,'%s */\n',cprNote);    
+% Insert description header
+fprintf(fid,'%s\n',hFString);    
 
 % Includes
 fprintf(fid,'%s\n%s\n\n',...
@@ -146,8 +126,18 @@ fprintf(fid,'%s',sprintf(funstr));
 fclose(fid);
 
 %% Compile the MEX file
-if CGen.compilemex
-    eval(mexCompCmnd)
+srcDir = fullfile(CGen.ccodepath,'src');
+hdrDir = fullfile(CGen.ccodepath,'include');
+
+cfilelist = fullfile(srcDir,[opt.funname,'.c']);
+for kJoints = 1:CGen.rob.n
+    cfilelist = [cfilelist, ' ',fullfile(srcDir,[opt.funname,'_row_',num2str(kJoints),'.c'])];
+end
+
+if CGen.verbose
+    eval(['mex ',opt.funfilename, ' ',cfilelist,' -I',hdrDir, ' -v -outdir ',CGen.robjpath]);   
+else
+    eval(['mex ',opt.funfilename, ' ',cfilelist,' -I',hdrDir,' -outdir ',CGen.robjpath]);
 end
 
 CGen.logmsg('\t%s\n',' done!');
