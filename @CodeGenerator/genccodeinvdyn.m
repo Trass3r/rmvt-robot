@@ -1,14 +1,14 @@
 %CODEGENERATOR.GENCCODEINVDYN Generate C-code for inverse dynamics
 % 
-% cGen.genccodeinvdyn() generates a robot-specific C-code to compute the
+% cGen.genccodeinvdyn() generates a robot-specific C-code to compute
 % inverse dynamics.
 %
 % Notes::
 % - Is called by CodeGenerator.geninvdyn if cGen has active flag genccode or
 %   genmex.
-% - The .c and .h files are generated in the directory specified
+% - The generated .c and .h files are generated in the directory specified
 %   by the ccodepath property of the CodeGenerator object.
-% - The resulting C-function is composed of previously generated C-functions
+% - The generated C-function is composed of previously generated C-functions
 %   for the inertia matrix, coriolis matrix, vector of gravitational load and 
 %   joint friction vector. This function recombines these components to 
 %   compute the inverse dynamics.
@@ -16,9 +16,9 @@
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.geninvdyn, CodeGenerator.genccodefdyn.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.geninvdyn.
 
-% Copyright (C) 2012-2014, by Joern Malzahn
+% Copyright (C) 2012-2013, by Joern Malzahn
 %
 % This file is part of The Robotics Toolbox for Matlab (RTB).
 %
@@ -36,6 +36,10 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
 % http://www.petercorke.com
+%
+% The code generation module emerged during the work on a project funded by
+% the German Research Foundation (DFG, BE1569/7-1). The authors gratefully 
+% acknowledge the financial support.
 
 function [  ] = genccodeinvdyn( CGen )
 
@@ -56,27 +60,34 @@ end
 symname = 'invdyn';
 outputname = 'TAU';
 
-funname = [CGen.getrobfname,'_',symname];
+funname = [CGen.rob.name,'_',symname];
 funfilename = [funname,'.c'];
 hfilename = [funname,'.h'];
 
 %%
 CGen.logmsg([datestr(now),'\tGenerating inverse dynamics C-code']);
 
-% Convert symbolic expression into C-code
+% Create the function description header
+hStruct = createHeaderStruct(CGen.rob,symname); % create header
+if ~isempty(hStruct)
+    hFString = CGen.constructheaderstringc(hStruct);
+end
+
 dummy = sym(zeros(nJoints,1));
+% Convert symbolic expression into C-code
 [funstr hstring] = ccodefunctionstring(dummy,...
     'funname',funname,...
     'vars',{Q, QD, QDD},'output',outputname,...
     'flag',1);
 
-% Create the function description header
-hStruct = createHeaderStruct(CGen.rob,funname); % create header
-hStruct.calls = hstring;
-hFString = CGen.constructheaderstringc(hStruct);
+
+
 
 %% Generate C implementation file
 fid = fopen(fullfile(srcDir,funfilename),'w+');
+
+% Function description header
+fprintf(fid,'%s\n\n',hFString);
 
 % Includes
 fprintf(fid,'%s\n\n',...
@@ -87,7 +98,7 @@ fprintf(fid,'%s{\n\n',funstr);
 
 
 % Allocate memory
-fprintf(fid,'%s\n','/* declare variables */');
+fprintf(fid,'%s\n','/* allocate memory */');
 for iJoints = 1:nJoints
 	fprintf(fid,'%s\n',['double inertia_row',num2str(iJoints),'[',num2str(nJoints),'][1];']);
 end
@@ -102,26 +113,26 @@ fprintf(fid,'%s\n',['double friction[',num2str(nJoints),'][1];']);
 
 fprintf(fid,'%s\n',' '); % empty line
 fprintf(fid,'%s\n','/* call the computational routines */');
-fprintf(fid,'%s\n',[CGen.getrobfname,'_','gravload(gravload, input1);']);
-fprintf(fid,'%s\n',[CGen.getrobfname,'_','friction(friction, input2);']);
+fprintf(fid,'%s\n',[CGen.rob.name,'_','gravload(gravload, input1);']);
+fprintf(fid,'%s\n',[CGen.rob.name,'_','friction(friction, input2);']);
 
 fprintf(fid,'%s\n','/* rowwise routines */');
 for iJoints = 1:nJoints
-    fprintf(fid,'%s\n',[CGen.getrobfname,'_','inertia_row_',num2str(iJoints),'(inertia_row',num2str(iJoints),', input1);']);
+    fprintf(fid,'%s\n',[CGen.rob.name,'_','inertia_row_',num2str(iJoints),'(inertia_row',num2str(iJoints),', input1);']);
 end
 
 for iJoints = 1:nJoints
-    fprintf(fid,'%s\n',[CGen.getrobfname,'_','coriolis_row_',num2str(iJoints),'(coriolis_row',num2str(iJoints),', input1, input2);']);
+    fprintf(fid,'%s\n',[CGen.rob.name,'_','coriolis_row_',num2str(iJoints),'(coriolis_row',num2str(iJoints),', input1, input2);']);
 end
 
 fprintf(fid,'%s\n',' '); % empty line
 fprintf(fid,'%s\n','/* fill output vector */');
 
 for iJoints = 1:nJoints
-    fprintf(fid,'%s\n',[outputname,'[0][',num2str(iJoints-1),'] = dotprod(inertia_row',num2str(iJoints),', input3, ',num2str(nJoints),') /* inertia */']);
-    fprintf(fid,'\t%s\n',[' + dotprod(coriolis_row',num2str(iJoints),', input2, ',num2str(nJoints),') /* coriolis */']);
+    fprintf(fid,'%s\n',[outputname,'[0][',num2str(iJoints-1),'] = dotprod(inertia_row',num2str(iJoints),', input3, ',num2str(nJoints),') // inertia']);
+    fprintf(fid,'\t%s\n',[' + dotprod(coriolis_row',num2str(iJoints),', input2, ',num2str(nJoints),') // coriolis']);
     fprintf(fid,'\t%s\n',[' + gravload[',num2str(iJoints-1),'][0]']);
-    fprintf(fid,'\t%s\n',[' - friction[',num2str(iJoints-1),'][0];']);
+    fprintf(fid,'\t%s\n',[' + friction[',num2str(iJoints-1),'][0];']);
 end
 fprintf(fid,'%s\n',' '); % empty line
 
@@ -143,10 +154,10 @@ fprintf(fid,'%s\n%s\n\n',...
 % Includes
 fprintf(fid,'%s\n%s\n%s\n%s\n%s\n\n',...
     '#include "dotprod.h"',...
-    ['#include "',CGen.getrobfname,'_inertia.h"'],...
-    ['#include "',CGen.getrobfname,'_coriolis.h"'],...
-    ['#include "',CGen.getrobfname,'_gravload.h"'],...
-    ['#include "',CGen.getrobfname,'_friction.h"']);
+    ['#include "',CGen.rob.name,'_inertia.h"'],...
+    ['#include "',CGen.rob.name,'_coriolis.h"'],...
+    ['#include "',CGen.rob.name,'_gravload.h"'],...
+    ['#include "',CGen.rob.name,'_friction.h"']);
 
 
 fprintf(fid,'%s\n\n',hstring);
@@ -183,8 +194,8 @@ if ~(exist(fullfile(CGen.ccodepath,'src','friction.c'),'file') == 2) || ~(exist(
     CGen.genccodefriction;
 end
 
-if ~(exist(fullfile(CGen.ccodepath,'src','dotprod.c'),'file') == 2) || ~(exist(fullfile(CGen.ccodepath,'include','dotprod.h'),'file') == 2)
-    CGen.logmsg('\t\t%s\n','Dot product C-code not found or not complete! Generating:');
+if ~(exist(fullfile(CGen.ccodepath,'src','dotprod.c'),'file') == 2) || ~(exist(fullfile(CGen.ccodepath,'include','friction.h'),'file') == 2)
+    CGen.logmsg('\t\t%s\n','Friction C-code not found or not complete! Generating:');
     CGen.gendotprodc;
 end
 
@@ -193,18 +204,25 @@ end
 %% Definition of the header contents for each generated file
 function hStruct = createHeaderStruct(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
-hStruct.shortDescription = ['C-implementation of the inverse dynamics for the ',rob.name,' arm.'];
+hStruct.shortDescription = ['C-implementation of the inverse dynamics for the',rob.name,' arm.'];
+hStruct.calls = {['tau = ',hStruct.funName,'(rob,q,qd,qdd)'],...
+    ['tau = rob.',hStruct.funName,'(q,qd,qdd)']};
 hStruct.detailedDescription = {'Given a full set of joint variables and their first and second order',...
     'temporal derivatives this function computes the joint space',...
-    'torques needed to perform the particular motion. Angles have to be given in radians!'};
-hStruct.inputs = { ['input1:  ',int2str(rob.n),'-element vector of generalized coordinates'],...
-                   ['input2:  ',int2str(rob.n),'-element vector of generalized velocities,'],...
-                   ['input3:  ',int2str(rob.n),'-element vector of generalized accelerations.']};
-hStruct.outputs = {['TAU:  [',int2str(rob.n),'x1] vector of joint forces/torques.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+    'torques needed to perform the particular motion.'};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+                   ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     coordinates',...
+                   ['qd:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     velocities', ...
+                   ['qdd:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     accelerations',...
+                   'Angles have to be given in radians!'};
+hStruct.outputs = {['tau:  [',int2str(rob.n),'x1] vector of joint forces/torques.']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
     'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};
