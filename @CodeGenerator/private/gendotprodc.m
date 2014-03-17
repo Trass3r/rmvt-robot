@@ -26,7 +26,7 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU Lesser General Public License for more details.
 %
-% You should have received a copy of the GNU Leser General Public License
+% You should have received a copy of the GNU Lesser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
 % http://www.petercorke.com
@@ -90,6 +90,7 @@ fprintf(fid,'%s\n%s\n\n',...
     ['#ifndef ', upper([funname,'_h'])],...
     ['#define ', upper([funname,'_h'])]);
 
+% Function prototype
 fprintf(fid,'%s\n\n',['double ',funname,'(const double *input1, const double *input2, int nEl);']);
 
 % Include guard

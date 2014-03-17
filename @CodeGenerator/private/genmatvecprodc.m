@@ -1,10 +1,10 @@
 %CODEGENERATOR.GENMATVECPRODC Generates a matrix-vector product C-implementation.
 %
-% cGen.gendotprodc generates a .h and a .c file in the directory
+% CGen.gendotprodc generates a .h and a .c file in the directory
 % specified by ccodepath.
 %
 % Notes::
-% - Is called by geninvdyn and genfdyn if cGen has active flag genmex or genccode.
+% - Is called by geninvdyn and genfdyn if CGen has active flag genmex or genccode.
 %
 % Authors::
 %  Joern Malzahn   (joern.malzahn@tu-dortmund.de) 
@@ -74,7 +74,7 @@ fprintf(fid,'\t%s\n','int iRow, iCol = 0;');
 fprintf(fid,'%s\n',' '); % empty line    
 fprintf(fid,'\t%s\n','for (iRow = 0; iRow < nRow; iRow++){');
 fprintf(fid,'\t\t%s\n','for (iCol = 0; iCol < nCol; iCol++){');
-fprintf(fid,'\t\t\t%s\n','outVector[iCol] += inMatrix[nRow*iRow+iCol] * inVector[iRow];');
+fprintf(fid,'\t\t\t%s\n','outVector[iRow] += inMatrix[nRow*iCol+iRow] * inVector[iCol];');
 fprintf(fid,'\t\t%s\n','}');
 fprintf(fid,'\t%s\n','}  ');
 fprintf(fid,'%s\n','}');
@@ -109,7 +109,7 @@ end
 function hStruct = createHeaderStruct(fname)
 [~,hStruct.funName] = fileparts(fname);
 hStruct.shortDescription = ['Compute the product of a matrix and a vector'];
-hStruct.calls = ['void ',hStruct.funName,'(double *outVector, const double *inMatrix, const double *inVector, int nRow, int nCol)'];
+hStruct.calls = {['void ',hStruct.funName,'(double *outVector, const double *inMatrix, const double *inVector, int nRow, int nCol)']};
 hStruct.detailedDescription = {['Given an [nRow x nCol] inMatrix and a nCol-element inVector, the function'],...
     'computes the nRow-element outVector as: outVector = inMatrix*inVector.'};
 hStruct.inputs = { ['inMatrix: [nRow x nCol] input matrix,'],...

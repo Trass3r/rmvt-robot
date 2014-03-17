@@ -1,18 +1,12 @@
 %CODEGENERATOR.GENMEXFDYN Generate C-MEX-function for forward dynamics
 %
-% cGen.genmexfdyn() generates a robot-specific MEX-function to compute
+% CGEN.GENMEXFDYN() generates a robot-specific MEX-function to compute
 % the forward dynamics.
 % 
 % Notes::
 % - Is called by CodeGenerator.genfdyn if cGen has active flag genmex
-% - The MEX file uses the .c and .h files generated in the directory 
-%   specified by the ccodepath property of the CodeGenerator object.
 % - Access to generated function is provided via subclass of SerialLink
 %   whose class definition is stored in cGen.robjpath.
-% - You will need a C compiler to use the generated MEX-functions. See the 
-%   MATLAB documentation on how to setup the compiler in MATLAB. 
-%   Nevertheless the basic C-MEX-code as such may be generated without a
-%   compiler. In this case switch the cGen flag compilemex to false.
 %
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
@@ -42,10 +36,10 @@ function [] = genmexfdyn(CGen)
 
 CGen.logmsg([datestr(now),'\tGenerating inverse dynamics MEX-function: ']);
 
-mexfunname = 'accel';
+mexfunname = 'fdyn';
 mexcfilename = fullfile(CGen.robjpath,[mexfunname,'.c']);
 
-cfunname = [CGen.getrobfname,'_',mexfunname];
+cfunname = [CGen.rob.name,'_',mexfunname];
 cfilename = [cfunname '.c'];
 hfilename = [cfunname '.h'];
 
@@ -81,16 +75,16 @@ hdrDir = fullfile(CGen.ccodepath,'include');
 
 cfilelist = fullfile(srcDir,cfilename);
 for kJoints = 1:CGen.rob.n
-    cfilelist = [cfilelist, ' ',fullfile(srcDir,[CGen.getrobfname,'_inertia_row_',num2str(kJoints),'.c'])];
+    cfilelist = [cfilelist, ' ',fullfile(srcDir,[CGen.rob.name,'_inertia_row_',num2str(kJoints),'.c'])];
 end
 for kJoints = 1:CGen.rob.n
-    cfilelist = [cfilelist, ' ',fullfile(srcDir,[CGen.getrobfname,'_coriolis_row_',num2str(kJoints),'.c'])];
+    cfilelist = [cfilelist, ' ',fullfile(srcDir,[CGen.rob.name,'_coriolis_row_',num2str(kJoints),'.c'])];
 end
 
-cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.getrobfname,'_inertia.c'])];
-cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.getrobfname,'_coriolis.c'])];
-cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.getrobfname,'_gravload.c'])];
-cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.getrobfname,'_friction.c'])];
+cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.rob.name,'_inertia.c'])];
+cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.rob.name,'_coriolis.c'])];
+cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.rob.name,'_gravload.c'])];
+cfilelist = [cfilelist, ' ', fullfile(srcDir,[CGen.rob.name,'_friction.c'])];
 cfilelist = [cfilelist, ' ', fullfile(srcDir,'matvecprod.c')];
 cfilelist = [cfilelist, ' ', fullfile(srcDir,'gaussjordan.c')];
 
@@ -104,21 +98,26 @@ CGen.logmsg('\t%s\n',' done!');
 
 end
 
-%% Definition of the header contents for each generated file
+%% Definition of the description header contents for each generated file
 function hStruct = createHeaderStruct(rob,fname)
 [~,hStruct.funName] = fileparts(fname);
-hStruct.calls = '';
-hStruct.shortDescription = ['C-implementation of the forward dynamics for the ',rob.name,' arm.'];
-hStruct.detailedDescription = {'Given a full set of joint angles and velocities',...
-    'this function computes the joint space accelerations effected by the generalized forces. Angles have to be given in radians!'};
-hStruct.inputs = { ['input1:  ',int2str(rob.n),'-element vector of generalized coordinates'],...
-    ['input2:  ',int2str(rob.n),'-element vector of generalized velocities'],...
-    ['input3:  [',int2str(rob.n),'x1] vector of generalized forces.']};
-hStruct.outputs = {['QDD:  ',int2str(rob.n),'-element output vector of generalized accelerations.']};
-hStruct.references = {'Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
-    'Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
-    'Introduction to Robotics, Mechanics and Control - Craig',...
-    'Modeling, Identification & Control of Robots - Khalil & Dombre'};
+hStruct.shortDescription = ['MEX function to compute forward dynamics for the',rob.name,' arm.'];
+hStruct.calls = {['qdd = ',hStruct.funName,'(rob,q,qd,tau)'],...
+    ['qdd = rob.',hStruct.funName,'(q,qd,tau)']};
+hStruct.detailedDescription = {'Given a full set of generalized joint values, velocities and forces',...
+    'this function computes the generalized joint accelerations.'};
+hStruct.inputs = { ['rob: robot object of ', rob.name, ' specific class'],...
+                   ['q:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     coordinates',...
+                   ['qd:  ',int2str(rob.n),'-element vector of generalized'],...
+                   '     velocities', ...
+                   ['tau:  [',int2str(rob.n),'x1] vector of joint forces/torques.'],...
+                   'Angles have to be given in radians!'};
+hStruct.outputs = {['qdd:  ',int2str(rob.n),'-element vector of generalized accelerations.']};
+hStruct.references = {'1) Robot Modeling and Control - Spong, Hutchinson, Vidyasagar',...
+    '2) Modelling and Control of Robot Manipulators - Sciavicco, Siciliano',...
+    '3) Introduction to Robotics, Mechanics and Control - Craig',...
+    '4) Modeling, Identification & Control of Robots - Khalil & Dombre'};
 hStruct.authors = {'This is an autogenerated function!',...
     'Code generator written by:',...
     'Joern Malzahn (joern.malzahn@tu-dortmund.de)'};

@@ -1,14 +1,14 @@
 %CODEGENERATOR.GENCCODEINVDYN Generate C-code for inverse dynamics
 % 
-% cGen.genccodeinvdyn() generates a robot-specific C-code to compute
+% cGen.genccodeinvdyn() generates a robot-specific C-code to compute the
 % inverse dynamics.
 %
 % Notes::
 % - Is called by CodeGenerator.geninvdyn if cGen has active flag genccode or
 %   genmex.
-% - The generated .c and .h files are generated in the directory specified
+% - The .c and .h files are generated in the directory specified
 %   by the ccodepath property of the CodeGenerator object.
-% - The generated C-function is composed of previously generated C-functions
+% - The resulting C-function is composed of previously generated C-functions
 %   for the inertia matrix, coriolis matrix, vector of gravitational load and 
 %   joint friction vector. This function recombines these components to 
 %   compute the inverse dynamics.
@@ -16,7 +16,7 @@
 % Author::
 %  Joern Malzahn, (joern.malzahn@tu-dortmund.de)
 %
-% See also CodeGenerator.CodeGenerator, CodeGenerator.geninvdyn.
+% See also CodeGenerator.CodeGenerator, CodeGenerator.geninvdyn, CodeGenerator.genccodefdyn.
 
 % Copyright (C) 2012-2013, by Joern Malzahn
 %
@@ -36,10 +36,6 @@
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 %
 % http://www.petercorke.com
-%
-% The code generation module emerged during the work on a project funded by
-% the German Research Foundation (DFG, BE1569/7-1). The authors gratefully 
-% acknowledge the financial support.
 
 function [  ] = genccodeinvdyn( CGen )
 
@@ -98,7 +94,7 @@ fprintf(fid,'%s{\n\n',funstr);
 
 
 % Allocate memory
-fprintf(fid,'%s\n','/* allocate memory */');
+fprintf(fid,'%s\n','/* declare variables */');
 for iJoints = 1:nJoints
 	fprintf(fid,'%s\n',['double inertia_row',num2str(iJoints),'[',num2str(nJoints),'][1];']);
 end
@@ -194,8 +190,8 @@ if ~(exist(fullfile(CGen.ccodepath,'src','friction.c'),'file') == 2) || ~(exist(
     CGen.genccodefriction;
 end
 
-if ~(exist(fullfile(CGen.ccodepath,'src','dotprod.c'),'file') == 2) || ~(exist(fullfile(CGen.ccodepath,'include','friction.h'),'file') == 2)
-    CGen.logmsg('\t\t%s\n','Friction C-code not found or not complete! Generating:');
+if ~(exist(fullfile(CGen.ccodepath,'src','dotprod.c'),'file') == 2) || ~(exist(fullfile(CGen.ccodepath,'include','dotprod.h'),'file') == 2)
+    CGen.logmsg('\t\t%s\n','Dot product C-code not found or not complete! Generating:');
     CGen.gendotprodc;
 end
 
