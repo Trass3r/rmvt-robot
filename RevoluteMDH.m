@@ -1,4 +1,4 @@
-%RevoluteMDH Robot manipulator Revolute link class for MDH convention
+%Revolute Robot manipulator Revolute link class for MDH convention
 %
 % A subclass of the Link class: holds all information related to a robot 
 % link such as kinematics parameters, rigid-body inertial parameters, motor
@@ -16,10 +16,9 @@
 % See also Link, Prismatic, SerialLink.
 % See also Link, PrismaticMDH, Revolute, SerialLink.
 
-
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -33,12 +32,10 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
-classdef RevoluteMDH < Link
+classdef Revolute < Link
     methods
-        function L = RevoluteMDH(varargin)
+        function L = Revolute(varargin)
             L = L@Link(varargin{:});
             
             if nargin == 0
@@ -50,7 +47,7 @@ classdef RevoluteMDH < Link
             end
             L.mdh = 1;
             if ~isempty(L.theta)
-                error('theta cannot be specified for a revolute link');
+                error('theta cannot be specified for a prismatic link');
             end
         end
         
