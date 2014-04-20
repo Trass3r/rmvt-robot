@@ -1,17 +1,11 @@
-%SerialLink.plot3d Graphical display and animation of solid model robot
+%SerialLink.plot Graphical display and animation
 %
-% R.plot3d(Q, options) displays and animates a solid model of the robot.
-% The robot is displayed at the joint angle Q (1xN), or
+% R.plot(Q, options) displays a graphical animation of a robot based on
+% the kinematic model.  A stick figure polyline joins the origins of
+% the link coordinate frames. The robot is displayed at the joint angle Q (1xN), or
 % if a matrix (MxN) it is animated as the robot moves along the M-point trajectory.
 %
 % Options::
-%
-% 'color',C         A cell array of color names, one per link.  These are
-%                   mapped to RGB using colorname().  If not given, colors
-%                   come from the axis ColorOrder property.
-% 'alpha',A         Set alpha for all links, 0 is transparant, 1 is opaque
-%                   (default 1)
-% 'path',P          Overide path to folder containing STL model files
 % 'workspace', W    Size of robot 3D workspace, W = [xmn, xmx ymn ymx zmn zmx]
 % 'floorlevel',L    Z-coordinate of floor (default -1)
 %-
@@ -22,11 +16,12 @@
 % 'movie',M         Save frames as files in the folder M
 %-
 % 'scale',S         Annotation scale factor
-% 'ortho'           Orthographic view (default)
-% 'perspective'     Perspective view
-% 'view',V          Specify view V='x', 'y', 'top' or [az el] for side elevations,
-%                   plan view, or general view by azimuth and elevation
-%                   angle. 
+% 'ortho'           Orthographic view
+% 'perspective'     Perspective view (default)
+%-
+% '[no]shading'     Enable Gouraud shading (default true)
+% 'lightpos',L      Position of the light source (default [0 0 20])
+% '[no]name'        Display the robot's name
 %-
 % '[no]wrist'       Enable display of wrist coordinate frame
 % 'xyz'             Wrist axis label is XYZ
@@ -40,62 +35,17 @@
 %-
 % '[no]jaxes'       Enable display of joint axes (default true)
 % '[no]joints'      Enable display of joints
+% 'jointcolor',C    Colorspec for joint cylinders (default [0.7 0 0])
+% 'jointdiam',D     Diameter of joint cylinder in scale units (default 5)
+%-
+% 'linkcolor',C     Colorspec of links (default 'b')
 %-
 % '[no]base'        Enable display of base shape
-%
-% Notes::
-% - Solid models of the robot links are required as STL ascii format files,
-%   with extensions .stl
-% - Suitable STL files can be found in the package ARTE: A ROBOTICS TOOLBOX
-%   FOR EDUCATION by Arturo Gil, https://arvc.umh.es/arte
-% - The root of the solid models is an installation of ARTE with an empty
-%   file called arte.m at the top level
-% - Each STL model is called 'linkN'.stl where N is the link number 0 to N
-% - The specific folder to use comes from the SerialLink.model3d property
-% - The path of the folder containing the STL files can be specified using
-%   the 'path' option
-% - The height of the floor is set in decreasing priority order by:
-%   - 'workspace' option, the fifth element of the passed vector
-%   - 'floorlevel' option
-%   - the lowest z-coordinate in the link1.stl object
-%
-% Authors::
-% - Peter Corke, based on existing code for plot()
-% - Bryan Moutrie, demo code on the Google Group for connecting ARTE and RTB
-% - Don Riley, function rndread() extracted from cad2matdemo (MATLAB
-%   File Exchange)
-%
-% See also SerialLink.plot, plotbotopt3d, SerialLink.animate, SerialLink.teach, SerialLink.fkine.
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
-
 
 function plot3d(robot, q, varargin)
     
-    
-    if robot.mdh
-        error('RTB:plot3d:badmodel', '3D models are defined for standard, not modified, DH parameters');
-    end
-    
-    clf
     opt = plot_options(robot, varargin);
+    opt
     
     %-- load the shape if need be
     
@@ -104,41 +54,33 @@ function plot3d(robot, q, varargin)
     if isempty(robot.faces)
         % no 3d model defined, let's try to load one
         
-        if isempty(opt.path)
-            % first find the path to the models
-            pth = which('arte.m');
-            if ~pth
-                error('RTB:plot3d:nomodel', 'no 3D model found, install the RTB contrib zip file');
-            end
-            
-            % find the path to this specific model
-            pth = fullfile(fileparts(pth), 'robots', robot.model3d);
-        else
-            pth = opt.path;
+        % first find the path to the models
+        pth = which('arte.m');
+        if ~pth
+            error('RTB:plot3d:nomodel', 'no 3D model found, install the RTB contrib zip file');
         end
+        
+        % find the path to this specific model
+        pth = fullfile(fileparts(pth), 'robots', robot.model3d);
         
         % now load the STL files
         robot.points = cell(1, robot.n+1);
         robot.faces = cell(1, robot.n+1);
         for i=1:nshapes
             [F,P] = rndread( fullfile(pth, sprintf('link%d.stl', i-1)) );
+            %robot.points{i} = [P'; ones(1, numrows(P))];
             robot.points{i} = P;
             robot.faces{i} = F;
         end
     end
     
     % if a base is specified set the floor height to this
-    if isempty(opt.workspace)
-        % workspace not provided, fall through the options for setting floor level
-        if ~isempty(opt.floorlevel)
-            opt.ws(5) = opt.floorlevel;
-        elseif opt.base
-            mn = min( robot.points{1} );
-            opt.ws(5) = mn(3);
-        end
+    if opt.base
+        m = min( robot.points{1} );
+        opt.workspace(5) = m(3);
+        opt.floorlevel = m(3);
     end
-    opt.floorlevel = opt.ws(5);
-
+    
 % TODO
 % should test if the plot exists, pinch the logic from plot()
 
@@ -147,10 +89,10 @@ function plot3d(robot, q, varargin)
     ish = ishold();
     if ~ishold
         % if hold is off, set the axis dimensions
-        axis(opt.ws);
+        axis(opt.workspace);
         set(gca, 'ZLimMode', 'manual');
-        axis(opt.ws);
-        hold on
+        axis(opt.workspace);
+        hold
     end
     
 
@@ -159,8 +101,19 @@ function plot3d(robot, q, varargin)
         figure(gcf);
     end
     
-    if strcmp(opt.projection, 'perspective')
+    if strcmp(opt.view, 'perspective')
         set(gca, 'Projection', 'perspective');
+    end
+    
+    if opt.look
+        switch opt.look
+            case 'top'
+                view(0, 90);
+            case 'x'
+                view(0, 0);
+            case 'y'
+                view(90, 0)
+        end
     end
     
     grid on
@@ -172,24 +125,7 @@ function plot3d(robot, q, varargin)
     end
     
     %--- configure view and lighting
-    if isstr(opt.view)
-        switch opt.view
-            case 'top'
-                view(0, 90);
-            case 'x'
-                view(0, 0);
-            case 'y'
-                view(90, 0)
-            otherwise
-                error('rtb:plot3d:badarg', 'view must be: x, y, top')
-        end
-    elseif isnumeric(opt.view) && length(opt.view) == 2
-        view(opt.view)
-    else
-        campos([2 2 1]);
-    end
-
-    daspect([1 1 1]);
+    campos([2 2 1]);
     light('Position', [0 0 opt.reach*2]);
     light('Position', [1 0.5 1]);
     
@@ -197,7 +133,7 @@ function plot3d(robot, q, varargin)
     %-- figure the colors for each shape 
     if isempty(opt.color)
         % if not given, use the axis color order
-        C = get(gca,'ColorOrder');
+    C = get(gca,'ColorOrder');
     else
         C = [];
         for c=opt.color
@@ -228,10 +164,6 @@ function plot3d(robot, q, varargin)
             'Parent', h.link(link));
         end
     end
-    
-    % enable mouse-based 3D rotation
-    rotate3d on
-    
     h.wrist = [];  % HACK, should be trplot
     h.robot = robot;
     h.link = [0 h.link];
@@ -245,7 +177,7 @@ function plot3d(robot, q, varargin)
 end
 
 function opt = plot_options(robot, optin)
-    opt.color = [];
+        opt.color = [];
     opt.path = [];  % override path
     opt.alpha = 1;
     
@@ -260,11 +192,11 @@ function opt = plot_options(robot, optin)
     opt.scale = 1;
     
     opt.workspace = [];
-    opt.floorlevel = [];
+        opt.floorlevel = [];
 
     opt.name = true;
-    opt.projection = {'ortho', 'perspective'};
-    opt.view = [];
+    opt.view = {'ortho', 'perspective'};
+    opt.look = {[], 'top', 'x', 'y'};
 
     
     % tiled floor
@@ -308,9 +240,9 @@ function opt = plot_options(robot, optin)
     if ~isempty(opt.fps)
         opt.delay = 1/opt.fps;
     end
-    % figure the size of the figure
-    
-    if isempty(opt.workspace)
+            % figure the size of the figure
+
+       if isempty(opt.workspace)
         %
         % simple heuristic to figure the maximum reach of the robot
         %
@@ -329,23 +261,24 @@ function opt = plot_options(robot, optin)
         end
         
         % now create a 3D volume based on this reach
-        opt.ws = [-reach reach -reach reach -reach reach];
+        opt.workspace = [-reach reach -reach reach -reach reach];
         
         % if a floorlevel has been given, ammend the 3D volume
         if ~isempty(opt.floorlevel)
-            opt.ws(5) = opt.floorlevel;
+            opt.workspace(5) = opt.floorlevel;
+        else
+            opt.floorlevel = -reach;
         end
     else
-        % workspace is provided
         reach = min(abs(opt.workspace));
         if opt.tiles
             % set xy limits to be integer multiple of tilesize
-            opt.ws(1:4) = opt.tilesize * round(opt.workspace(1:4)/opt.tilesize);
-            opt.ws(5:6) = opt.workspace(5:6);
+            opt.workspace(1:4) = opt.tilesize * round(opt.workspace(1:4)/opt.tilesize);
+            opt.floorlevel = opt.workspace(5);
         end
-    end
+       end
     
-    opt.reach = reach;
+       opt.reach = reach;
     
     % update the fundamental scale factor (given by the user as a multiplier) by a length derived from
     % the overall workspace dimension
@@ -402,7 +335,6 @@ end
 % POSSIBILITY OF SUCH DAMAGE.
 
 function [fout, vout, cout] = rndread(filename)
-    
     % Reads CAD STL ASCII files, which most CAD programs can export.
     % Used to create Matlab patches of CAD 3D data.
     % Returns a vertex list and face list, for Matlab patch command.
@@ -475,10 +407,10 @@ end
 % draw a tiled floor in the current axes
 function create_tiled_floor(opt)
      
-    xmin = opt.ws(1);
-    xmax = opt.ws(2);
-    ymin = opt.ws(3);
-    ymax = opt.ws(4);
+    xmin = opt.workspace(1);
+    xmax = opt.workspace(2);
+    ymin = opt.workspace(3);
+    ymax = opt.workspace(4);
     
     % create a colored tiled floor
     xt = xmin:opt.tilesize:xmax;
