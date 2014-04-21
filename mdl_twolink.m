@@ -36,31 +36,16 @@
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
 
-twolink_dh = [
-% theta d a alpha a	sigma	m	rx	ry	rz	Ixx	Iyy	Izz	Ixy	Iyz	Ixz	Jm	G
-  0     0         1     0         0     1       1       0       0       0       0       0       0       0       0        0      1
-  0     0         1     0         0     1       1       0       0       0       0       0       0       0       0        0      1
-];
 
 a1 = 1;
 a2 = 1;
 %   theta d a alpha
-clear L
-L(1) = Link([ 0     0   a1  0], 'standard');
-L(2) = Link([ 0     0   a2  0], 'standard');
-L(1).m = 1;
-L(1).r = [-0.5 0 0];
-L(1).I = zeros(3,3);
-L(1).G = 0;
-L(1).Jm = 0;
-L(1).B = 0;
-L(2).m = 1;
-L(2).r = [-0.5 0 0];
-L(2).I = zeros(3,3);
-L(2).G = 0;
-L(2).Jm = 0;
-L(2).B = 0;
-twolink = SerialLink(L, 'name', 'two link', ...
+
+twolink = SerialLink([
+    Revolute('d', 0, 'a', a1, 'alpha', 0, 'm', 1, 'r', [-0.5 0 0], 'I', [0 0 0], 'B', 0, 'G', 0, 'Jm', 0, 'standard')
+    Revolute('d', 0, 'a', a2, 'alpha', 0, 'm', 1, 'r', [-0.5 0 0], 'I', [0 0 0], 'B', 0, 'G', 0, 'Jm', 0, 'standard')
+    ], ...
+    'name', 'two link', ...
     'comment', 'from Spong, Hutchinson, Vidyasagar');
 qz = [0 0];
 qn = [pi/6, -pi/6];
