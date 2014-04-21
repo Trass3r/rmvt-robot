@@ -1,27 +1,26 @@
-%MDL_TWOLINK_MDH Create model of a 2-link mechanism using modified DH convention
+%MDL_TWOLINK_MDH Create model of a simple 2-link mechanism with modified DH convention
 %
-% MDL_TWOLINK_MDH is a script that the workspace variable tl which
-% describes the kinematic and dynamic characteristics of a simple planar
-% 2-link mechanism using modified Denavit-Hartenberg conventions.
+%      mdl_twolink_mdh
+%
+% Script creates the workspace variable tl which describes the 
+% kinematic and dynamic characteristics of a simple planar 2-link mechanism
+% using modified Denavit-Hartenberg conventions.
 %
 % Also defines the vector:
 %   qz   corresponds to the zero joint angle configuration.
 %
 % Notes::
-% - SI units of metres are used.
-% - It is a planar mechanism operating in the XY (horizontal) plane and is 
-%   therefore not affected by gravity.
+% - It is a planar mechanism operating in the XY (horizontal) plane
 %
 % References::
 %  - Based on Fig 3.8 (p71) of Craig (3rd edition).  
 %
-% See also SerialLink, mdl_onelink, mdl_twolink, mdl_planar2.
+% See also SerialLink, mdl_twolink.
 
-% MODEL: generic, planar, 2DOF, modified_DH
 
-% Copyright (C) 1993-2015, by Peter I. Corke
+% Copyright (C) 1993-2011, by Peter I. Corke
 %
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
+% This file is part of The Robotics Toolbox for Matlab (RTB).
 % 
 % RTB is free software: you can redistribute it and/or modify
 % it under the terms of the GNU Lesser General Public License as published by
@@ -35,8 +34,6 @@
 % 
 % You should have received a copy of the GNU Leser General Public License
 % along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
 
 
 a1 = 1;
