@@ -1,60 +1,27 @@
 %IKINE_SYM  Symbolic inverse kinematics
 %
-% Q = R.IKINE_SYM(K, OPTIONS) is a cell array (Cx1) of inverse kinematic
-% solutions of the SerialLink object ROBOT.  The cells of Q represent the
-% different possible configurations.  Each cell of Q is a vector (Nx1), and
-% element J is the symbolic expressions for the J'th joint angle.  The
+% Q = R.IKINE_SYM(N, OPTIONS) is a vector (Nx1) of symbolic expressions
+% for the inverse kinematic solution of the SerialLink object ROBOT.  The
 % solution is in terms of the desired end-point pose of the robot which is
-% represented by the symbolic matrix (3x4) with elements
-%      nx ox ax tx
-%      ny oy ay ty
-%      nz oz az tz
-% where the first three columns specify orientation and the last column
-% specifies translation.
+% represented by the symbolic matrix and elements
+%      nx ox ax px
+%      ny oy ay py
+%      nz oz az pz
+% Elements of Q may be cell arrays that contain multiple expressions,
+% representing different possible joint configurations.
 %
-% K <= N can have only specific values:
-%  - 2 solve for translation tx and ty
-%  - 3 solve for translation tx, ty and tz
+% N can have only specific values:
+%  - 2 solve for translation px and py
+%  - 3 solve for translation px, py and pz
 %  - 6 solve for translation and orientation
 %
 % Options::
 %
 % 'file',F    Write the solution to an m-file named F
 %
-% Example::
-%
-%         mdl_planar2
-%         sol = p2.ikine_sym(2);
-%         length(sol)
-%         ans = 
-%               2       % there are 2 solutions
-%         s1 = sol{1}  % is one solution
-%         q1 = s1(1);      % the expression for q1
-%         q2 = s1(2);      % the expression for q2
-%
 % Notes::
-% - Requires the Symbolic Toolbox for MATLAB.
-% - This code is experimental and has a lot of diagnostic prints.
-% - Based on the classical approach using Pieper's method.
-
-% Copyright (C) 1993-2015, by Peter I. Corke
-%
-% This file is part of The Robotics Toolbox for MATLAB (RTB).
-% 
-% RTB is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% 
-% RTB is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU Lesser General Public License for more details.
-% 
-% You should have received a copy of the GNU Leser General Public License
-% along with RTB.  If not, see <http://www.gnu.org/licenses/>.
-%
-% http://www.petercorke.com
+% - This code is experimental and has a lot of diagnostic prints
+% - Based on the classical approach using Pieper's method
 
 function out = ikine_sym(srobot, N, varargin)
     
@@ -75,7 +42,7 @@ function out = ikine_sym(srobot, N, varargin)
     opt = tb_optparse(opt, varargin);
     
     % make a symbolic representation of the passed robot
-    srobot = sym(srobot);
+    srobot = sym(robot);
     q = srobot.gencoords();
 
     % test N DOF has an allowable value
@@ -88,9 +55,9 @@ function out = ikine_sym(srobot, N, varargin)
     end
     
     % define symbolic elements of the homogeneous transform
-    syms nx ox ax tx
-    syms ny oy ay ty
-    syms nz oz az tz
+    syms nx ox ax px
+    syms ny oy ay py
+    syms nz oz az pz
     syms d3
     
     % inits
@@ -138,8 +105,6 @@ function out = ikine_sym(srobot, N, varargin)
             end
         end
         
-        eq = [];
-        
         if ~isnan(k)
             % create the equation to solve: LHS-RHS == 0
             eq = left(k) - right(k);
@@ -177,12 +142,6 @@ function out = ikine_sym(srobot, N, varargin)
         trigsubOld = [trigsubOld mvar('sin(q%d)', j) mvar('cos(q%d)', j)];
         trigsubNew = [trigsubNew mvar('S%d', j) mvar('C%d', j)];
         
-        if isempty(eq)
-            fprintf('cant solve this equation');
-            k
-            left(k)==right(k)
-            error('cant solve');
-        end
         % now solve the equation
         if srobot.links(j).isrevolute()
             % for revolute joint it will be a trig equation, do we know how to solve it?
@@ -250,13 +209,13 @@ function [L,R] = pieper(robot, n, which)
         which = 'left';
     end
     
-    syms nx ox ax tx real
-    syms ny oy ay ty real
-    syms nz oz az tz real
-        
-    T = [nx ox ax tx
-        ny oy ay ty
-        nx oz az tz
+    syms nx ox ax px real
+    syms ny oy ay py real
+    syms nz oz az pz real
+    
+    T = [nx ox ax px
+        ny oy ay py
+        nx oz az pz
         0  0  0  1 ];
     
     T = inv(robot.base) * T * inv(robot.tool);
