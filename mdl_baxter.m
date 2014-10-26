@@ -1,26 +1,9 @@
 %MDL_BAXTER Kinematic model of Baxter dual-arm robot
 %
-% MDL_BAXTER is a script that creates the workspace variables LEFT and
-% RIGHT which describes the kinematic characteristics of the two arms of a
-% Rethink Robotics Baxter robot using standard DH conventions.
+% Reference:
+% Kinematics Modeling and Experimental Verification of Baxter Robot
+% Z. Ju, C. Yang, H. Ma, Chinese Control Conf, 2014.
 %
-% Also define the workspace vectors:
-%   qz         zero joint angle configuration
-%   qr         vertical 'READY' configuration
-%   qd         lower arm horizontal as per data sheet
-%
-% Notes::
-% - SI units of metres are used.
-%
-% References::
-% "Kinematics Modeling and Experimental Verification of Baxter Robot"
-% Z. Ju, C. Yang, H. Ma, Chinese Control Conf, 2015.
-%
-% See also SerialLink, mdl_nao.
-
-
-% MODEL: Baxter, Rethink Robotics, 7DOF, standard_DH
-
 
 %     th  d  a  alpha
 
