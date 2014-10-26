@@ -14,6 +14,7 @@
 % See also SerialLink, mdl_twolink.
 
 
+% MODEL: generic, planar, 2DOF, standard_DH
 
 % Copyright (C) 1993-2014, by Peter I. Corke
 %
