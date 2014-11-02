@@ -1,35 +1,37 @@
-%SerialLink.PAY Joint forces due to payload
+%PAY Joint forces from payload for SerialLink objects
 %
-% TAU = R.PAY(W, J) returns the generalised joint force/torques due to a
-% payload wrench W (1x6) and where the manipulator Jacobian is J (6xN), and
-% N is the number of robot joints.
+% Calculates the joint loads due to a payload for SerialLink objects,
+% It uses the formula Q = J'w, where w is a wrench vector applied at
+% the end effector, w = [Fx Fy Fz Mxx Myy Mzz]'. The Jacobian can be
+% supplied or computed by RTB
 %
-% TAU = R.PAY(Q, W, F) as above but the Jacobian is calculated at pose Q
-% (1xN) in the frame given by F which is '0' for world frame, 'n' for
-% end-effector frame.
-%
-% Uses the formula TAU = J'W, where W is a wrench vector applied at the end
-% effector, W = [Fx Fy Fz Mx My Mz]'.
-%
-% Trajectory operation::
-%
-% In the case Q is MxN or J is 6xNxM then TAU is MxN where each row is the
-% generalised force/torque at the pose given by corresponding row of Q.
-%
-% Notes::
-% - Wrench vector and Jacobian must be from the same reference frame.
-% - Tool transforms are taken into consideration when F = 'n'.
-% - Must have a constant wrench - no trajectory support for this yet.
-%
-% Author::
-% Bryan Moutrie
-%
-% See also SerialLink.paycap, SerialLink.jacob0, SerialLink.jacobn.
-
-% Copyright (C) Bryan Moutrie, 2013-2015
+% Copyright (C) Bryan Moutrie, 2013-2014
 % Licensed under the GNU Lesser General Public License
 % see full file for full statement
 %
+% This file requires file(s) from The Robotics Toolbox for MATLAB (RTB)
+% by Peter Corke (www.petercorke.com), see file for statement
+%
+% Syntax:
+%  (1) tauP = pay(w, J)
+%  (2) tauP = robot.pay(q, w, f)
+%
+%  (1) Uses a supplied Jacobian
+%  (2) Calculates the Jacobian for joint configuration q in frame f,
+%       using either robot.jacob0(q) or robot.jacob0(q) for Jacobian
+%
+% Outputs:
+%  tauP : Generalised joint force/torques
+%
+% Inputs:
+%  robot : SerialLink object with n joints
+%  w     : Wrench vector [Fx Fy Fz Mxx Myy Mzz]' in same frame as J
+%  J     : Jacobian (supplied): 6-by-n or 6-by-n-m for trajectory
+%  q     : Joint row vector, or trajectory matrix of joint row vectors
+%  f     : '0' for world frame, 'n' for end-effector frame
+%
+% See also jacob0, jacobn, paycap, SerialLink.payload
+
 % LICENSE STATEMENT:
 %
 % This file is part of pHRIWARE.
@@ -46,32 +48,38 @@
 %
 % You should have received a copy of the GNU Lesser General Public 
 % License along with pHRIWARE.  If not, see <http://www.gnu.org/licenses/>.
+%
+% RTB LIBRARY:
+%
+% Copyright (C) 1993-2014, by Peter I. Corke
+% http://www.petercorke.com
+% Released under the GNU Lesser General Public license
 
-function tauP = pay(robot, varargin)
-    
-    if length(varargin) == 2
-        w = varargin{1};
-        J = varargin{2};
-        n = size(J,2);
-    elseif length(varargin) == 3
-        q = varargin{1};
-        w = varargin{2};
-        f = varargin{3};
-        n = robot.n;
-        J = zeros(6,n,size(q,1));
-        if f == '0'
-            for i= 1: size(q,1)
-                J(:,:,i) = robot.jacob0(q(i,:));
-            end
-        elseif f == 'n'
-            for i= 1: size(q,1)
-                J(:,:,i) = robot.jacobn(q(i,:));
-            end
+function tauP = pay(varargin)
+
+if length(varargin) == 2
+    w = varargin{1};
+    J = varargin{2};
+    n = size(J,2);
+elseif length(varargin) == 4
+    robot = varargin{1};
+    q = varargin{2};
+    w = varargin{3};
+    f = varargin{4};
+    n = robot.n;
+    J = zeros(6,n,size(q,1));
+    if f == '0'
+        for i= 1: size(q,1)
+            J(:,:,i) = robot.jacob0(q(i,:));
+        end
+    elseif f == 'n'
+        for i= 1: size(q,1)
+            J(:,:,i) = robot.jacobn(q(i,:));
         end
     end
-    
-    if ~isequal(size(w),[6 1]), error(pHRIWARE('error', 'inputSize')); end
-    tauP = -reshape(J(:,:)'*w,n,[])';
-    
+end
+
+tauP = -reshape(J(:,:)'*w,n,[])';
+
 end
 
