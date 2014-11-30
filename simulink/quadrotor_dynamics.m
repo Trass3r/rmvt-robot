@@ -5,6 +5,8 @@ function [sys,x0,str,ts] = quadrotor_dynamics(t,x,u,flag, quad)
     % version 2.0 2005 modified to be compatible with latest version of Matlab
     % version 3.0 2006 fixed rotation matrix problem
     % version 4.0 4/2/10, fixed rotor flapping rotation matrix bug, mirroring
+    % version 5.0 8/8/11, simplified and restructured
+   % version 6.0 25/10/13, fixed rotation matrix/inverse wronskian definitions, flapping cross-product bug
     
     warning off MATLAB:divideByZero
     

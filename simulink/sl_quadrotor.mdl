@@ -1,17 +1,16 @@
 Model {
   Name			  "sl_quadrotor"
-  Version		  8.0
+  Version		  8.4
   MdlSubVersion		  0
+  SavedCharacterEncoding  "ISO-8859-1"
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.23"
+    ComputedModelVersion    "1.27"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
-  SavedCharacterEncoding  "ISO-8859-1"
-  SaveDefaultBlockParams  on
   ScopeRefreshTime	  0.035000
   OverrideScopeRefreshTime on
   DisableAllScopes	  off
@@ -21,8 +20,8 @@ Model {
   MinMaxOverflowArchiveMode "Overwrite"
   FPTRunName		  "Run 1"
   MaxMDLFileLineLength	  120
-  InitFcn		  "% load parameters of the default quadrotor\ndisp('Quadrotor parameters loaded by InitFcn')\nmdl_quadcopt"
-  "er"
+  InitFcn		  "% load parameters of the default quadrotor\ndisp('Quadrotor parameters loaded by InitFcn')\nmdl_quadroto"
+  "r"
   Object {
     $PropName		    "BdWindowsInfo"
     $ObjectID		    1
@@ -32,7 +31,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [363.0, 44.0, 1013.0, 745.0]
+      Location		      [759.0, 80.0, 1013.0, 745.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -41,7 +40,7 @@ Model {
 	DockPosition		"Left"
 	Width			[50]
 	Height			[50]
-	Filter			[8]
+	Filter			[9]
       }
       Object {
 	$PropName		"ExplorerBarInfo"
@@ -56,7 +55,7 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[979.0, 571.0]
+	Extents			[979.0, 575.0]
 	ZoomFactor		[1.0]
 	Offset			[0.0, 0.0]
       }
@@ -68,10 +67,10 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "corkep"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Sat Jan 12 13:37:18 2013"
-  RTWModifiedTimeStamp	  270302600
-  ModelVersionFormat	  "1.%<AutoIncrement:23>"
-  ConfigurationManager	  "None"
+  LastModifiedDate	  "Sun Nov 30 14:14:43 2014"
+  RTWModifiedTimeStamp	  339257681
+  ModelVersionFormat	  "1.%<AutoIncrement:27>"
+  ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "user"
@@ -88,6 +87,7 @@ Model {
   SortedOrder		  off
   ExecutionContextIcon	  off
   ShowLinearizationAnnotations on
+  ShowMarkup		  on
   BlockNameDataTip	  off
   BlockParametersDataTip  off
   BlockDescriptionStringDataTip	off
@@ -96,6 +96,11 @@ Model {
   BrowserShowLibraryLinks off
   BrowserLookUnderMasks	  off
   SimulationMode	  "normal"
+  PauseTimes		  "5"
+  NumberOfSteps		  1
+  SnapshotBufferSize	  10
+  SnapshotInterval	  10
+  NumberOfLastSnapshots	  0
   LinearizationMsg	  "none"
   Profile		  off
   ParamWorkspaceSource	  "MATLABWorkspace"
@@ -128,6 +133,7 @@ Model {
   CovNameIncrementing	  off
   CovHtmlReporting	  on
   CovForceBlockReductionOff on
+  CovEnableCumulative	  on
   covSaveCumulativeToWorkspaceVar on
   CovSaveSingleToWorkspaceVar on
   CovCumulativeVarName	  "covCumulativeData"
@@ -135,6 +141,12 @@ Model {
   CovReportOnPause	  on
   CovModelRefEnable	  "Off"
   CovExternalEMLEnable	  off
+  CovSFcnEnable		  off
+  CovBoundaryAbsTol	  0.000010
+  CovBoundaryRelTol	  0.010000
+  CovUseTimeInterval	  off
+  CovStartTime		  0
+  CovStopTime		  0
   ExtModeBatchMode	  off
   ExtModeEnableFloating	  on
   ExtModeTrigType	  "manual"
@@ -164,13 +176,13 @@ Model {
     Dimension		    1
     Simulink.ConfigSet {
       $ObjectID		      7
-      Version		      "1.12.1"
+      Version		      "1.14.3"
       Array {
 	Type			"Handle"
 	Dimension		8
 	Simulink.SolverCC {
 	  $ObjectID		  8
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  StartTime		  "0.0"
 	  StopTime		  "20"
 	  AbsTol		  "auto"
@@ -205,7 +217,7 @@ Model {
 	}
 	Simulink.DataIOCC {
 	  $ObjectID		  9
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  Decimation		  "1"
 	  ExternalInput		  "[t, u]"
 	  FinalStateName	  "xFinal"
@@ -223,6 +235,7 @@ Model {
 	  SignalLogging		  on
 	  DSMLogging		  on
 	  InspectSignalLogs	  off
+	  VisualizeSimOutput	  on
 	  SaveTime		  on
 	  ReturnWorkspaceOutputs  off
 	  StateSaveName		  "xout"
@@ -237,7 +250,7 @@ Model {
 	}
 	Simulink.OptimizationCC {
 	  $ObjectID		  10
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    7
@@ -254,13 +267,16 @@ Model {
 	  BooleanDataType	  on
 	  ConditionallyExecuteInputs on
 	  InlineParams		  off
-	  UseIntDivNetSlope	  off
+	  UseDivisionForNetSlopeComputation "Off"
 	  UseFloatMulNetSlope	  off
+	  DefaultUnderspecifiedDataType	"double"
 	  UseSpecifiedMinMax	  off
 	  InlineInvariantSignals  off
 	  OptimizeBlockIOStorage  on
 	  BufferReuse		  on
 	  EnhancedBackFolding	  off
+	  CachingGlobalReferences off
+	  GlobalBufferReuse	  on
 	  StrengthReduction	  off
 	  ExpressionFolding	  on
 	  BooleansAsBitfields	  off
@@ -275,6 +291,7 @@ Model {
 	  SystemCodeInlineAuto	  off
 	  StateBitsets		  off
 	  DataBitsets		  off
+	  ActiveStateOutputEnumStorageType "Native Integer"
 	  UseTempVars		  off
 	  ZeroExternalMemoryAtStartup on
 	  ZeroInternalMemoryAtStartup on
@@ -292,7 +309,7 @@ Model {
 	}
 	Simulink.DebuggingCC {
 	  $ObjectID		  11
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  RTPrefix		  "error"
 	  ConsistencyChecking	  "none"
 	  ArrayBoundsChecking	  "none"
@@ -366,7 +383,7 @@ Model {
 	  SimStateInterfaceChecksumMismatchMsg "warning"
 	  SimStateOlderReleaseMsg "error"
 	  InitInArrayFormatMsg	  "warning"
-	  StrictBusMsg		  "Warning"
+	  StrictBusMsg		  "ErrorLevel1"
 	  BusNameAdapt		  "WarnAndRepair"
 	  NonBusSignalsTreatedAsBus "none"
 	  LoggingUnavailableSignals "error"
@@ -379,14 +396,16 @@ Model {
 	  SFUnconditionalTransitionShadowingDiag "warning"
 	  SFUndirectedBroadcastEventsDiag "warning"
 	  SFTransitionActionBeforeConditionDiag	"warning"
+	  IntegerSaturationMsg	  "warning"
 	}
 	Simulink.HardwareCC {
 	  $ObjectID		  12
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  ProdBitPerChar	  8
 	  ProdBitPerShort	  16
 	  ProdBitPerInt		  32
 	  ProdBitPerLong	  32
+	  ProdBitPerLongLong	  64
 	  ProdBitPerFloat	  32
 	  ProdBitPerDouble	  64
 	  ProdBitPerPointer	  32
@@ -396,17 +415,20 @@ Model {
 	  ProdEndianess		  "Unspecified"
 	  ProdWordSize		  32
 	  ProdShiftRightIntArith  on
+	  ProdLongLongMode	  off
 	  ProdHWDeviceType	  "32-bit Generic"
 	  TargetBitPerChar	  8
 	  TargetBitPerShort	  16
 	  TargetBitPerInt	  32
 	  TargetBitPerLong	  32
+	  TargetBitPerLongLong	  64
 	  TargetBitPerFloat	  32
 	  TargetBitPerDouble	  64
 	  TargetBitPerPointer	  32
 	  TargetLargestAtomicInteger "Char"
 	  TargetLargestAtomicFloat "None"
 	  TargetShiftRightIntArith on
+	  TargetLongLongMode	  off
 	  TargetIntDivRoundTo	  "Undefined"
 	  TargetEndianess	  "Unspecified"
 	  TargetWordSize	  32
@@ -419,7 +441,7 @@ Model {
 	}
 	Simulink.ModelReferenceCC {
 	  $ObjectID		  13
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
 	  CheckModelReferenceTargetMessage "error"
 	  EnableParallelModelReferenceBuilds off
@@ -434,7 +456,7 @@ Model {
 	}
 	Simulink.SFSimCC {
 	  $ObjectID		  14
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  SFSimEnableDebug	  on
 	  SFSimOverflowDetection  on
 	  SFSimEcho		  on
@@ -445,11 +467,12 @@ Model {
 	  SimUseLocalCustomCode	  off
 	  SimParseCustomCode	  on
 	  SimBuildMode		  "sf_incremental_build"
+	  SimGenImportedTypeDefs  off
 	}
 	Simulink.RTWCC {
 	  $BackupClass		  "Simulink.RTWCC"
 	  $ObjectID		  15
-	  Version		  "1.12.1"
+	  Version		  "1.14.3"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    6
@@ -462,11 +485,15 @@ Model {
 	    PropName		    "DisabledProps"
 	  }
 	  SystemTargetFile	  "grt.tlc"
+	  TLCOptions		  ""
 	  GenCodeOnly		  off
 	  MakeCommand		  "make_rtw"
 	  GenerateMakefile	  on
 	  PackageGeneratedCodeAndArtifacts off
+	  PackageName		  ""
 	  TemplateMakefile	  "grt_default_tmf"
+	  PostCodeGenCommand	  ""
+	  Description		  ""
 	  GenerateReport	  off
 	  SaveLog		  off
 	  RTWVerbose		  on
@@ -477,18 +504,29 @@ Model {
 	  TLCAssert		  off
 	  ProcessScriptMode	  "Default"
 	  ConfigurationMode	  "Optimized"
+	  ProcessScript		  ""
+	  ConfigurationScript	  ""
 	  ConfigAtBuild		  off
 	  RTWUseLocalCustomCode	  off
 	  RTWUseSimCustomCode	  off
+	  CustomSourceCode	  ""
+	  CustomHeaderCode	  ""
+	  CustomInclude		  ""
+	  CustomSource		  ""
+	  CustomLibrary		  ""
+	  CustomInitializer	  ""
+	  CustomTerminator	  ""
+	  Toolchain		  "Automatically locate an installed toolchain"
+	  BuildConfiguration	  "Faster Builds"
 	  IncludeHyperlinkInReport off
 	  LaunchReport		  off
 	  PortableWordSizes	  off
-	  GenerateErtSFunction	  off
 	  CreateSILPILBlock	  "None"
 	  CodeExecutionProfiling  off
 	  CodeExecutionProfileVariable "executionProfile"
 	  CodeProfilingSaveOptions "SummaryOnly"
 	  CodeProfilingInstrumentation off
+	  SILDebugging		  off
 	  TargetLang		  "C"
 	  IncludeBusHierarchyInRTWFileBlockHierarchyMap	off
 	  IncludeERTFirstTime	  off
@@ -502,14 +540,17 @@ Model {
 	  GenerateCodeMetricsReport off
 	  GenerateCodeReplacementReport	off
 	  RTWCompilerOptimization "Off"
+	  RTWCustomCompilerOptimizations ""
 	  CheckMdlBeforeBuild	  "Off"
 	  CustomRebuildMode	  "OnUpdate"
+	  DataInitializer	  ""
+	  SharedConstantsCachingThreshold 1024
 	  Array {
 	    Type		    "Handle"
 	    Dimension		    2
 	    Simulink.CodeAppCC {
 	      $ObjectID		      16
-	      Version		      "1.12.1"
+	      Version		      "1.14.3"
 	      Array {
 		Type			"Cell"
 		Dimension		19
@@ -536,6 +577,7 @@ Model {
 	      }
 	      ForceParamTrailComments off
 	      GenerateComments	      on
+	      CommentStyle	      "Auto"
 	      IgnoreCustomStorageClasses on
 	      IgnoreTestpoints	      off
 	      IncHierarchyInIds	      off
@@ -551,13 +593,14 @@ Model {
 	      IncDataTypeInIds	      off
 	      MangleLength	      1
 	      CustomSymbolStrGlobalVar "$R$N$M"
-	      CustomSymbolStrType     "$N$R$M"
+	      CustomSymbolStrType     "$N$R$M_T"
 	      CustomSymbolStrField    "$N$M"
 	      CustomSymbolStrFcn      "$R$N$M$F"
 	      CustomSymbolStrFcnArg   "rt$I$N$M"
 	      CustomSymbolStrBlkIO    "rtb_$N$M"
 	      CustomSymbolStrTmpVar   "$N$M"
 	      CustomSymbolStrMacro    "$R$N$M"
+	      CustomSymbolStrUtil     "$N$C"
 	      DefineNamingRule	      "None"
 	      ParamNamingRule	      "None"
 	      SignalNamingRule	      "None"
@@ -566,7 +609,7 @@ Model {
 	      SimulinkBlockComments   on
 	      MATLABSourceComments    off
 	      EnableCustomComments    off
-	      InternalIdentifier      "Classic"
+	      InternalIdentifier      "Shortened"
 	      InlinedPrmAccess	      "Literals"
 	      ReqsInCode	      off
 	      UseSimReservedNames     off
@@ -574,32 +617,33 @@ Model {
 	    Simulink.GRTTargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
 	      $ObjectID		      17
-	      Version		      "1.12.1"
+	      Version		      "1.14.3"
 	      Array {
 		Type			"Cell"
-		Dimension		16
+		Dimension		15
 		Cell			"GeneratePreprocessorConditionals"
 		Cell			"IncludeMdlTerminateFcn"
-		Cell			"CombineOutputUpdateFcns"
+		Cell			"SupportNonInlinedSFcns"
 		Cell			"SuppressErrorStatus"
 		Cell			"ERTCustomFileBanners"
 		Cell			"GenerateSampleERTMain"
 		Cell			"GenerateTestInterfaces"
 		Cell			"ModelStepFunctionPrototypeControlCompliant"
 		Cell			"CPPClassGenCompliant"
-		Cell			"MultiInstanceERTCode"
+		Cell			"SupportContinuousTime"
 		Cell			"PurelyIntegerCode"
 		Cell			"PortableWordSizes"
 		Cell			"SupportComplex"
 		Cell			"SupportAbsoluteTime"
-		Cell			"SupportContinuousTime"
-		Cell			"SupportNonInlinedSFcns"
+		Cell			"GenerateAllocFcn"
 		PropName		"DisabledProps"
 	      }
 	      TargetFcnLib	      "ansi_tfl_table_tmw.mat"
 	      TargetLibSuffix	      ""
 	      TargetPreCompLibLocation ""
-	      CodeReplacementLibrary  "ANSI_C"
+	      GenFloatMathFcnCalls    "NOT IN USE"
+	      TargetLangStandard      "C89/C90 (ANSI)"
+	      CodeReplacementLibrary  "None"
 	      UtilityFuncGeneration   "Auto"
 	      ERTMultiwordTypeDef     "System defined"
 	      ERTMultiwordLength      256
@@ -607,7 +651,6 @@ Model {
 	      GenerateFullHeader      on
 	      GenerateSampleERTMain   off
 	      GenerateTestInterfaces  off
-	      IsPILTarget	      off
 	      ModelReferenceCompliant on
 	      ParMdlRefBuildCompliant on
 	      CompOptLevelCompliant   on
@@ -624,6 +667,7 @@ Model {
 	      LogVarNameModifier      "rt_"
 	      MatFileLogging	      on
 	      MultiInstanceERTCode    off
+	      CodeInterfacePackaging  "Nonreusable function"
 	      SupportNonFinite	      on
 	      SupportComplex	      on
 	      PurelyIntegerCode	      off
@@ -632,10 +676,14 @@ Model {
 	      SupportVariableSizeSignals off
 	      EnableShiftOperators    on
 	      ParenthesesLevel	      "Nominal"
+	      CastingMode	      "Nominal"
+	      MATLABClassNameForMDSCustomization "Simulink.SoftwareTarget.GRTCustomization"
 	      ModelStepFunctionPrototypeControlCompliant off
-	      CPPClassGenCompliant    off
+	      CPPClassGenCompliant    on
 	      AutosarCompliant	      off
 	      GRTInterface	      on
+	      GenerateAllocFcn	      off
+	      GenerateSharedConstants on
 	      UseMalloc		      off
 	      ExtMode		      off
 	      ExtModeStaticAlloc      off
@@ -649,6 +697,7 @@ Model {
 	      RTWCAPIStates	      off
 	      RTWCAPIRootIO	      off
 	      GenerateASAP2	      off
+	      MultiInstanceErrorCode  "Error"
 	    }
 	    PropName		    "Components"
 	  }
@@ -854,15 +903,16 @@ Model {
       VariableName	      "simulink_output"
       MaxDataPoints	      "1000"
       Decimation	      "1"
-      SampleTime	      "0"
       SaveFormat	      "Array"
+      Save2DSignal	      "Inherit from input (this choice will be removed - see release notes)"
       FixptAsFi		      off
       NumInputs		      "1"
+      SampleTime	      "0"
     }
   }
   System {
     Name		    "sl_quadrotor"
-    Location		    [363, 44, 1376, 789]
+    Location		    [759, 80, 1772, 825]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -876,7 +926,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "105"
+    SIDHighWatermark	    "108"
     Block {
       BlockType		      BusSelector
       Name		      "Bus\nSelector1"
@@ -1008,13 +1058,14 @@ Model {
       BlockType		      Reference
       Name		      "Control Mixer"
       SID		      "93"
-      Ports		      [4, 5]
-      Position		      [700, 45, 760, 355]
+      Ports		      [4, 2]
+      Position		      [700, 47, 760, 358]
       ZOrder		      -8
       DropShadow	      on
-      LibraryVersion	      "1.55"
-      SourceBlock	      "roblocks/Dynamics/Control Mixer"
+      LibraryVersion	      "1.67"
+      SourceBlock	      "roblocks/Dynamics/Control Mixer 4"
       SourceType	      ""
+      ContentPreviewEnabled   off
     }
     Block {
       BlockType		      Gain
@@ -1097,7 +1148,6 @@ Model {
       Port {
 	PortNumber		1
 	Name			"xy*"
-	PropagatedSignals	", "
 	RTWStorageClass		"Auto"
 	DataLoggingNameMode	"SignalName"
       }
@@ -1173,13 +1223,14 @@ Model {
       BlockType		      Reference
       Name		      "Quadrotor"
       SID		      "85"
-      Ports		      [4, 1]
+      Ports		      [1, 1]
       Position		      [810, 47, 870, 293]
       ZOrder		      -21
       DropShadow	      on
-      LibraryVersion	      "1.55"
+      LibraryVersion	      "1.67"
       SourceBlock	      "roblocks/Dynamics/Quadrotor"
       SourceType	      ""
+      ContentPreviewEnabled   off
       quad		      "quad"
     }
     Block {
@@ -1190,9 +1241,10 @@ Model {
       Position		      [650, 422, 680, 468]
       ZOrder		      -22
       DropShadow	      on
-      LibraryVersion	      "1.55"
+      LibraryVersion	      "1.67"
       SourceBlock	      "roblocks/Robot Graphics/Quadrotor plot"
       SourceType	      ""
+      ContentPreviewEnabled   off
       x			      "0"
     }
     Block {
@@ -1236,6 +1288,7 @@ Model {
       YMax		      "0.045"
       DataFormat	      "StructureWithTime"
       SampleTime	      "0"
+      ScrollMode	      off
     }
     Block {
       BlockType		      Sum
@@ -1446,9 +1499,10 @@ Model {
       Ports		      [0, 1]
       Position		      [25, 280, 55, 310]
       ZOrder		      -39
-      LibraryVersion	      "1.281"
+      LibraryVersion	      "1.354"
       SourceBlock	      "simulink/Sources/Ramp"
       SourceType	      "Ramp"
+      ContentPreviewEnabled   off
       slope		      "0.2"
       start		      "2"
       X0		      "0"
@@ -1464,18 +1518,7 @@ Model {
       SampleTime	      "0"
     }
     Line {
-      SrcBlock		      "Control Mixer"
-      SrcPort		      1
-      DstBlock		      "Quadrotor"
-      DstPort		      1
-    }
-    Line {
-      SrcBlock		      "Control Mixer"
-      SrcPort		      4
-      DstBlock		      "Quadrotor"
-      DstPort		      4
-    }
-    Line {
+      ZOrder		      3
       SrcBlock		      "w0"
       SrcPort		      1
       Points		      [10, 0]
@@ -1483,51 +1526,65 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      4
       SrcBlock		      "Sum15"
       SrcPort		      1
       DstBlock		      "P_z"
       DstPort		      1
     }
     Line {
+      ZOrder		      5
       SrcBlock		      "P_z"
       SrcPort		      1
       DstBlock		      "Sum4"
       DstPort		      2
     }
     Line {
+      ZOrder		      6
       SrcBlock		      "Quadrotor"
       SrcPort		      1
       Points		      [55, 0; 0, 365; -130, 0]
       Branch {
+	ZOrder			7
 	Points			[-180, 0]
 	Branch {
+	  ZOrder		  8
 	  Points		  [-530, 0; 0, -60]
 	  Branch {
+	    ZOrder		    9
 	    DstBlock		    "Bus\nSelector6"
 	    DstPort		    1
 	  }
 	  Branch {
+	    ZOrder		    10
 	    Points		    [0, -130]
 	    Branch {
+	      ZOrder		      11
 	      Points		      [0, -120]
 	      Branch {
+		ZOrder			12
 		DstBlock		"Bus\nSelector4"
 		DstPort			1
 	      }
 	      Branch {
+		ZOrder			13
 		Points			[0, -50]
 		Branch {
+		  ZOrder		  14
 		  DstBlock		  "Bus\nSelector3"
 		  DstPort		  1
 		}
 		Branch {
+		  ZOrder		  15
 		  Points		  [0, -35]
 		  Branch {
+		    ZOrder		    16
 		    Points		    [0, -50]
 		    DstBlock		    "Bus\nSelector1"
 		    DstPort		    1
 		  }
 		  Branch {
+		    ZOrder		    17
 		    DstBlock		    "Bus\nSelector2"
 		    DstPort		    1
 		  }
@@ -1535,30 +1592,35 @@ Model {
 	      }
 	    }
 	    Branch {
+	      ZOrder		      18
 	      DstBlock		      "Bus\nSelector5"
 	      DstPort		      1
 	    }
 	  }
 	}
 	Branch {
+	  ZOrder		  19
 	  Points		  [0, -90]
 	  DstBlock		  "Quadrotor plot"
 	  DstPort		  1
 	}
       }
       Branch {
+	ZOrder			20
 	Points			[0, -95]
 	DstBlock		"Mux"
 	DstPort			2
       }
     }
     Line {
+      ZOrder		      21
       SrcBlock		      "x*"
       SrcPort		      1
       DstBlock		      "Mux1"
       DstPort		      1
     }
     Line {
+      ZOrder		      22
       SrcBlock		      "y*"
       SrcPort		      1
       Points		      [5, 0; 0, -30]
@@ -1567,6 +1629,7 @@ Model {
     }
     Line {
       Name		      "xy"
+      ZOrder		      23
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector1"
       SrcPort		      1
@@ -1575,6 +1638,7 @@ Model {
     }
     Line {
       Name		      "xy*"
+      ZOrder		      24
       Labels		      [0, 0]
       SrcBlock		      "Mux1"
       SrcPort		      1
@@ -1584,6 +1648,7 @@ Model {
     }
     Line {
       Name		      "xy rates"
+      ZOrder		      25
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector2"
       SrcPort		      1
@@ -1591,6 +1656,7 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      26
       SrcBlock		      "D_xy"
       SrcPort		      1
       Points		      [135, 0]
@@ -1599,6 +1665,7 @@ Model {
     }
     Line {
       Name		      "pitch/roll\ndmd"
+      ZOrder		      27
       Labels		      [0, 0]
       SrcBlock		      "P_xy"
       SrcPort		      1
@@ -1607,6 +1674,7 @@ Model {
     }
     Line {
       Name		      "pitch/roll"
+      ZOrder		      28
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector3"
       SrcPort		      1
@@ -1616,6 +1684,7 @@ Model {
     }
     Line {
       Name		      "pitch/roll rates"
+      ZOrder		      29
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector4"
       SrcPort		      1
@@ -1624,6 +1693,7 @@ Model {
     }
     Line {
       Name		      "pitch/roll\nerror"
+      ZOrder		      30
       Labels		      [0, 0]
       SrcBlock		      "Sum19"
       SrcPort		      1
@@ -1631,18 +1701,21 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      31
       SrcBlock		      "Sum16"
       SrcPort		      1
       DstBlock		      "P_pr"
       DstPort		      1
     }
     Line {
+      ZOrder		      32
       SrcBlock		      "P_pr"
       SrcPort		      1
       DstBlock		      "Demux"
       DstPort		      1
     }
     Line {
+      ZOrder		      33
       SrcBlock		      "P_yaw"
       SrcPort		      1
       Points		      [270, 0; 0, -85]
@@ -1651,21 +1724,26 @@ Model {
     }
     Line {
       Name		      "<yaw>"
+      ZOrder		      34
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector5"
       SrcPort		      1
       Points		      [10, 0]
       Branch {
+	ZOrder			35
 	DstBlock		"RZ^T"
 	DstPort			1
       }
       Branch {
+	ZOrder			36
 	Points			[15, 0]
 	Branch {
+	  ZOrder		  37
 	  DstBlock		  "Sum1"
 	  DstPort		  2
 	}
 	Branch {
+	  ZOrder		  38
 	  Points		  [0, 70]
 	  DstBlock		  "Scope"
 	  DstPort		  1
@@ -1673,6 +1751,7 @@ Model {
       }
     }
     Line {
+      ZOrder		      39
       SrcBlock		      "Sum2"
       SrcPort		      1
       DstBlock		      "P_yaw"
@@ -1680,6 +1759,7 @@ Model {
     }
     Line {
       Name		      "<Z>"
+      ZOrder		      40
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector6"
       SrcPort		      1
@@ -1687,6 +1767,7 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      41
       SrcBlock		      "z*"
       SrcPort		      1
       Points		      [170, 0]
@@ -1695,6 +1776,7 @@ Model {
     }
     Line {
       Name		      "<dyaw>"
+      ZOrder		      42
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector5"
       SrcPort		      2
@@ -1702,6 +1784,7 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      43
       SrcBlock		      "Sum3"
       SrcPort		      1
       DstBlock		      "Sum15"
@@ -1709,6 +1792,7 @@ Model {
     }
     Line {
       Name		      "<dz>"
+      ZOrder		      44
       Labels		      [0, 0]
       SrcBlock		      "Bus\nSelector6"
       SrcPort		      2
@@ -1716,6 +1800,7 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      45
       SrcBlock		      "D_z"
       SrcPort		      1
       Points		      [30, 0]
@@ -1723,6 +1808,7 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      46
       SrcBlock		      "D_pr"
       SrcPort		      1
       Points		      [20, 0]
@@ -1730,6 +1816,7 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      47
       SrcBlock		      "Demux"
       SrcPort		      2
       Points		      [0, 75]
@@ -1737,6 +1824,7 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      48
       SrcBlock		      "D_yaw"
       SrcPort		      1
       Points		      [20, 0]
@@ -1744,15 +1832,18 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      49
       SrcBlock		      "Sum4"
       SrcPort		      1
       Points		      [75, 0]
       Branch {
+	ZOrder			50
 	Points			[0, 25]
 	DstBlock		"To Workspace1"
 	DstPort			1
       }
       Branch {
+	ZOrder			51
 	Labels			[3, 0]
 	Points			[65, 0; 0, -110; 90, 0; 0, -30]
 	DstBlock		"Control Mixer"
@@ -1760,38 +1851,44 @@ Model {
       }
     }
     Line {
+      ZOrder		      52
       SrcBlock		      "Sum1"
       SrcPort		      1
       DstBlock		      "Sum2"
       DstPort		      1
     }
     Line {
+      ZOrder		      53
       SrcBlock		      "Mux"
       SrcPort		      1
       DstBlock		      "To Workspace"
       DstPort		      1
     }
     Line {
+      ZOrder		      54
       SrcBlock		      "Clock"
       SrcPort		      1
       DstBlock		      "Mux"
       DstPort		      1
     }
     Line {
-      Labels		      [2, 0]
+      ZOrder		      64
+      Labels		      [2, 1]
       SrcBlock		      "Control Mixer"
-      SrcPort		      5
-      Points		      [20, 0; 0, 140]
+      SrcPort		      2
+      Points		      [15, 0; 0, 180]
       DstBlock		      "Mux"
       DstPort		      3
     }
     Line {
+      ZOrder		      56
       SrcBlock		      "Sum18"
       SrcPort		      1
       DstBlock		      "P_xy"
       DstPort		      1
     }
     Line {
+      ZOrder		      57
       SrcBlock		      "yaw*"
       SrcPort		      1
       Points		      [170, 0]
@@ -1799,6 +1896,7 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      58
       SrcBlock		      "Product"
       SrcPort		      1
       DstBlock		      "Sum18"
@@ -1806,6 +1904,7 @@ Model {
     }
     Line {
       Name		      "xy error"
+      ZOrder		      59
       Labels		      [0, 0]
       SrcBlock		      "Sum17"
       SrcPort		      1
@@ -1813,6 +1912,7 @@ Model {
       DstPort		      2
     }
     Line {
+      ZOrder		      60
       SrcBlock		      "RZ^T"
       SrcPort		      1
       Points		      [25, 0; 0, -185]
@@ -1820,6 +1920,7 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      61
       SrcBlock		      "Demux"
       SrcPort		      1
       Points		      [5, 0; 0, 20]
@@ -1827,84 +1928,128 @@ Model {
       DstPort		      1
     }
     Line {
+      ZOrder		      66
       SrcBlock		      "Control Mixer"
-      SrcPort		      3
+      SrcPort		      1
+      Points		      [20, 0; 0, 45]
       DstBlock		      "Quadrotor"
-      DstPort		      3
-    }
-    Line {
-      SrcBlock		      "Control Mixer"
-      SrcPort		      2
-      DstBlock		      "Quadrotor"
-      DstPort		      2
+      DstPort		      1
     }
     Annotation {
       SID		      "94"
       Name		      " "
-      Position		      [470, 40]
+      Position		      [470, 40, 474, 52]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
+      ZOrder		      -1
     }
     Annotation {
       SID		      "95"
       Name		      "state vector"
-      Position		      [446, 523]
+      Position		      [446, 523, 499, 535]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
+      ZOrder		      -2
     }
     Annotation {
       SID		      "96"
       Name		      "gravity feedforward"
-      Position		      [442, 475]
+      Position		      [442, 475, 528, 487]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
+      ZOrder		      -3
     }
     Annotation {
       SID		      "97"
       Name		      "attitude rate\nloop"
-      Position		      [582, 135]
+      Position		      [582, 135, 636, 157]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -4
     }
     Annotation {
       SID		      "98"
       Name		      "attitude\nloop"
-      Position		      [504, 135]
+      Position		      [504, 135, 538, 157]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -5
     }
     Annotation {
       SID		      "99"
       Name		      "position rate\nloop"
-      Position		      [367, 130]
+      Position		      [367, 130, 423, 152]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -6
     }
     Annotation {
       SID		      "100"
       Name		      "position\nloop"
-      Position		      [242, 50]
+      Position		      [242, 50, 278, 72]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -7
     }
     Annotation {
       SID		      "101"
       Name		      "yaw rate\nloop"
-      Position		      [287, 365]
+      Position		      [287, 365, 326, 387]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -8
     }
     Annotation {
       SID		      "102"
       Name		      "yaw angle\nloop"
-      Position		      [242, 300]
+      Position		      [242, 300, 288, 322]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -9
     }
     Annotation {
       SID		      "103"
       Name		      "height rate\nloop"
-      Position		      [292, 470]
+      Position		      [292, 470, 341, 492]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -10
     }
     Annotation {
       SID		      "104"
       Name		      "height \nloop"
-      Position		      [242, 430]
+      Position		      [242, 430, 273, 452]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
       HorizontalAlignment     "left"
+      ZOrder		      -11
     }
     Annotation {
       SID		      "105"
       Name		      "state"
-      Position		      [938, 140]
+      Position		      [938, 140, 961, 152]
+      InternalMargins	      [0, 0, 0, 0]
+      FixedHeight	      off
+      FixedWidth	      off
+      ZOrder		      -12
     }
   }
 }
